@@ -37,6 +37,11 @@
                 display: contents;
             }
 
+            div.page {
+                /* Overridden by JS... */
+                background-image: url('page.png');
+            }
+
             div.page:first-child {
                 -webkit-print-color-adjust: exact;
                 grid-column: 1;
@@ -108,6 +113,13 @@
 
         @media screen {
 
+            input:focus,
+            button:focus,
+            select:focus {
+                outline: 0; /* meh */
+                box-shadow: 0 0 0 2px #0099f8;
+            }
+
             body {
                 height: 100vh;
                 overflow: hidden;
@@ -135,6 +147,7 @@
             }
 
             div.page {
+                /* Overridden by JS... */
                 background-image: url('page.png');
             }
 
@@ -332,6 +345,20 @@
                 width: 1rem;
             }
 
+            section select.custom,
+            section select.custom:focus {
+                border-radius: 0.25rem 0.25rem 0 0;
+            }
+
+            section div.custom {
+                padding: 0.25rem 0.5rem;
+                border-bottom: 1px solid #111;
+                border-left: 1px solid #111;
+                border-right: 1px solid #111;
+                border-radius: 0 0 0.25rem 0.25rem;
+                margin-top: -0.5rem;
+            }
+
             ul {
                 padding: 0 0 0 1.5rem;
             }
@@ -349,14 +376,38 @@
                 border-radius: 0.25rem;
                 box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
             }
+
+            .hide {
+                display: none;
+            }
         }
     </style>
     <script>
+        /**
+         * Utility to take image data and update template
+         */
+        function updateTemplate() {
+            const templateEle = document.getElementById('template');
+            const customTemplateEle = document.getElementById('customTemplate');
+            const template = templateEle.value;
+            if (template === 'custom') {
+                // Usage Custom Image
+            } else {
+                // Use Template Path
+            }
+        }
         /**
          * Utility to visibly show page numbers. Personally find it easier
          * to keep track of which page is being printed.
          */
         function updateTotalPages() {
+            // Calculate Template
+            const templateEle = document.getElementById('template');
+            const customTemplateEle = document.getElementById('customTemplate');
+            const template = templateEle.value;
+            customTemplateEle.classList.toggle('hide', template !== 'custom');
+            templateEle.classList.toggle('custom', template === 'custom');
+            // Generate Page Select
             const pageSelect = document.getElementById('pageSelect');
             const enabledEle = document.getElementById('enablePageNumbers');
             const isEnabled = enabledEle.checked;
@@ -426,18 +477,18 @@
                 pageEles.push(pEle);
                 // Updage Image
                 const pages = [...document.querySelectorAll('div.page')];
+                
             });
             pageSelect.firstChild.click();
         }
         // Setup
         window.addEventListener('load', () => {
-            const pages = [...document.querySelectorAll('div.page')];
-            pages.forEach(page => {
-                
-            });
             // Wire up button, input, etc events
             document.getElementById('print').addEventListener('click', () => {
                 window.print();
+            });
+            document.getElementById('template').addEventListener('change', () => {
+                updateTotalPages();
             });
             document.getElementById('enablePageNumbers').addEventListener('change', () => {
                 updateTotalPages();
@@ -465,14 +516,17 @@
             <button id="print">Print</button>
         </div>
         <div>
-            <label>Template</label>
-            <select>
+            <label for="template">Template</label>
+            <select id="template">
                 <option value="custom">Custom</option>
-                <option value="covers/">Cover - Front - </option>
-                <option value="back">Cover - Back</option>
+                <option value="covers/cover-st-louis.png">Cover - St Louis</option>
+                <option value="details/detail-basic.png">Detail - Basic</option>
                 <option value="inner-fourth-dots">Inner - 1/4 Inch Dots</option>
                 <option value="inner-fourth-lines">Inner - 1/4 Inch Line Rule</option>
             </select>
+        </div>
+        <div id="customTemplate" class="custom">
+            <input type="file" id="upload"/>
         </div>
         <div>
             <label>
@@ -521,7 +575,7 @@
             <h3>Page Names</h3>
             <ul>
                 <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+ paper recommended.</li>
-                <li><strong>Detail</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock.</li>
+                <li><strong>Detail (Cover Back)</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock. If this is not the case then print the inner page on the back of the cover page.</li>
                 <li><strong>Inner</strong> - This paper stock can vary depending on the usage. 65lb is common. Too many pages can cause a notebook to be difficult to close or staple.</li>
             </ul>
         </div>
