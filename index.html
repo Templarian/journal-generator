@@ -247,7 +247,7 @@
                 cursor: help;
                 text-decoration: underline;
                 text-decoration-style: wavy;
-                text-decoration-color: #168bea;
+                text-decoration-color: #0099f8;
             }
 
             section h1 {
@@ -314,10 +314,31 @@
                 background: #EEE;
             }
             section .pageSelect button.selected {
-                border-color: #168bea;
+                border-color: #0099f8;
+                border-width: 2px;
             }
             section .pageSelect button.selected:hover {
                 background: #FFF;
+            }
+            section .pageSelect button:nth-child(even) {
+                border-top-right-radius: 0.5rem;
+            }
+            section .pageSelect button:nth-child(even)::after {
+                content: ' ';
+                position: absolute;
+                border-radius: 0 0.25rem 0 0.25rem;
+                top: 0;
+                right: 0;
+                border-bottom: 1px solid #666;
+                border-left: 1px solid #666;
+                width: 0.5rem;
+                height: 0.5rem;
+                box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.10);
+            }
+
+            section .pageSelect button.selected:nth-child(even)::after {
+                border-bottom: 2px solid #0099f8;
+                border-left: 2px solid #0099f8;
             }
 
             section .pageSelect span.page-start {
@@ -343,6 +364,10 @@
                 background: #EEE;
                 padding: 0.25rem;
                 width: 1rem;
+            }
+            section .pageSelect .selected span.page-number {
+                background: rgba(0, 153, 248, 0.2);
+                color: #333;
             }
 
             section select.custom,
@@ -375,6 +400,8 @@
                 right: 1rem;
                 border-radius: 0.25rem;
                 box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
+                /* disabled for now as I don't use it */
+                display: none;
             }
 
             .hide {
@@ -430,15 +457,20 @@
             } else {
                 pages.push({ name: 'Page 1 Details Back', number: 1, start: null, end: null });
             }
+            // Need to stop coding at 1am... but it works so don't touch it?
             for (let i = 1; i <= totalPages; i++) {
-                pages.push({
-                    name: `Page ${i + 1} Back`,
-                    number: i + 1,
+                const front = {
                     start: isEnabled ? (i * 2) - 1 + (includeCover ? 1 : 0) : null,
                     end: isEnabled ? total - ((i - 1) * 2) - (includeCover ? 1 : 0) : null
-                });
+                }
                 pages.push({
                     name: `Page ${i + 1} Front`,
+                    number: i + 1,
+                    start: i % 2 ? front.end : front.start,
+                    end: i % 2 ? front.start : front.end
+                });
+                pages.push({
+                    name: `Page ${i + 1} Back`,
                     number: i + 1,
                     start: isEnabled ? i * 2 + (includeCover ? 1 : 0) : null,
                     end: isEnabled ? total - ((i - 1) * 2) - 1 - (includeCover ? 1 : 0) : null
@@ -471,7 +503,10 @@
                     document.getElementById('print').textContent = `Print '${page.name}'`;
                     pageEles.forEach(pEle => pEle.classList.remove('selected'));
                     pEle.classList.add('selected');
-                    // Update print instructions
+                    const startNumberEles = [...document.querySelectorAll('.left > span')];
+                    startNumberEles.forEach(ele => ele.textContent = page.start);
+                    const endNumberEles = [...document.querySelectorAll('.right > span')];
+                    endNumberEles.forEach(ele => ele.textContent = page.end);
                 });
                 pageSelect.appendChild(pEle);
                 pageEles.push(pEle);
@@ -539,7 +574,7 @@
             </label>
         </div>
         <div>
-            <label>Total Pages</label>
+            <label for="totalPages">Total Pages</label>
             <select id="totalPages">
                 <option value="1">1 Inner Page (4 Numbered Pages)</option>
                 <option value="2">2 Inner Pages (8 Numbered Pages)</option>
@@ -572,7 +607,7 @@
             <p>Since there are no page numbers each inner sheet will have a standard front and back. Print an info page on the cover back or any template.</p>
             <h4>With Page Numbers</h4>
             <p>Use the page selection tool to correctly mark the pages then print them.</p>
-            <h3>Page Names</h3>
+            <h3>Page</h3>
             <ul>
                 <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+ paper recommended.</li>
                 <li><strong>Detail (Cover Back)</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock. If this is not the case then print the inner page on the back of the cover page.</li>
