@@ -419,6 +419,7 @@
             const template = templateEle.value;
             if (template === 'custom') {
                 // Usage Custom Image
+
             } else {
                 // Use Template Path
             }
@@ -524,6 +525,10 @@
             });
             document.getElementById('template').addEventListener('change', () => {
                 updateTotalPages();
+                updateTemplate();
+            });
+            document.getElementById('upload').addEventListener('change', () => {
+                updateTemplate();
             });
             document.getElementById('enablePageNumbers').addEventListener('change', () => {
                 updateTotalPages();
