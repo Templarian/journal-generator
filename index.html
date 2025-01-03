@@ -411,9 +411,29 @@
     </style>
     <script>
         /**
+         * Rarely refresh the page, so this makes it snappy
+         * as you can swap between templates instantly
+         */
+        const cacheTemplate = new Map();
+        /**
          * Utility to take image data and update template
          */
         function updateTemplate() {
+            // Updates
+            const width = 2478;
+            const height = 1650;
+            const widthInner = 2148;
+            const heightInner = 1548;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(
+                    cacheTemplate.get('page.png'),
+                    0, 0, width, height,
+                    0, 0, width, height
+                );
+            // Elements
             const templateEle = document.getElementById('template');
             const customTemplateEle = document.getElementById('customTemplate');
             const template = templateEle.value;
@@ -422,6 +442,16 @@
 
             } else {
                 // Use Template Path
+                ctx.drawImage(
+                    cacheTemplate.get(template),
+                    0, 0, widthInner, heightInner,
+                    55 * 3, 27 * 3, widthInner, heightInner
+                );
+                const pages = [...document.querySelectorAll('div.page')];
+                pages.forEach(page => {
+                    page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
+                });
+                
             }
         }
         /**
@@ -511,9 +541,6 @@
                 });
                 pageSelect.appendChild(pEle);
                 pageEles.push(pEle);
-                // Updage Image
-                const pages = [...document.querySelectorAll('div.page')];
-                
             });
             pageSelect.firstChild.click();
         }
@@ -539,6 +566,27 @@
             document.getElementById('totalPages').addEventListener('change', () => {
                 updateTotalPages();
             });
+            // Cache all images
+            const promises = [];
+            const templateEle = document.getElementById('template');
+            const options = [...templateEle.querySelectorAll('option')];
+            const list = ['page.png', ...(options.filter(o => o.value !== 'custom').map(o => o.value))];
+            list.forEach((value) => {
+                const img = new Image();
+                promises.push(new Promise(resolve => {
+                    img.addEventListener('load', () => {
+                        cacheTemplate.set(value, img);
+                        resolve(img);
+                    }); 
+                }));
+                console.log(`Caching '${value}'...`);
+                img.src = value;
+            });
+            Promise.all(promises).then((imgs) => {
+                console.log('Cached all image templates.');
+                // Enable dropdown
+                templateEle.disabled = false;
+            });
             // Init Defaults
             updateTotalPages();
         });
@@ -557,12 +605,12 @@
         </div>
         <div>
             <label for="template">Template</label>
-            <select id="template">
+            <select id="template" disabled>
                 <option value="custom">Custom</option>
                 <option value="covers/cover-st-louis.png">Cover - St Louis</option>
-                <option value="details/detail-basic.png">Detail - Basic</option>
-                <option value="inner-fourth-dots">Inner - 1/4 Inch Dots</option>
-                <option value="inner-fourth-lines">Inner - 1/4 Inch Line Rule</option>
+                <option value="details/details-basic.png">Detail - Basic</option>
+                <option value="inner/inner-dot.png">Inner - 1/4 Inch Dots</option>
+                <option value="inner/inner-line.png">Inner - 1/4 Inch Line Rule</option>
             </select>
         </div>
         <div id="customTemplate" class="custom">
