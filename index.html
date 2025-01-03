@@ -58,12 +58,6 @@
                 user-select: none;
             }
 
-            .page-back .number,
-            .page-front .number,
-            .page-front-jp .number {
-                display: none;
-            }
-
             div>span.right {
                 position: absolute;
                 left: 50%;
@@ -140,6 +134,10 @@
                 box-shadow: 0 0 1rem rgba(0, 0, 0, 0.25);
             }
 
+            div.page {
+                background-image: url('page.png');
+            }
+
             div.page:first-child {
                 grid-column: 1;
                 grid-row: 1;
@@ -162,12 +160,6 @@
             label {
                 display: block;
                 margin-bottom: 0.25rem;
-            }
-
-            .page-back .number,
-            .page-front .number,
-            .page-front-jp .number {
-                display: none;
             }
 
             div>span.right {
@@ -380,12 +372,12 @@
             // Total Pages
             const total = (totalPages * 4) + (includeCover ? 2 : 0);
             const pages = [
-                { name: 'Cover Front', number: 1, start: null, end: null }
+                { name: 'Page 1 Cover Front', number: 1, start: null, end: null }
             ];
             if (includeCover) {
-                pages.push({ name: 'Page 1 Cover Back', number: 1, start: 1, end: total });
+                pages.push({ name: 'Page 1 Details Back', number: 1, start: 1, end: total });
             } else {
-                pages.push({ name: 'Page 1 Cover Back', number: 1, start: null, end: null });
+                pages.push({ name: 'Page 1 Details Back', number: 1, start: null, end: null });
             }
             for (let i = 1; i <= totalPages; i++) {
                 pages.push({
@@ -476,7 +468,7 @@
             <label>Template</label>
             <select>
                 <option value="custom">Custom</option>
-                <option value="front">Cover - Front</option>
+                <option value="covers/">Cover - Front - </option>
                 <option value="back">Cover - Back</option>
                 <option value="inner-fourth-dots">Inner - 1/4 Inch Dots</option>
                 <option value="inner-fourth-lines">Inner - 1/4 Inch Line Rule</option>
@@ -526,14 +518,20 @@
             <p>Since there are no page numbers each inner sheet will have a standard front and back. Print an info page on the cover back or any template.</p>
             <h4>With Page Numbers</h4>
             <p>Use the page selection tool to correctly mark the pages then print them.</p>
+            <h3>Page Names</h3>
+            <ul>
+                <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+ paper recommended.</li>
+                <li><strong>Detail</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock.</li>
+                <li><strong>Inner</strong> - This paper stock can vary depending on the usage. 65lb is common. Too many pages can cause a notebook to be difficult to close or staple.</li>
+            </ul>
         </div>
     </section>
     <div class="body">
-        <div class="page page-grid" data-list="grid,front,front-jp,back">
+        <div class="page">
             <span class="number left"><span>1</span></span>
             <span class="number right"><span>2</span></span>
         </div>
-        <div class="page page-grid" data-list="grid,front,front-jp,back">
+        <div class="page">
             <span class="number left"><span>1</span></span>
             <span class="number right"><span>2</span></span>
         </div>
