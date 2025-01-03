@@ -436,10 +436,35 @@
             // Elements
             const templateEle = document.getElementById('template');
             const customTemplateEle = document.getElementById('customTemplate');
+            const uploadEle = document.getElementById('upload');
             const template = templateEle.value;
             if (template === 'custom') {
                 // Usage Custom Image
-
+                const file = uploadEle.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (img.width !== widthInner || img.height !== heightInner) {
+                            alert(`Should really only use ${widthInner}x${heightInner} images.`);
+                        }
+                        ctx.drawImage(
+                            img,
+                            0, 0, widthInner, heightInner,
+                            55 * 3, 27 * 3, widthInner, heightInner
+                        );
+                        const pages = [...document.querySelectorAll('div.page')];
+                        pages.forEach(page => {
+                            page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
+                        });
+                    };
+                    img.src = e.target.result;
+                };
+                try {
+                    reader.readAsDataURL(file);
+                } catch (e) {
+                    console.error('error file not sure');
+                }
             } else {
                 // Use Template Path
                 ctx.drawImage(
@@ -451,7 +476,6 @@
                 pages.forEach(page => {
                     page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
                 });
-                
             }
         }
         /**
