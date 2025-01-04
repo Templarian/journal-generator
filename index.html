@@ -300,6 +300,7 @@
             section .pageSelect button {
                 display: flex;
                 flex: 1;
+                flex-grow: 0;
                 min-width: 2.5rem;
                 height: 3.25rem;
                 padding: 0;
@@ -514,15 +515,11 @@
             }
             // Need to stop coding at 1am... but it works so don't touch it?
             for (let i = 1; i <= totalPages; i++) {
-                const front = {
-                    start: isEnabled ? (i * 2) - 1 + (includeCover ? 1 : 0) : null,
-                    end: isEnabled ? total - ((i - 1) * 2) - (includeCover ? 1 : 0) : null
-                }
                 pages.push({
                     name: `Page ${i + 1} Front`,
                     number: i + 1,
-                    start: i % 2 ? front.end : front.start,
-                    end: i % 2 ? front.start : front.end
+                    start: isEnabled ? total - ((i - 1) * 2) - (includeCover ? 1 : 0) : null,
+                    end: isEnabled ? (i * 2) - 1 + (includeCover ? 1 : 0) : null
                 });
                 pages.push({
                     name: `Page ${i + 1} Back`,
@@ -631,7 +628,8 @@
             <label for="template">Template</label>
             <select id="template" disabled>
                 <option value="custom">Custom</option>
-                <option value="covers/cover-st-louis.png">Cover - St Louis</option>
+                <option value="covers/cover-chicago.png">Cover - Chicago</option>
+                <option value="covers/cover-st-louis.png">Cover - St. Louis</option>
                 <option value="details/details-basic.png">Detail - Basic</option>
                 <option value="inner/inner-dot.png">Inner - 1/4 Inch Dots</option>
                 <option value="inner/inner-line.png">Inner - 1/4 Inch Line Rule</option>
