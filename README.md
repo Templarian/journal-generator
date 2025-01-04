@@ -10,4 +10,4 @@ Steps to use the app are in the left section of the app.
 
 ## Source
 
-This was hacked together a while back and is one of those it meets my needs type projects, so it might not support everything. I really only make changes as required for my own personal journal printing, but would be interested to hear if you use this or find it useful. Contact me on Mastodon.
+This was hacked together a while back and is one of those it meets my needs type projects, so it might not support everything. Would be interested to hear if you use this or find it useful. Contact me on Mastodon.
