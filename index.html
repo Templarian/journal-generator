@@ -665,6 +665,54 @@
         }
     </style>
     <script>
+        let dbCache = null;
+        // Open a DB, these images are large ~6mb+ for
+        // - Cover
+        // - Detail
+        // - Inner (right now this caches a single, but may be more later)
+        const dbPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open("CachePages", 1);
+            request.onerror = (event) => {
+                console.error("indexedDB failed to init");
+                reject();
+            };
+            request.onsuccess = (event) => {
+                resolve(event.target.result);
+            };
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (event.oldVersion === 0) {
+                    const objectStore = db.createObjectStore("items", { keyPath: "key" });
+                    objectStore.transaction.oncomplete = () => {
+                        resolve(db);
+                    };
+                }
+            };
+        });
+        async function setItem(key, value) {
+            const itemsObjectStore = dbCache
+                .transaction(["items"], "readwrite")
+                .objectStore("items");
+            const request = itemsObjectStore.put({ key, value });
+            return new Promise((resolve, reject) => {
+                request.onsuccess = (event) => {
+                    resolve(event.target.result);
+                };
+                request.onerror = reject;
+            });
+        }
+        async function getItem(key) {
+            const itemsObjectStore = dbCache
+                .transaction(["items"], "readwrite")
+                .objectStore("items");
+            const request = itemsObjectStore.get(key);
+            return new Promise((resolve, reject) => {
+                request.onsuccess = (event) => {
+                    resolve(request.result ? request.result.value : null);
+                };
+                request.onerror = reject;
+            });
+        }
         // Keep track of selected page
         let currentIndex = 0;
         /**
@@ -675,7 +723,7 @@
         /**
          * Utility to take image data and update template
          */
-        function updateTemplate(pageNumber) {
+        async function updateTemplate(pageNumber) {
             // Updates
             const width = 2478;
             const height = 1650;
@@ -723,6 +771,14 @@
                         pages.forEach(page => {
                             page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
                         });
+                        // Cache to localStorage
+                        if (pageNumber === 0) {
+                            setItem('coverCache', canvas.toDataURL("image/png"));
+                        } else if (pageNumber === 1) {
+                            setItem('detailCache', canvas.toDataURL("image/png"));
+                        } else {
+                            setItem('innerCache', canvas.toDataURL("image/png"));
+                        }
                     };
                     img.src = e.target.result;
                 };
@@ -730,11 +786,19 @@
                     if (file) {
                         reader.readAsDataURL(file);
                     } else {
-                        console.log('No file uploaded to render');
+                        console.log('No file uploaded to render, will check cache');
+                        let cachePage = null;
+                        if (pageNumber === 0) {
+                            cachePage = await getItem('coverCache');
+                        } else if (pageNumber === 1) {
+                            cachePage = await getItem('detailCache');
+                        } else {
+                            cachePage = await getItem('innerCache');
+                        }
                         // Render blank
                         const pages = [...document.querySelectorAll('div.page')];
                         pages.forEach(page => {
-                            page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
+                            page.style.backgroundImage = `url('${cachePage ?? canvas.toDataURL("image/png")}')`;
                         });
                     }
                 } catch (e) {
@@ -948,6 +1012,7 @@
                 document.getElementById('body').style.zoom = e.target.value;
             });
             document.getElementById('typeCover').addEventListener('click', (e) => {
+                document.getElementById('upload').value = '';
                 const pages = document.getElementById('pageSelect');
                 pages.children[0].click();
                 currentIndex = 0;
@@ -956,6 +1021,7 @@
                 document.getElementById('typeInner').classList.remove('selected');
             });
             document.getElementById('typeDetail').addEventListener('click', (e) => {
+                document.getElementById('upload').value = '';
                 const pages = document.getElementById('pageSelect');
                 pages.children[1].click();
                 currentIndex = 1;
@@ -964,6 +1030,7 @@
                 document.getElementById('typeInner').classList.remove('selected');
             });
             document.getElementById('typeInner').addEventListener('click', (e) => {
+                document.getElementById('upload').value = '';
                 if (currentIndex < 2 ) {
                     const pages = document.getElementById('pageSelect');
                     pages.children[2].click();
@@ -973,8 +1040,11 @@
                 document.getElementById('typeDetail').classList.remove('selected');
                 document.getElementById('typeInner').classList.add('selected');
             });
+            document.getElementById('clearCache').addEventListener('click', (e) => {
+                localStorage.clear();
+            });
             // Cache all images
-            const promises = [];
+            const promises = [dbPromise];
             const templateEle = document.getElementById('template');
             const list = ['page.png', ...(templates.map(o => o.value))];
             list.forEach((value) => {
@@ -989,6 +1059,9 @@
                 img.src = value;
             });
             Promise.all(promises).then((imgs) => {
+                // DB
+                dbCache = imgs.shift();
+                // Images are all Cached
                 console.log('Cached all image templates.');
                 // Enable dropdown
                 templateEle.disabled = false;
@@ -1219,6 +1292,10 @@
             </ul>
             <h2>Source Code</h2>
             <p><a href="https://github.com/Templarian/journal-generator">https://github.com/Templarian/journal-generator</a></p>
+            <hr/>
+            <h3>Clear Cache</h3>
+            <p>Something acting broken...</p>
+            <button id="clearCache">Clear Cache</button>
         </div>
     </section>
     <div class="body" id="body">
