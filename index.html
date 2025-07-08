@@ -744,7 +744,29 @@
             const customTemplateEle = document.getElementById('customTemplate');
             const uploadEle = document.getElementById('upload');
             const template = templateEle.value || 'custom';
-            const offset = pageNumber - 1;
+            const offset = Math.floor(pageNumber / 2) === 0 ? 0 : Math.floor(pageNumber / 2);
+            // Draw pages
+            function draw(img) {
+                if (img) {
+                    // Left Page
+                    ctx.drawImage(
+                        img,
+                        offset, 0, halfWidthInner - offset, heightInner,
+                        (55 * 3) + offset, 27 * 3, halfWidthInner - offset, heightInner
+                    );
+                    // Right Page
+                    ctx.drawImage(
+                        img,
+                        halfWidthInner + offset, 0, halfWidthInner - offset, heightInner,
+                        (55 * 3) + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
+                    );
+                }
+                const pages = [...document.querySelectorAll('div.page')];
+                pages.forEach(page => {
+                    page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
+                });
+            }
+            // Draw
             if (template === 'custom') {
                 // Usage Custom Image
                 const file = uploadEle.files[0];
@@ -755,29 +777,24 @@
                         if (img.width !== widthInner || img.height !== heightInner) {
                             alert(`Should really only use ${widthInner}x${heightInner} images.`);
                         }
-                        // Left Page
-                        ctx.drawImage(
+                        draw(img);
+                        // Create cache
+                        const canvas2 = document.createElement('canvas');
+                        const ctx2 = canvas2.getContext('2d');
+                        canvas2.width = widthInner;
+                        canvas2.height = heightInner;
+                        ctx2.drawImage(
                             img,
-                            0, 0, halfWidthInner - offset, heightInner,
-                            (55 * 3) + offset, 27 * 3, halfWidthInner - offset, heightInner
+                            0, 0, widthInner, heightInner,
+                            0, 0, widthInner, heightInner
                         );
-                        // Right Page
-                        ctx.drawImage(
-                            img,
-                            halfWidthInner - offset, 0, halfWidthInner - offset, heightInner,
-                            55 * 3 + halfWidthInner - offset, 27 * 3, halfWidthInner - offset, heightInner
-                        );
-                        const pages = [...document.querySelectorAll('div.page')];
-                        pages.forEach(page => {
-                            page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
-                        });
                         // Cache to localStorage
                         if (pageNumber === 0) {
-                            setItem('coverCache', canvas.toDataURL("image/png"));
+                            setItem('coverCache', canvas2.toDataURL("image/png"));
                         } else if (pageNumber === 1) {
-                            setItem('detailCache', canvas.toDataURL("image/png"));
+                            setItem('detailCache', canvas2.toDataURL("image/png"));
                         } else {
-                            setItem('innerCache', canvas.toDataURL("image/png"));
+                            setItem('innerCache', canvas2.toDataURL("image/png"));
                         }
                     };
                     img.src = e.target.result;
@@ -795,33 +812,23 @@
                         } else {
                             cachePage = await getItem('innerCache');
                         }
-                        // Render blank
-                        const pages = [...document.querySelectorAll('div.page')];
-                        pages.forEach(page => {
-                            page.style.backgroundImage = `url('${cachePage ?? canvas.toDataURL("image/png")}')`;
-                        });
+                        if (cachePage === null) {
+                            console.info('custom selected, no file or cache');
+                            draw();
+                        } else {
+                            const img2 = document.createElement('img');
+                            img2.onload = () => {
+                                draw(img2);
+                            };
+                            img2.src = cachePage;
+                        }
                     }
                 } catch (e) {
-                    console.error('error file not sure');
+                    console.error('corrupted cache or something');
                 }
             } else {
                 // Use Template Path
-                // Left Page
-                ctx.drawImage(
-                    cacheTemplate.get(template),
-                    0, 0, halfWidthInner - offset, heightInner,
-                    (55 * 3) + offset, 27 * 3, halfWidthInner - offset, heightInner
-                );
-                // Right Page
-                ctx.drawImage(
-                    cacheTemplate.get(template),
-                    halfWidthInner + offset, 0, halfWidthInner - offset, heightInner,
-                    55 * 3 + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
-                );
-                const pages = [...document.querySelectorAll('div.page')];
-                pages.forEach(page => {
-                    page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
-                });
+                draw(cacheTemplate.get(template));
             }
             // Store selected template in localStorage
             if (pageNumber === 0) {
