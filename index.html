@@ -1048,6 +1048,20 @@
                 document.getElementById('typeDetail').classList.remove('selected');
                 document.getElementById('typeInner').classList.add('selected');
             });
+            document.getElementById('offset').addEventListener('change', (e) => {
+                const { value } = e.target;
+                const pages = [...document.querySelectorAll('div.page')];
+                pages.forEach(page => {
+                    page.style.left = `${value}mm`;
+                });
+                localStorage.setItem('offset', value);
+            });
+            const currentOffset = localStorage.getItem('offset') ?? '0';
+            document.getElementById('offset').value = currentOffset;
+            const pages = [...document.querySelectorAll('div.page')];
+            pages.forEach(page => {
+                page.style.left = `${currentOffset}mm`;
+            });
             document.getElementById('clearCache').addEventListener('click', (e) => {
                 localStorage.clear();
                 indexedDB.deleteDatabase("CachePages");
@@ -1282,6 +1296,39 @@
                 <option value="12">12 Inner Pages (48 Numbered Pages)</option>
             </select>
             <div id="pageSelect" class="pageSelect"></div>
+            <fieldset style="margin-block-start: 1rem;">
+                <legend style="cursor: default;">Printer Tweaks</legend>
+                <div style="display: flex; gap: 1rem">
+                    <label for="offset">Offset</label>
+                    <select id="offset">
+                        <option value="-1.0">-1.0mm</option>
+                        <option value="-0.9">-0.9mm</option>
+                        <option value="-0.8">-0.8mm</option>
+                        <option value="-0.7">-0.7mm</option>
+                        <option value="-0.6">-0.6mm</option>
+                        <option value="-0.5">-0.5mm</option>
+                        <option value="-0.4">-0.4mm</option>
+                        <option value="-0.3">-0.3mm</option>
+                        <option value="-0.2">-0.2mm</option>
+                        <option value="-0.1">-0.1mm</option>
+                        <option value="0" selected>0mm</option>
+                        <option value="0.1">+0.1mm</option>
+                        <option value="0.2">+0.2mm</option>
+                        <option value="0.3">+0.3mm</option>
+                        <option value="0.7">+0.7mm</option>
+                        <option value="0.4">+0.4mm</option>
+                        <option value="0.5">+0.5mm</option>
+                        <option value="0.6">+0.6mm</option>
+                        <option value="0.8">+0.8mm</option>
+                        <option value="0.9">+0.9mm</option>
+                        <option value="1.0">+1.0mm</option>
+                    </select>
+                </div>
+                <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
+                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
+                    Hold your print up to the light. If the front is offset to the right use a <code>-</code> value. Reprint to verify.
+                </div>
+            </fieldset>
         </div>
         <div>
             <h2>Documentation</h2>
