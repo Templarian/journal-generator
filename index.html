@@ -744,7 +744,10 @@
             const customTemplateEle = document.getElementById('customTemplate');
             const uploadEle = document.getElementById('upload');
             const template = templateEle.value || 'custom';
-            const offset = Math.floor(pageNumber / 2) === 0 ? 0 : Math.floor(pageNumber / 2);
+            const innerOffset = parseInt(document.getElementById('innerOffset').value, 10);
+            const offset = Math.floor(pageNumber / 2) === 0
+                ? 0
+                : Math.floor(pageNumber / 2) * innerOffset;
             // Draw pages
             function draw(img) {
                 if (img) {
@@ -969,7 +972,7 @@
                 if(pageIndex === 0) {
                     return template.type === templateType.cover;
                 } else if (pageIndex === 1) {
-                    return template.type === templateType.detail;
+                    return template.type === templateType.detail || template.type === templateType.inner;
                 }
                 return template.type === templateType.inner;
             }).forEach((template) => {
@@ -1063,6 +1066,7 @@
                 document.getElementById('typeDetail').classList.remove('selected');
                 document.getElementById('typeInner').classList.add('selected');
             });
+            // Offset
             document.getElementById('offset').addEventListener('change', (e) => {
                 const { value } = e.target;
                 const pages = [...document.querySelectorAll('div.page')];
@@ -1077,6 +1081,15 @@
             pages.forEach(page => {
                 page.style.left = `${currentOffset}mm`;
             });
+            // Inner Offset
+            document.getElementById('innerOffset').addEventListener('change', (e) => {
+                const { value } = e.target;
+                updateTemplate(currentIndex);
+                localStorage.setItem('innerOffset', value);
+            });
+            const currentInnerOffset = localStorage.getItem('innerOffset') ?? '1';
+            document.getElementById('innerOffset').value = currentInnerOffset;
+            // Clear Cache
             document.getElementById('clearCache').addEventListener('click', (e) => {
                 localStorage.clear();
                 indexedDB.deleteDatabase("CachePages");
@@ -1223,7 +1236,7 @@
             }
         ];
         const templateCovers = templates.filter(x => x.type === templateType.cover).map(x => x.value);
-        const templateDetails = templates.filter(x => x.type === templateType.detail).map(x => x.value);
+        const templateDetails = templates.filter(x => x.type === templateType.detail || x.type === templateType.inner).map(x => x.value);
         const templateInners = templates.filter(x => x.type === templateType.inner).map(x => x.value);
     </script>
 </head>
@@ -1341,11 +1354,11 @@
                 </div>
                 <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
                     <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                    Hold your print up to the light. If the front is offset to the right use a <code>-</code> value. Reprint to verify.
+                    Hold your print up to the light. If the front is offset to the right use a negative value. Reprint to verify.
                 </div>
                 <div style="display: flex; gap: 1rem; padding-top: 0.75rem;margin-top:0.75rem;border-top: 2px solid #999;">
-                    <label for="offset" style="white-space: pre;">Inset Offset</label>
-                    <select id="offset">
+                    <label for="innerOffset" style="white-space: pre;">Inner Offset</label>
+                    <select id="innerOffset">
                         <option value="1" selected>1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -1355,7 +1368,7 @@
                 </div>
                 <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
                     <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                    Nesting pages causes gradual offset due to paper thickness. Ensure printed pages are nested in order.
+                    Nesting pages causes a gradual offset due to the paper thickness. Ensure inner pages are nested in order.
                 </div>
             </fieldset>
         </div>
