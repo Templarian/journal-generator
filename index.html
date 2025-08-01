@@ -866,6 +866,8 @@
             }
             const totalPagesEle = document.getElementById('totalPages');
             const totalPages = parseInt(totalPagesEle.value, 10);
+            // Cache
+            localStorage.setItem('totalPages', `${totalPages}`);
             // Include Cover
             const includeCoverEle = document.getElementById('includeCover');
             const includeCover = isEnabled ? includeCoverEle.checked : false;
@@ -1097,6 +1099,10 @@
             });
             const currentInnerOffset = localStorage.getItem('innerOffset') ?? '2';
             document.getElementById('innerOffset').value = currentInnerOffset;
+            // Update Total Pages
+            const totalPagesEle = document.getElementById('totalPages');
+            const cacheTotalPages = localStorage.getItem('totalPages') ?? '6';
+            totalPagesEle.value = cacheTotalPages;
             // Clear Cache
             document.getElementById('clearCache').addEventListener('click', (e) => {
                 localStorage.clear();
