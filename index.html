@@ -581,7 +581,7 @@
             }
 
             .hide {
-                display: none;
+                display: none !important;
             }
 
             div>span.arrow {
@@ -640,6 +640,24 @@
             div>span.config > span {
                 color: #999;
                 padding-right: 1rem;
+            }
+
+            section .fontPreview {
+                padding: 0.5rem 0.75rem;
+                position: relative;
+                background: #f1f1f1;
+                border-radius: 0 0 0.25rem 0.25rem;
+                font-size: 1.5rem;
+                border: 1px solid #DDD;
+                letter-spacing: 0.5rem;
+            }
+            section .fontPreview::before {
+                content: 'Preview';
+                position: absolute;
+                bottom: 0.125rem;
+                right: 0.25rem;
+                font-size: 0.75rem;
+                letter-spacing: 0;
             }
         }
     </style>
@@ -746,14 +764,14 @@
                     ctx.font = "14mm Rubik";
                     if (customGridType === 'inch') {
                         ctx.textAlign = 'right';
-                        ctx.fillText(page.start, 263, height - 72);
+                        page.start && ctx.fillText(page.start, 263, height - 72);
                         ctx.textAlign = 'left';
-                        ctx.fillText(page.end, width - 263, height - 72);
+                        page.end && ctx.fillText(page.end, width - 263, height - 72);
                     } else {
                         ctx.textAlign = 'left';
-                        ctx.fillText(page.start, 254, height - 96);
+                        page.start && ctx.fillText(page.start, 254, height - 96);
                         ctx.textAlign = 'right';
-                        ctx.fillText(page.end, width - 254, height - 96);
+                        page.end && ctx.fillText(page.end, width - 254, height - 96);
                     }
                     // Test placement with: ██
                 }
@@ -1410,18 +1428,21 @@
             </select>
         </div>
         <div>
-            <label>
-                <input type="checkbox" id="enablePageNumbers" checked />
-                Enable Page Numbers
-            </label>
+            <div style="display: flex;gap:0.5rem;align-items: center">
+                <label style="white-space: pre;"><input type="checkbox" id="enablePageNumbers" checked /> Page Numbers</label>
+                <select id="font">
+                    <option value="Gill Sans" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;">Gill Sans</option>
+                    <option value="Rubik Light" style="font-family: 'Rubik';font-weight:100;font-size:20px;">Rubik Light</option>
+                    <option value="Rubik Regular" style="font-family: 'Rubik';font-size:20px;">Rubik Bold</option>
+                </select>
+            </div>
             <label>
                 <input type="checkbox" id="includeCover" />
                 Start number on reverse of cover page
             </label>
-            <select>
-                <option style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;">Gil Sans (1234567890)</option>
-                <option style="font-family: 'Rubik';font-size:20px;">Rubik (1234567890)</option>
-            </select>
+            <div class="fontPreview">
+                1234567890
+            </div>
         </div>
         <div>
             <label for="totalPages">Total Pages</label>
