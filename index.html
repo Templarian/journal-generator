@@ -650,6 +650,7 @@
                 font-size: 1.5rem;
                 border: 1px solid #DDD;
                 letter-spacing: 0.5rem;
+                cursor: default;
             }
             section .fontPreview::before {
                 content: 'Preview';
@@ -658,6 +659,26 @@
                 right: 0.25rem;
                 font-size: 0.75rem;
                 letter-spacing: 0;
+            }
+            section .fontPreview.disabled {
+                color: #999;
+            }
+            section .fontPreview.disabled::before {
+                color: #999;
+            }
+            section .fontPreview.fontGillSans span {
+                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            }
+            section .fontPreview.fontRubikLight span {
+                font-family: 'Rubik';
+                font-weight: 100;
+            }
+            section .fontPreview.fontRubikRegular span {
+                font-family: 'Rubik';
+            }
+            section .fontPreview.fontRubikBold span {
+                font-family: 'Rubik';
+                font-weight: Bold;
             }
         }
     </style>
@@ -741,6 +762,9 @@
             // Numbers
             const enabledEle = document.getElementById('enablePageNumbers');
             const isEnabled = enabledEle.checked;
+            // Font Preview
+            const fontPreviewEle = document.getElementById('fontPreview');
+            fontPreviewEle.classList.toggle('disabled', !isEnabled);
             // Elements
             const templateEle = document.getElementById('template');
             const customTemplateEle = document.getElementById('customTemplate');
@@ -1047,6 +1071,14 @@
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
         }
+        // Set font
+        function setFont(font) {
+            const fontPreviewEle = document.getElementById('fontPreview');
+            fontPreviewEle.classList.toggle('fontGillSans', font === 'Gill Sans');
+            fontPreviewEle.classList.toggle('fontRubikLight', font === 'Rubik Light');
+            fontPreviewEle.classList.toggle('fontRubikRegular', font === 'Rubik Regular');
+            fontPreviewEle.classList.toggle('fontRubikBold', font === 'Rubik Bold');
+        }
         // Create a single edit text node
         function createEditTextItem() {
 
@@ -1099,6 +1131,11 @@
             document.getElementById('totalPages').addEventListener('change', () => {
                 updateTotalPages();
             });
+            document.getElementById('font').addEventListener('change', (e) => {
+                setFont(e.target.value);
+                updateTemplate(currentIndex);
+            });
+            setFont(localStorage.getItem('font') ?? 'Gill Sans');
             document.getElementById('zoom').addEventListener('change', (e) => {
                 document.getElementById('body').style.zoom = e.target.value;
             });
@@ -1440,8 +1477,8 @@
                 <input type="checkbox" id="includeCover" />
                 Start number on reverse of cover page
             </label>
-            <div class="fontPreview">
-                1234567890
+            <div id="fontPreview" class="fontPreview">
+                <span>1234567890</span>
             </div>
         </div>
         <div>
