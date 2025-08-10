@@ -667,7 +667,7 @@
                 color: #999;
             }
             section .fontPreview.fontGillSans span {
-                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             }
             section .fontPreview.fontRubikLight span {
                 font-family: 'Rubik';
@@ -740,6 +740,25 @@
          * as you can swap between templates instantly
          */
         const cacheTemplate = new Map();
+        // Fonts
+        const fonts = {
+            'Gill Sans MT': {
+                font: 'Gill Sans MT',
+                weight: '400'
+            },
+            'Rubik Light': {
+                font: 'Rubik',
+                weight: '100'
+            },
+            'Rubik Regular': {
+                font: 'Rubik',
+                weight: '400'
+            },
+            'Rubik Bold': {
+                font: 'Rubik',
+                weight: '700'
+            }
+        };
         /**
          * Utility to take image data and update template
          */
@@ -763,6 +782,7 @@
             const enabledEle = document.getElementById('enablePageNumbers');
             const isEnabled = enabledEle.checked;
             // Font Preview
+            const fontEle = document.getElementById('font');
             const fontPreviewEle = document.getElementById('fontPreview');
             fontPreviewEle.classList.toggle('disabled', !isEnabled);
             // Elements
@@ -785,7 +805,7 @@
                 // Draw Page Numbers
                 if (isEnabled) {
                     ctx.fillStyle = '#aaa';
-                    ctx.font = "14mm Rubik";
+                    ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
                     if (customGridType === 'inch') {
                         ctx.textAlign = 'right';
                         page.start && ctx.fillText(page.start, 263, height - 72);
@@ -1074,7 +1094,7 @@
         // Set font
         function setFont(font) {
             const fontPreviewEle = document.getElementById('fontPreview');
-            fontPreviewEle.classList.toggle('fontGillSans', font === 'Gill Sans');
+            fontPreviewEle.classList.toggle('fontGillSans', font === 'Gill Sans MT');
             fontPreviewEle.classList.toggle('fontRubikLight', font === 'Rubik Light');
             fontPreviewEle.classList.toggle('fontRubikRegular', font === 'Rubik Regular');
             fontPreviewEle.classList.toggle('fontRubikBold', font === 'Rubik Bold');
@@ -1468,9 +1488,10 @@
             <div style="display: flex;gap:0.5rem;align-items: center">
                 <label style="white-space: pre;"><input type="checkbox" id="enablePageNumbers" checked /> Page Numbers</label>
                 <select id="font">
-                    <option value="Gill Sans" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;">Gill Sans</option>
+                    <option value="Gill Sans MT" style="font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;">Gill Sans MT</option>
                     <option value="Rubik Light" style="font-family: 'Rubik';font-weight:100;font-size:20px;">Rubik Light</option>
-                    <option value="Rubik Regular" style="font-family: 'Rubik';font-size:20px;">Rubik Bold</option>
+                    <option value="Rubik Regular" style="font-family: 'Rubik';font-size:20px;">Rubik Regular</option>
+                    <option value="Rubik Bold" style="font-family: 'Rubik';font-weight:700;font-size:20px;">Rubik Bold</option>
                 </select>
             </div>
             <label>
