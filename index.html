@@ -804,7 +804,7 @@
                 const page = pages.find(x => x.index === pageNumber);
                 // Draw Page Numbers
                 if (isEnabled) {
-                    ctx.fillStyle = '#aaa';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
                     ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
                     if (customGridType === 'inch') {
                         ctx.textAlign = 'right';
