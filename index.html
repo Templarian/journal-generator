@@ -791,7 +791,9 @@
             const uploadEle = document.getElementById('upload');
             const template = templateEle.value || 'custom';
             const customGridTypeEle = document.getElementById('customGridType');
-            const customGridType = customGridTypeEle.value;
+            const customGridType = template === 'custom'
+                ? customGridTypeEle.value
+                : templates.find(x => x.value === template).gridType ?? 'inch';
             // This is to fix printer alignment
             const printerOffset = document.getElementById('offset').value;
             // This is the offset for nesting pages
@@ -1154,8 +1156,11 @@
             document.getElementById('font').addEventListener('change', (e) => {
                 setFont(e.target.value);
                 updateTemplate(currentIndex);
+                localStorage.setItem('font', e.target.value);
             });
-            setFont(localStorage.getItem('font') ?? 'Gill Sans');
+            const currentFont = localStorage.getItem('font') ?? 'Gill Sans MT';
+            setFont(currentFont);
+            document.getElementById('font').value = currentFont;
             document.getElementById('zoom').addEventListener('change', (e) => {
                 document.getElementById('body').style.zoom = e.target.value;
             });
@@ -1412,10 +1417,16 @@
                 gridType: templateGridType.inch
             },
             {
-                label: 'RPG - Item',
+                label: '1/4" RPG - Item',
                 value: 'inner/inner-rpg-item.png',
                 type: templateType.inner,
                 gridType: templateGridType.inch
+            },
+            {
+                label: '1cm Dot',
+                value: 'inner/inner-1cm-dot.png',
+                type: templateType.inner,
+                gridType: templateGridType.cm
             }
         ];
         const templateCovers = templates.filter(x => x.type === templateType.cover).map(x => x.value);
