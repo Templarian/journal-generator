@@ -807,17 +807,24 @@
                 // Draw Page Numbers
                 if (isEnabled) {
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                    ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
                     if (customGridType === 'inch') {
+                        ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
                         ctx.textAlign = 'right';
                         page.start && ctx.fillText(page.start, 263, height - 72);
                         ctx.textAlign = 'left';
                         page.end && ctx.fillText(page.end, width - 263, height - 72);
-                    } else {
+                    } else if (customGridType === 'cm') {
+                        ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
                         ctx.textAlign = 'left';
                         page.start && ctx.fillText(page.start, 254, height - 96);
                         ctx.textAlign = 'right';
                         page.end && ctx.fillText(page.end, width - 254, height - 96);
+                    } else {
+                        ctx.font = `${fonts[fontEle.value].weight} 13mm ${fonts[fontEle.value].font}`;
+                        ctx.textAlign = 'left';
+                        page.start && ctx.fillText(page.start, 246, height - 93);
+                        ctx.textAlign = 'right';
+                        page.end && ctx.fillText(page.end, width - 246, height - 93);
                     }
                     // Test placement with: ██
                 }
@@ -1267,7 +1274,8 @@
         // Determines where page numbers are placed
         const templateGridType = {
             inch: 'inch',
-            cm: 'cm'
+            cm: 'cm',
+            mm: 'mm'
         };
         const templates = [
             {
@@ -1427,6 +1435,12 @@
                 value: 'inner/inner-1cm-dot.png',
                 type: templateType.inner,
                 gridType: templateGridType.cm
+            },
+            {
+                label: '5mm Dot',
+                value: 'inner/inner-5mm-dot.png',
+                type: templateType.inner,
+                gridType: templateGridType.mm
             }
         ];
         const templateCovers = templates.filter(x => x.type === templateType.cover).map(x => x.value);
