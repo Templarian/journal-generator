@@ -766,8 +766,12 @@
             // Updates
             const width = 2478;
             const height = 1650;
+            // Design at 100dpi, so math is easier... for inches
+            const convert = 3;
+            const offsetX = 55 * convert;
+            const offsetY = 27 * convert;
             const widthInner = 2148;
-            const halfWidthInner = 2148 / 2;
+            const halfWidthInner = widthInner / 2;
             const heightInner = 1548;
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -794,6 +798,9 @@
             const customGridType = template === 'custom'
                 ? customGridTypeEle.value
                 : templates.find(x => x.value === template).gridType ?? 'inch';
+            const textNodes = template === 'custom'
+                ? [] // pull cache by cover, detail, innner
+                : templates.find(x => x.value === template).text ?? [];
             // This is to fix printer alignment
             const printerOffset = document.getElementById('offset').value;
             // This is the offset for nesting pages
@@ -834,6 +841,69 @@
                 if (!show) {
                     return;
                 }
+                /**
+                 * Example Config:
+                 *
+                 * value: 'Campaign Notes',
+                 * side: 'back' | 'front'
+                 * block: 'start' | 'center' | 'end',
+                 * blockOffset: 0,
+                 * inline: 'start' | 'center' | 'end',
+                 * inlineOffset: 0,
+                 */
+                const mapX = {
+                    'back': {
+                        'start': offsetX + (32 * convert),
+                        'center': offsetX + (halfWidthInner / 2),
+                        'end': offsetX - (24 * convert) + halfWidthInner
+                    },
+                    'front': {
+                        'start': offsetX + (24 * convert) + halfWidthInner,
+                        'center': offsetX + halfWidthInner + (halfWidthInner / 2),
+                        'end': offsetX - (32 * convert) + widthInner
+                    }
+                };
+                const mapY = {
+                    'back': {
+                        'start': offsetY + (32 * convert),
+                        'center': offsetY + (heightInner / 2),
+                        'end': offsetY - (32 * convert) + heightInner
+                    },
+                    'front': {
+                        'start': offsetY + (32 * convert),
+                        'center': offsetY + (heightInner / 2),
+                        'end': offsetY - (32 * convert) + heightInner
+                    }
+                };
+                const mapAlign = {
+                    'start': 'left',
+                    'center': 'center',
+                    'end': 'right'
+                };
+                const mapBaseline = {
+                    'start': 'top',
+                    'center': 'middle',
+                    'end': 'bottom'
+                };
+                const mapGridType = {
+                    'inch': 100,
+                    'cm': 100 / 2.54
+                };
+                textNodes.forEach((text) => {
+                    let x = mapX[text.side][text.inline];
+                    if (text.inlineOffset) {
+                        x += text.innerOffset * mapGridType[customGridType];
+                    }
+                    let y = mapY[text.side][text.block];
+                    if (text.blockOffset) {
+                        y += text.blockOffset * mapGridType[customGridType];
+                    }
+                    ctx.textBaseline = mapBaseline[text.block];
+                    ctx.textAlign = mapAlign[text.inline];
+                    ctx.font = `${text.size * mapGridType[customGridType]}px ${text.font}`;
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(text.value, x, y);
+                });
             }
             // Draw pages
             function draw(img) {
@@ -1291,76 +1361,280 @@
             {
                 label: 'Blank',
                 value: 'covers/cover-blank.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Map - Chicago',
                 value: 'covers/cover-chicago.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Map - St. Louis',
                 value: 'covers/cover-st-louis.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Map - Seattle',
                 value: 'covers/cover-seattle.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Map - New York',
                 value: 'covers/cover-new-york.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Map - Kansas',
                 value: 'covers/cover-kansas.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Contour - Boulder, CO',
                 value: 'covers/cover-boulder-contour.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'Iso Dungeon',
                 value: 'covers/cover-iso.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: 'D20',
                 value: 'covers/cover-d20.png',
                 type: templateType.cover,
+                gridType: templateGridType.inch,
                 text: [
                     {
-                        value: 'Campaign Notes',
+                        value: '█Campaiiin Notes█',
+                        side: 'front',
                         block: 'end',
-                        blockOffset: 0,
+                        blockOffset: -2.0,
                         inline: 'center',
                         inlineOffset: 0,
+                        size: 1,
+                        font: 'Rubik'
                     }
                 ]
             },
             {
                 label: 'Dice',
                 value: 'covers/cover-dice.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: '1/4" Grid Dice',
                 value: 'covers/cover-grid-dice.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: '1/4" Grid Fallout Survival Guide',
                 value: 'covers/cover-grid-survival-guide.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
             },
             {
                 label: '1/4" Grid Elder Scrolls',
                 value: 'covers/cover-grid-elder-scrolls.png',
-                type: templateType.cover
+                type: templateType.cover,
+                gridType: templateGridType.inch
+            },
+            {
+                label: 'Debug Inch',
+                value: 'covers/cover-inch-debug.png',
+                type: templateType.cover,
+                gridType: templateGridType.inch,
+                text: [
+                    {
+                        value: '█ Text1 █',
+                        side: 'back',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text2 █',
+                        side: 'back',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text3 █',
+                        side: 'back',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text4 █',
+                        side: 'back',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text5 █',
+                        side: 'back',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text6 █',
+                        side: 'back',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text7 █',
+                        side: 'back',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text8 █',
+                        side: 'back',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text9 █',
+                        side: 'back',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text1 █',
+                        side: 'front',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text2 █',
+                        side: 'front',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text3 █',
+                        side: 'front',
+                        block: 'start',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text4 █',
+                        side: 'front',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text5 █',
+                        side: 'front',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text6 █',
+                        side: 'front',
+                        block: 'center',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text7 █',
+                        side: 'front',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'start',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text8 █',
+                        side: 'front',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'center',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    },
+                    {
+                        value: '█ Text9 █',
+                        side: 'front',
+                        block: 'end',
+                        blockOffset: 0,
+                        inline: 'end',
+                        inlineOffset: 0,
+                        size: 0.5,
+                        font: 'Rubik'
+                    }
+                ]
             },
             {
                 label: '1/4" Basic - Blank',
