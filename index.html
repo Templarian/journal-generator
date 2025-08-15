@@ -759,6 +759,66 @@
                 weight: '700'
             }
         };
+        const iconBlock = 'M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z';
+        const iconInline = 'M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z';
+        function createIcon(data) {
+            const ns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(ns, "svg");
+            svg.style = 'width:1rem;height:1rem;';
+            svg.setAttribute('viewBox', '0 0 24 24');
+            const path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', data);
+            svg.appendChild(path);
+            return svg;
+        }
+        function createSelect(options) {
+            const select = document.createElement('select');
+
+            return select;
+        }
+        function updateTextList(texts) {
+            const textList = document.getElementById('textList');
+            texts.forEach((text) => {
+                const row = document.createElement('tr');
+                // Checkbox
+                const tdCheck = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                tdCheck.appendChild(checkbox);
+                row.appendChild(tdCheck);
+                // Editor
+                const tdArea = document.createElement('td');
+                tdArea.colSpan = 2;
+                // Editor - Input
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = text.value;
+                tdArea.appendChild(input);
+                const blockDiv = document.createElement('div');
+                blockDiv.appendChild(createIcon(iconBlock));
+                const blockSelect = createSelect([
+                    ['left', 'Left'],
+                    ['center', 'Center'],
+                    ['right', 'Right']
+                ]);
+                blockDiv.appendChild(blockSelect);
+                tdArea.appendChild(blockDiv);
+                const inlineDiv = document.createElement('div');
+                inlineDiv.appendChild(createIcon(iconInline));
+                const inlineSelect = createSelect([
+                    ['left', 'Left'],
+                    ['center', 'Center'],
+                    ['right', 'Right']
+                ]);
+                inlineDiv.appendChild(inlineSelect);
+                tdArea.appendChild(inlineDiv);
+                // TD
+                row.appendChild(tdArea);
+                // Append Row
+                textList.appendChild(row);
+            });
+        }
         /**
          * Utility to take image data and update template
          */
@@ -854,12 +914,12 @@
                 const mapX = {
                     'back': {
                         'start': offsetX + (32 * convert),
-                        'center': offsetX + (halfWidthInner / 2),
+                        'center': offsetX + (halfWidthInner / 2) + 12,
                         'end': offsetX - (24 * convert) + halfWidthInner
                     },
                     'front': {
                         'start': offsetX + (24 * convert) + halfWidthInner,
-                        'center': offsetX + halfWidthInner + (halfWidthInner / 2),
+                        'center': offsetX + halfWidthInner + (halfWidthInner / 2) - 12,
                         'end': offsetX - (32 * convert) + widthInner
                     }
                 };
@@ -900,7 +960,7 @@
                     }
                     ctx.textBaseline = mapBaseline[text.block];
                     ctx.textAlign = mapAlign[text.inline];
-                    ctx.font = `${text.size * mapGridType[customGridType]}px ${text.font}`;
+                    ctx.font = ` ${text.weight} ${text.size * mapGridType[customGridType]}px ${text.font}`;
                     ctx.fillStyle = '#000';
                     ctx.fillText(text.value, x, y);
                 });
@@ -1019,6 +1079,16 @@
             configElement.textContent = Math.floor(pageNumber / 2) === 0
                 ? `${printerOffset}mm Printer Offset`
                 : `${printerOffset}mm Printer Offset • ${innerOffset} Inner Offset`;
+            const textKey = pageNumber === 0
+                ? 'coverText'
+                : pageNumber === 1
+                    ? 'detailText'
+                    : 'innerText';
+            updateTextList(
+                template === 'custom'
+                    ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
+                    : templates.find(x => x.value === template).text ?? []
+            );
         }
         /**
          * Utility to visibly show page numbers. Personally find it easier
@@ -1413,14 +1483,15 @@
                 gridType: templateGridType.inch,
                 text: [
                     {
-                        value: '█Campaiiin Notes█',
+                        value: 'Campaign Notes',
                         side: 'front',
                         block: 'end',
-                        blockOffset: -2.0,
+                        blockOffset: -2.75,
                         inline: 'center',
                         inlineOffset: 0,
-                        size: 1,
-                        font: 'Rubik'
+                        size: 0.9,
+                        font: 'Rubik',
+                        weight: 100
                     }
                 ]
             },
@@ -1462,7 +1533,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text2 █',
@@ -1472,7 +1544,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text3 █',
@@ -1482,7 +1555,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text4 █',
@@ -1492,7 +1566,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text5 █',
@@ -1502,7 +1577,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text6 █',
@@ -1512,7 +1588,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text7 █',
@@ -1522,7 +1599,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text8 █',
@@ -1532,7 +1610,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text9 █',
@@ -1542,7 +1621,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text1 █',
@@ -1552,7 +1632,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text2 █',
@@ -1562,7 +1643,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text3 █',
@@ -1572,7 +1654,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text4 █',
@@ -1582,7 +1665,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text5 █',
@@ -1592,7 +1676,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text6 █',
@@ -1602,7 +1687,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text7 █',
@@ -1612,7 +1698,8 @@
                         inline: 'start',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text8 █',
@@ -1622,7 +1709,8 @@
                         inline: 'center',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     },
                     {
                         value: '█ Text9 █',
@@ -1632,7 +1720,8 @@
                         inline: 'end',
                         inlineOffset: 0,
                         size: 0.5,
-                        font: 'Rubik'
+                        font: 'Rubik',
+                        weight: 400
                     }
                 ]
             },
@@ -1884,39 +1973,15 @@
                     <input type="checkbox" id="customText" style="vertical-align: text-bottom;" />
                     Custom Text (Coming Soon)
                 </legend>
-                <table>
+                <table style="width:100%">
                     <thead>
                         <tr>
-                            <th><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg></th>
+                            <th style="width:1rem;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg></th>
                             <th>Text</th>
-                            <th><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></th>
+                            <th style="width:1rem;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input type="checkbox" />
-                            </th>
-                            <td>
-                                <input type="text" />
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;"><path d="M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z" /></svg>
-                                <select>
-                                    <option>Top</option>
-                                    <option>Center</option>
-                                    <option>Bottom</option>
-                                </select>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;"><path d="M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z" /></svg>
-                                <select>
-                                    <option>Left</option>
-                                    <option>Center</option>
-                                    <option>Right</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button>X</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="textList"></tbody>
                 </table>
                 <button>Add Text</button>
             </fieldset>
