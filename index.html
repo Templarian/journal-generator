@@ -217,6 +217,12 @@
                 border-radius: 0.25rem;
             }
 
+            section input[type="text"] {
+                padding: 0.25rem 0.5rem;
+                border: 1px solid #111;
+                border-radius: 0.25rem;
+            }
+
             section p {
                 margin: 0.25rem 0;
                 line-height: 1.5rem;
@@ -559,6 +565,19 @@
                 text-align: left;
             }
 
+            section .editor-row {
+                display: flex;
+                gap: 0.25rem;
+            }
+            section .editor-row input {
+                display: flex;
+                width: 6rem;
+            }
+            section .editor-row select {
+                display: flex;
+                width: 6rem;
+            }
+
             ul {
                 padding: 0 0 0 1.5rem;
             }
@@ -759,8 +778,10 @@
                 weight: '700'
             }
         };
+        const iconText = 'M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z';
         const iconBlock = 'M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z';
         const iconInline = 'M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z';
+        const iconFont = 'M17,8H20V20H21V21H17V20H18V17H14L12.5,20H14V21H10V20H11L17,8M18,9L14.5,16H18V9M5,3H10C11.11,3 12,3.89 12,5V16H9V11H6V16H3V5C3,3.89 3.89,3 5,3M6,5V9H9V5H6Z';
         function createIcon(data) {
             const ns = "http://www.w3.org/2000/svg";
             const svg = document.createElementNS(ns, "svg");
@@ -773,11 +794,45 @@
         }
         function createSelect(options) {
             const select = document.createElement('select');
-
+            options.forEach(([value, label]) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                select.appendChild(option);
+            });
+            return select;
+        }
+        const fontOptions = [{
+            value: 'Gill Sans MT:400',
+            style: "font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;",
+            label: 'Gill Sans MT'
+        }, {
+            value: 'Rubik Light:100',
+            style: "font-family: 'Rubik';font-weight:100;font-size:20px;",
+            label: 'Rubik Light'
+        }, {
+            value: 'Rubik Regular:400',
+            style: "font-family: 'Rubik';font-size:20px;",
+            label: 'Rubik Regular',
+        }, {
+            value: 'Rubik Bold:700',
+            style: "font-family: 'Rubik';font-weight:700;font-size:20px;",
+            label: 'Rubik Bold'
+        }];
+        function createFontSelect() {
+            const select = document.createElement('select');
+            fontOptions.forEach(({ value, label, style }) => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = label;
+                option.style = style;
+                select.appendChild(option);
+            });
             return select;
         }
         function updateTextList(texts) {
             const textList = document.getElementById('textList');
+            textList.innerHTML = ''; // lazy clear out
             texts.forEach((text) => {
                 const row = document.createElement('tr');
                 // Checkbox
@@ -791,28 +846,74 @@
                 const tdArea = document.createElement('td');
                 tdArea.colSpan = 2;
                 // Editor - Input
+                const inputDiv = document.createElement('div');
+                inputDiv.classList.add('editor-row');
+                inputDiv.appendChild(createIcon(iconText));
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = text.value;
-                tdArea.appendChild(input);
+                inputDiv.appendChild(input);
+                tdArea.appendChild(inputDiv);
                 const blockDiv = document.createElement('div');
+                blockDiv.classList.add('editor-row');
                 blockDiv.appendChild(createIcon(iconBlock));
                 const blockSelect = createSelect([
-                    ['left', 'Left'],
+                    ['start', 'Top'],
                     ['center', 'Center'],
-                    ['right', 'Right']
+                    ['end', 'Bottom']
                 ]);
+                blockSelect.value = text.block;
+                blockSelect.addEventListener('change', () => {
+
+                });
                 blockDiv.appendChild(blockSelect);
+                const blockOffsetInput = document.createElement('input');
+                blockOffsetInput.type = 'number';
+                blockOffsetInput.step = '0.01';
+                blockOffsetInput.value = text.blockOffset;
+                blockDiv.appendChild(blockOffsetInput);
                 tdArea.appendChild(blockDiv);
                 const inlineDiv = document.createElement('div');
+                inlineDiv.classList.add('editor-row');
                 inlineDiv.appendChild(createIcon(iconInline));
                 const inlineSelect = createSelect([
-                    ['left', 'Left'],
+                    ['start', 'Left'],
                     ['center', 'Center'],
-                    ['right', 'Right']
+                    ['end', 'Right']
                 ]);
+                inlineSelect.value = text.inline;
+                inlineSelect.addEventListener('change', () => {
+
+                });
                 inlineDiv.appendChild(inlineSelect);
+                const inlineOffsetInput = document.createElement('input');
+                inlineOffsetInput.type = 'number';
+                inlineOffsetInput.step = '0.01';
+                inlineOffsetInput.value = text.inlineOffset;
+                inlineDiv.appendChild(inlineOffsetInput);
                 tdArea.appendChild(inlineDiv);
+                // Font
+                const fontDiv = document.createElement('div');
+                fontDiv.classList.add('editor-row');
+                fontDiv.appendChild(createIcon(iconFont));
+                const fontSelect = createFontSelect('select');
+                fontDiv.appendChild(fontSelect);
+                const sizeSelect = createSelect([
+                    ['0.5', '0.50 Inch'],
+                    ['0.6', '0.60 Inch'],
+                    ['0.7', '0.70 Inch'],
+                    ['0.75', '0.75 Inch'],
+                    ['0.8', '0.8 Inch'],
+                    ['0.9', '0.9 Inch'],
+                    ['1.0', '1.00 Inch']
+                ]);
+                sizeSelect.value = text.size;
+                sizeSelect.addEventListener('change', (e) => {
+                    text.size = e.target.value;
+                    updateTemplate(currentIndex);
+                });
+                fontDiv.appendChild(sizeSelect);
+                tdArea.appendChild(fontDiv);
                 // TD
                 row.appendChild(tdArea);
                 // Append Row
