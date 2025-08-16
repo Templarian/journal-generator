@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3.5" x 5" Pocket Journal Generator for Print</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap" rel="stylesheet">
     <style>
         /*
          * Print and Screen, kept it very basic.
@@ -759,6 +758,10 @@
          * as you can swap between templates instantly
          */
         const cacheTemplate = new Map();
+        // Google Fonts
+        const googleFonts = [
+            'https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap'
+        ];
         // Fonts
         const fonts = {
             'Gill Sans MT': {
@@ -779,6 +782,7 @@
             }
         };
         const iconText = 'M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z';
+        const iconLineHeight = 'M21 22H3V20H21V22M21 4H3V2H21V4M10 13.7H14L12 8.3L10 13.7M11.2 6H12.9L17.6 18H15.6L14.7 15.4H9.4L8.5 18H6.5L11.2 6Z';
         const iconBlock = 'M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z';
         const iconInline = 'M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z';
         const iconFont = 'M17,8H20V20H21V21H17V20H18V17H14L12.5,20H14V21H10V20H11L17,8M18,9L14.5,16H18V9M5,3H10C11.11,3 12,3.89 12,5V16H9V11H6V16H3V5C3,3.89 3.89,3 5,3M6,5V9H9V5H6Z';
@@ -849,9 +853,12 @@
                 const inputDiv = document.createElement('div');
                 inputDiv.classList.add('editor-row');
                 inputDiv.appendChild(createIcon(iconText));
-                const input = document.createElement('input');
-                input.type = 'text';
+                const input = document.createElement('textarea');
                 input.value = text.value;
+                input.addEventListener('change', (e) => {
+                    text.value = e.target.value;
+                    updateTemplate(currentIndex);
+                });
                 inputDiv.appendChild(input);
                 tdArea.appendChild(inputDiv);
                 const blockDiv = document.createElement('div');
@@ -914,6 +921,30 @@
                 });
                 fontDiv.appendChild(sizeSelect);
                 tdArea.appendChild(fontDiv);
+                // Line Height
+                const lineHeightDiv = document.createElement('div');
+                lineHeightDiv.classList.add('editor-row');
+                lineHeightDiv.appendChild(createIcon(iconLineHeight));
+                const lineHeightSelect = createSelect([
+                    ['0', '0.00 Inch'],
+                    ['0.05', '0.05 Inch'],
+                    ['0.1', '0.10 Inch'],
+                    ['0.15', '0.15 Inch'],
+                    ['0.2', '0.20 Inch'],
+                    ['0.25', '0.25 Inch'],
+                    ['0.3', '0.30 Inch'],
+                    ['0.35', '0.35 Inch'],
+                    ['0.4', '0.40 Inch'],
+                    ['0.45', '0.45 Inch'],
+                    ['0.5', '0.50 Inch']
+                ]);
+                lineHeightSelect.value = text.leadingOffset;
+                lineHeightSelect.addEventListener('change', (e) => {
+                    text.leadingOffset = parseFloat(e.target.value);
+                    updateTemplate(currentIndex);
+                });
+                lineHeightDiv.appendChild(lineHeightSelect);
+                tdArea.appendChild(lineHeightDiv);
                 // TD
                 row.appendChild(tdArea);
                 // Append Row
@@ -1014,26 +1045,26 @@
                  */
                 const mapX = {
                     'back': {
-                        'start': offsetX + (32 * convert),
-                        'center': offsetX + (halfWidthInner / 2) + 12,
-                        'end': offsetX - (24 * convert) + halfWidthInner
+                        'start': () => offsetX + (32 * convert),
+                        'center': () => offsetX + (halfWidthInner / 2) + 12,
+                        'end': () => offsetX - (24 * convert) + halfWidthInner
                     },
                     'front': {
-                        'start': offsetX + (24 * convert) + halfWidthInner,
-                        'center': offsetX + halfWidthInner + (halfWidthInner / 2) - 12,
-                        'end': offsetX - (32 * convert) + widthInner
+                        'start': () => offsetX + (24 * convert) + halfWidthInner,
+                        'center': () => offsetX + halfWidthInner + (halfWidthInner / 2) - 12,
+                        'end': () => offsetX - (32 * convert) + widthInner
                     }
                 };
                 const mapY = {
                     'back': {
-                        'start': offsetY + (32 * convert),
-                        'center': offsetY + (heightInner / 2),
-                        'end': offsetY - (32 * convert) + heightInner
+                        'start': () => offsetY + (32 * convert),
+                        'center': (offset) => offsetY + (heightInner / 2) - (offset / 2),
+                        'end': (offset) => offsetY - (32 * convert) + heightInner - offset
                     },
                     'front': {
-                        'start': offsetY + (32 * convert),
-                        'center': offsetY + (heightInner / 2),
-                        'end': offsetY - (32 * convert) + heightInner
+                        'start': () => offsetY + (32 * convert),
+                        'center': (offset) => offsetY + (heightInner / 2) - (offset / 2),
+                        'end': (offset) => offsetY - (32 * convert) + heightInner - offset
                     }
                 };
                 const mapAlign = {
@@ -1051,11 +1082,15 @@
                     'cm': 100 / 2.54
                 };
                 textNodes.forEach((text) => {
-                    let x = mapX[text.side][text.inline];
+                    const lines = text.value.split('\n');
+                    const lineCount = lines.length;
+                    const lineHeight = (text.size + (text.leadingOffset ?? 0)) * mapGridType[customGridType];
+                    const offset = lineHeight * (lineCount - 1);
+                    let x = mapX[text.side][text.inline]();
                     if (text.inlineOffset) {
                         x += text.innerOffset * mapGridType[customGridType];
                     }
-                    let y = mapY[text.side][text.block];
+                    let y = mapY[text.side][text.block](offset);
                     if (text.blockOffset) {
                         y += text.blockOffset * mapGridType[customGridType];
                     }
@@ -1063,7 +1098,9 @@
                     ctx.textAlign = mapAlign[text.inline];
                     ctx.font = ` ${text.weight} ${text.size * mapGridType[customGridType]}px ${text.font}`;
                     ctx.fillStyle = '#000';
-                    ctx.fillText(text.value, x, y);
+                    for (var i = 0; i<lines.length; i++) {
+                        ctx.fillText(lines[i], x, y + (i * lineHeight));
+                    }
                 });
             }
             // Draw pages
@@ -1504,6 +1541,19 @@
                 console.log(`Caching '${value}'...`);
                 img.src = value;
             });
+            const fontPromises = [];
+            googleFonts.forEach((url) => {
+                fontPromises.push(new Promise((resolve) => {
+                    const styleElement = document.createElement('link');
+                    styleElement.setAttribute('rel', 'stylesheet');
+                    styleElement.addEventListener('load', () => {
+                        console.log('Font:', url);
+                        resolve();
+                    });
+                    styleElement.setAttribute('href', url);
+                    document.head.appendChild(styleElement);
+                }));
+            });
             Promise.all(promises).then((imgs) => {
                 // DB
                 dbCache = imgs.shift();
@@ -1513,8 +1563,10 @@
                 templateEle.disabled = false;
                 // Init Template List
                 updateTemplateList(0);
-                // Init Defaults
-                updateTotalPages();
+                // Init Defaults, this clicks the first page
+                Promise.all(fontPromises).then(() => {
+                    updateTotalPages();
+                });
             });
         });
         const templateType = {
@@ -1592,7 +1644,8 @@
                         inlineOffset: 0,
                         size: 0.9,
                         font: 'Rubik',
-                        weight: 100
+                        weight: 100,
+                        leadingOffset: 0.25
                     }
                 ]
             },
@@ -1627,7 +1680,7 @@
                 gridType: templateGridType.inch,
                 text: [
                     {
-                        value: '█ Text1 █',
+                        value: '█ Text1 █\n█ Line1 █',
                         side: 'back',
                         block: 'start',
                         blockOffset: 0,
@@ -1635,10 +1688,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text2 █',
+                        value: '█ Text2 █\n█ Line2 █',
                         side: 'back',
                         block: 'start',
                         blockOffset: 0,
@@ -1646,10 +1700,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text3 █',
+                        value: '█ Text3 █\n█ Line3 █',
                         side: 'back',
                         block: 'start',
                         blockOffset: 0,
@@ -1657,10 +1712,12 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        lineHeight: 1,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text4 █',
+                        value: '█ Text4 █\n█ Line4 █',
                         side: 'back',
                         block: 'center',
                         blockOffset: 0,
@@ -1668,10 +1725,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text5 █',
+                        value: '█ Text5 █\n█ Line5 █',
                         side: 'back',
                         block: 'center',
                         blockOffset: 0,
@@ -1679,10 +1737,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text6 █',
+                        value: '█ Text6 █\n█ Line6 █',
                         side: 'back',
                         block: 'center',
                         blockOffset: 0,
@@ -1690,10 +1749,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text7 █',
+                        value: '█ Text7 █\n█ Line7 █',
                         side: 'back',
                         block: 'end',
                         blockOffset: 0,
@@ -1701,10 +1761,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text8 █',
+                        value: '█ Text8 █\n█ Line8 █',
                         side: 'back',
                         block: 'end',
                         blockOffset: 0,
@@ -1712,10 +1773,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text9 █',
+                        value: '█ Text9 █\n█ Line9 █',
                         side: 'back',
                         block: 'end',
                         blockOffset: 0,
@@ -1723,10 +1785,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text1 █',
+                        value: '█ Text1 █\n█ Line1 █',
                         side: 'front',
                         block: 'start',
                         blockOffset: 0,
@@ -1734,10 +1797,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text2 █',
+                        value: '█ Text2 █\n█ Line2 █',
                         side: 'front',
                         block: 'start',
                         blockOffset: 0,
@@ -1745,10 +1809,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text3 █',
+                        value: '█ Text3 █\n█ Line3 █',
                         side: 'front',
                         block: 'start',
                         blockOffset: 0,
@@ -1756,10 +1821,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text4 █',
+                        value: '█ Text4 █\n█ Line4 █',
                         side: 'front',
                         block: 'center',
                         blockOffset: 0,
@@ -1767,10 +1833,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text5 █',
+                        value: '█ Text5 █\n█ Line5 █',
                         side: 'front',
                         block: 'center',
                         blockOffset: 0,
@@ -1778,10 +1845,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text6 █',
+                        value: '█ Text6 █\n█ Line6 █',
                         side: 'front',
                         block: 'center',
                         blockOffset: 0,
@@ -1789,10 +1857,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text7 █',
+                        value: '█ Text7 █\n█ Line7 █',
                         side: 'front',
                         block: 'end',
                         blockOffset: 0,
@@ -1800,10 +1869,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text8 █',
+                        value: '█ Text8 █\n█ Line8 █',
                         side: 'front',
                         block: 'end',
                         blockOffset: 0,
@@ -1811,10 +1881,11 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     },
                     {
-                        value: '█ Text9 █',
+                        value: '█ Text9 █\n█ Line9 █',
                         side: 'front',
                         block: 'end',
                         blockOffset: 0,
@@ -1822,7 +1893,8 @@
                         inlineOffset: 0,
                         size: 0.5,
                         font: 'Rubik',
-                        weight: 400
+                        weight: 400,
+                        leadingOffset: 0.2
                     }
                 ]
             },
