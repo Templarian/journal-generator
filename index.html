@@ -867,6 +867,10 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = true;
+                checkbox.addEventListener('change', (e) => {
+                    text.hidden = !e.target.checked;
+                    updateTemplate(currentIndex);
+                });
                 tdCheck.appendChild(checkbox);
                 row.appendChild(tdCheck);
                 // Editor
@@ -1123,6 +1127,7 @@
                     'cm': 100 / 2.54
                 };
                 textNodes.forEach((text) => {
+                    if (text.hidden === true) { return; }
                     const lines = text.value.split('\n');
                     const lineCount = lines.length;
                     const lineHeight = (text.size + (text.leadingOffset ?? 0)) * mapGridType[customGridType];
