@@ -564,16 +564,39 @@
                 text-align: left;
             }
 
+            section .editor-column {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
             section .editor-row {
                 display: flex;
                 gap: 0.25rem;
             }
             section .editor-row input {
                 display: flex;
-                width: 6rem;
+                flex: 1;
+                border: 1px solid #111;
+                border-radius: 0.25rem;
             }
             section .editor-row select {
                 display: flex;
+            }
+            section .editor-row textarea { 
+                flex: 1;
+                border: 1px solid #111;
+                border-radius: 0.25rem;
+                padding: 0.25rem 0.5rem;
+                resize: vertical;
+            }
+            section .editor-select-inline,
+            section .editor-select-block {
+                width: 5rem;
+            }
+            section .editor-select-font {
+                flex: 1;
+            }
+            section .editor-select-size {
                 width: 6rem;
             }
 
@@ -849,18 +872,21 @@
                 // Editor
                 const tdArea = document.createElement('td');
                 tdArea.colSpan = 2;
-                // Editor - Input
+                const areaInner = document.createElement('div');
+                areaInner.classList.add('editor-column');
+                // Editor - Textarea
                 const inputDiv = document.createElement('div');
                 inputDiv.classList.add('editor-row');
                 inputDiv.appendChild(createIcon(iconText));
-                const input = document.createElement('textarea');
-                input.value = text.value;
-                input.addEventListener('change', (e) => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text.value;
+                textarea.rows = 3;
+                textarea.addEventListener('input', (e) => {
                     text.value = e.target.value;
                     updateTemplate(currentIndex);
                 });
-                inputDiv.appendChild(input);
-                tdArea.appendChild(inputDiv);
+                inputDiv.appendChild(textarea);
+                areaInner.appendChild(inputDiv);
                 const blockDiv = document.createElement('div');
                 blockDiv.classList.add('editor-row');
                 blockDiv.appendChild(createIcon(iconBlock));
@@ -869,6 +895,7 @@
                     ['center', 'Center'],
                     ['end', 'Bottom']
                 ]);
+                blockSelect.classList.add('editor-select-block');
                 blockSelect.value = text.block;
                 blockSelect.addEventListener('change', () => {
 
@@ -879,7 +906,7 @@
                 blockOffsetInput.step = '0.01';
                 blockOffsetInput.value = text.blockOffset;
                 blockDiv.appendChild(blockOffsetInput);
-                tdArea.appendChild(blockDiv);
+                areaInner.appendChild(blockDiv);
                 const inlineDiv = document.createElement('div');
                 inlineDiv.classList.add('editor-row');
                 inlineDiv.appendChild(createIcon(iconInline));
@@ -888,6 +915,7 @@
                     ['center', 'Center'],
                     ['end', 'Right']
                 ]);
+                inlineSelect.classList.add('editor-select-inline');
                 inlineSelect.value = text.inline;
                 inlineSelect.addEventListener('change', () => {
 
@@ -898,12 +926,13 @@
                 inlineOffsetInput.step = '0.01';
                 inlineOffsetInput.value = text.inlineOffset;
                 inlineDiv.appendChild(inlineOffsetInput);
-                tdArea.appendChild(inlineDiv);
+                areaInner.appendChild(inlineDiv);
                 // Font
                 const fontDiv = document.createElement('div');
                 fontDiv.classList.add('editor-row');
                 fontDiv.appendChild(createIcon(iconFont));
                 const fontSelect = createFontSelect('select');
+                fontSelect.classList.add('editor-select-font');
                 fontDiv.appendChild(fontSelect);
                 const sizeSelect = createSelect([
                     ['0.5', '0.50 Inch'],
@@ -912,15 +941,22 @@
                     ['0.75', '0.75 Inch'],
                     ['0.8', '0.8 Inch'],
                     ['0.9', '0.9 Inch'],
-                    ['1.0', '1.00 Inch']
+                    ['1.0', '1.00 Inch'],
+                    ['1.1', '1.10 Inch'],
+                    ['1.2', '1.20 Inch'],
+                    ['1.25', '1.25 Inch'],
+                    ['1.3', '1.30 Inch'],
+                    ['1.4', '1.40 Inch'],
+                    ['1.5', '1.50 Inch']
                 ]);
+                sizeSelect.classList.add('editor-select-size');
                 sizeSelect.value = text.size;
                 sizeSelect.addEventListener('change', (e) => {
-                    text.size = e.target.value;
+                    text.size = parseFloat(e.target.value);
                     updateTemplate(currentIndex);
                 });
                 fontDiv.appendChild(sizeSelect);
-                tdArea.appendChild(fontDiv);
+                areaInner.appendChild(fontDiv);
                 // Line Height
                 const lineHeightDiv = document.createElement('div');
                 lineHeightDiv.classList.add('editor-row');
@@ -944,7 +980,8 @@
                     updateTemplate(currentIndex);
                 });
                 lineHeightDiv.appendChild(lineHeightSelect);
-                tdArea.appendChild(lineHeightDiv);
+                areaInner.appendChild(lineHeightDiv);
+                tdArea.appendChild(areaInner);
                 // TD
                 row.appendChild(tdArea);
                 // Append Row
@@ -1042,6 +1079,10 @@
                  * blockOffset: 0,
                  * inline: 'start' | 'center' | 'end',
                  * inlineOffset: 0,
+                 * size: 0.9, // inch or cm
+                 * font: 'Rubik',
+                 * weight: 100,
+                 * leadingOffset: 0.25
                  */
                 const mapX = {
                     'back': {
@@ -1222,11 +1263,6 @@
                 : pageNumber === 1
                     ? 'detailText'
                     : 'innerText';
-            updateTextList(
-                template === 'custom'
-                    ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
-                    : templates.find(x => x.value === template).text ?? []
-            );
         }
         /**
          * Utility to visibly show page numbers. Personally find it easier
@@ -1385,6 +1421,12 @@
             const template = templateEle.value;
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
+            // Init Template Text
+            updateTextList(
+                template === 'custom'
+                    ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
+                    : templates.find(x => x.value === template).text ?? []
+            );
         }
         // Set font
         function setFont(font) {
@@ -1405,9 +1447,16 @@
                 window.print();
             });
             document.getElementById('template').addEventListener('change', (e) => {
+                const template = e.target.value;
                 updateTotalPages();
                 // Update visible template
                 updateTemplate(currentIndex);
+                // Update template text list
+                updateTextList(
+                    template === 'custom'
+                        ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
+                        : templates.find(x => x.value === template).text ?? []
+                );
             });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
