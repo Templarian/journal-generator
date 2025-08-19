@@ -901,14 +901,19 @@
                 ]);
                 blockSelect.classList.add('editor-select-block');
                 blockSelect.value = text.block;
-                blockSelect.addEventListener('change', () => {
-
+                blockSelect.addEventListener('change', (e) => {
+                    text.block = e.target.value;
+                    updateTemplate(currentIndex);
                 });
                 blockDiv.appendChild(blockSelect);
                 const blockOffsetInput = document.createElement('input');
                 blockOffsetInput.type = 'number';
                 blockOffsetInput.step = '0.01';
                 blockOffsetInput.value = text.blockOffset;
+                blockOffsetInput.addEventListener('input', (e) => {
+                    text.blockOffset = parseFloat(e.target.value);
+                    updateTemplate(currentIndex);
+                });
                 blockDiv.appendChild(blockOffsetInput);
                 areaInner.appendChild(blockDiv);
                 const inlineDiv = document.createElement('div');
@@ -921,14 +926,19 @@
                 ]);
                 inlineSelect.classList.add('editor-select-inline');
                 inlineSelect.value = text.inline;
-                inlineSelect.addEventListener('change', () => {
-
+                inlineSelect.addEventListener('change', (e) => {
+                    text.inline = e.target.value;
+                    updateTemplate(currentIndex);
                 });
                 inlineDiv.appendChild(inlineSelect);
                 const inlineOffsetInput = document.createElement('input');
                 inlineOffsetInput.type = 'number';
                 inlineOffsetInput.step = '0.01';
                 inlineOffsetInput.value = text.inlineOffset;
+                inlineOffsetInput.addEventListener('input', (e) => {
+                    text.inlineOffset = parseFloat(e.target.value);
+                    updateTemplate(currentIndex);
+                });
                 inlineDiv.appendChild(inlineOffsetInput);
                 areaInner.appendChild(inlineDiv);
                 // Font
@@ -2210,6 +2220,7 @@
                     </thead>
                     <tbody id="textList"></tbody>
                 </table>
+                <button>Reset to Template</button>
                 <button>Add Text</button>
             </fieldset>
         </div>
