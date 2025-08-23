@@ -563,6 +563,9 @@
                 font-size: 0.825rem;
                 text-align: left;
             }
+            section table td {
+                padding: 0;
+            }
 
             section .editor-column {
                 display: flex;
@@ -576,8 +579,10 @@
             section .editor-row input {
                 display: flex;
                 flex: 1;
+                width: 4rem;
                 border: 1px solid #111;
                 border-radius: 0.25rem;
+                padding: 0.25rem 0.5rem;
             }
             section .editor-row select {
                 display: flex;
@@ -598,6 +603,49 @@
             }
             section .editor-select-size {
                 width: 6rem;
+            }
+            section .editor-flex-1 {
+                flex: 1;
+            }
+            section .editor-buttons {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+                padding-top: 0.5rem;
+            }
+            section .editor-reset {
+                display: flex;
+                flex: 2;
+                border-radius: 0.25rem;
+                padding: 0.5rem 1.0rem;
+                border-style: solid;
+                border-width: 2px;
+                background-color: #f8f9fa;
+                border-color: #666;
+                color: #111;
+                justify-content: center;
+            }
+            section .editor-reset:hover {
+                background-color: #f8f9fa;
+                border-color: #dc3545;
+                color: #dc3545;
+            }
+            section .editor-add {
+                display: flex;
+                flex: 1;
+                border-radius: 0.25rem;
+                padding: 0.5rem 1.0rem;
+                border-style: solid;
+                border-width: 2px;
+                background-color: #f8f9fa;
+                border-color: #666;
+                color: #111;
+                justify-content: center;
+            }
+            section .editor-add:hover {
+                background-color: #f8f9fa;
+                border-color: #198754;
+                color: #198754;
             }
 
             ul {
@@ -725,10 +773,33 @@
     </style>
     <script>
         let dbCache = null;
-        // Open a DB, these images are large ~6mb+ for
-        // - Cover
-        // - Detail
-        // - Inner (right now this caches a single, but may be more later)
+        // Local Storage
+        //   Template Selection
+        //   - cover   = custom | cover/page.png
+        //   - detail  = custom | detail/page.png
+        //   - inner   = custom | inner/page.png
+        //   Template Grid Type
+        //   - cover:custom:gridType   = cm | inch
+        //   - detail:custom:gridType  = cm | inch
+        //   - inner:custom:gridType   = cm | inch
+        //   Printer Offset
+        //   - cover:printerOffset
+        //   - inner:printerOffset
+        //   Inner Page Offset
+        //   - inner:offset
+        //   Total Pages
+        //   - totalPages
+        //   Include Page Numbers on Cover
+        //   - includeCover
+        //   Text
+        //   - cover:{template} = [[{...props}, ...], ...]
+        //   - detail:{template} = [[{...props}, ...], ...]
+        //   - inner:{template} = [[{...props}, ...], ...]
+        // IndexedDB
+        //   Open a DB, these images are large ~6mb+ for
+        //   - Cover
+        //   - Detail
+        //   - Inner (right now this caches a single, but may be more later)
         const dbPromise = new Promise((resolve, reject) => {
             const request = indexedDB.open("CachePages", 1);
             request.onerror = (event) => {
@@ -805,6 +876,8 @@
             }
         };
         const iconText = 'M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z';
+        const iconCopy = 'M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z';
+        const iconTrash = 'M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z';
         const iconLineHeight = 'M21 22H3V20H21V22M21 4H3V2H21V4M10 13.7H14L12 8.3L10 13.7M11.2 6H12.9L17.6 18H15.6L14.7 15.4H9.4L8.5 18H6.5L11.2 6Z';
         const iconBlock = 'M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z';
         const iconInline = 'M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z';
@@ -875,7 +948,6 @@
                 row.appendChild(tdCheck);
                 // Editor
                 const tdArea = document.createElement('td');
-                tdArea.colSpan = 2;
                 const areaInner = document.createElement('div');
                 areaInner.classList.add('editor-column');
                 // Editor - Textarea
@@ -993,7 +1065,16 @@
                     text.leadingOffset = parseFloat(e.target.value);
                     updateTemplate(currentIndex);
                 });
+                lineHeightSelect.classList.add('editor-flex-1');
                 lineHeightDiv.appendChild(lineHeightSelect);
+                // Copy Button
+                const copyButton = document.createElement('button');
+                copyButton.appendChild(createIcon(iconCopy));
+                lineHeightDiv.appendChild(copyButton);
+                // Delete Button
+                const deleteButton = document.createElement('button');
+                deleteButton.appendChild(createIcon(iconTrash));
+                lineHeightDiv.appendChild(deleteButton);
                 areaInner.appendChild(lineHeightDiv);
                 tdArea.appendChild(areaInner);
                 // TD
@@ -1437,11 +1518,19 @@
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
             // Init Template Text
+            const textKey = pageIndex === 0
+                ? `cover:${template}`
+                : pageIndex === 1
+                    ? `detail:${template}`
+                    : `inner:${template}`;
             updateTextList(
                 template === 'custom'
                     ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
                     : templates.find(x => x.value === template).text ?? []
             );
+            // Hide / Show Reset Button
+            const textResetEle = document.getElementById('textReset');
+            textResetEle.classList.toggle('hide', template === 'custom');
         }
         // Set font
         function setFont(font) {
@@ -1467,6 +1556,11 @@
                 // Update visible template
                 updateTemplate(currentIndex);
                 // Update template text list
+                const textKey = pageIndex === 0
+                    ? `cover:${template}`
+                    : pageIndex === 1
+                        ? `detail:${template}`
+                        : `inner:${template}`;
                 updateTextList(
                     template === 'custom'
                         ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
@@ -2210,18 +2304,29 @@
                     <input type="checkbox" id="customText" style="vertical-align: text-bottom;" />
                     Custom Text (Coming Soon)
                 </legend>
-                <table style="width:100%">
+                <div class="editor-column">
+                    <div class="editor-row">
+                        <select id="presetSelect"></select>
+                        <button id="presetRemove" class="editor-preset-remove"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></button>
+                        <button id="presetAdd" class="editor-preset-add"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></button>
+                    </div>
+                    <div class="editor-row">
+                        <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
+                    </div>
+                </div>
+                <table style="width:100%;border-spacing:0">
                     <thead>
                         <tr>
                             <th style="width:1rem;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg></th>
                             <th>Text</th>
-                            <th style="width:1rem;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></th>
                         </tr>
                     </thead>
                     <tbody id="textList"></tbody>
                 </table>
-                <button>Reset to Template</button>
-                <button>Add Text</button>
+                <div class="editor-buttons">
+                    <button id="textReset" class="editor-reset">Reset to Template</button>
+                    <button id="textAdd" class="editor-add">Add Text</button>
+                </div>
             </fieldset>
         </div>
         <div>
