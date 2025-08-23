@@ -594,6 +594,9 @@
                 padding: 0.25rem 0.5rem;
                 resize: vertical;
             }
+            section .editor-row svg { 
+                align-self: center;
+            }
             section .editor-select-inline,
             section .editor-select-block {
                 width: 5rem;
@@ -603,6 +606,15 @@
             }
             section .editor-select-size {
                 width: 6rem;
+            }
+            section .editor-row button {
+                display: flex;
+                border: 2px solid #666;
+                border-radius: 0.5rem;
+                background: #f8f9fa;
+            }
+            section .editor-row button svg {
+                align-self: center;
             }
             section .editor-flex-1 {
                 flex: 1;
@@ -791,7 +803,7 @@
         //   - totalPages
         //   Include Page Numbers on Cover
         //   - includeCover
-        //   Text
+        //   Text Preset Lists
         //   - cover:{template} = [[{...props}, ...], ...]
         //   - detail:{template} = [[{...props}, ...], ...]
         //   - inner:{template} = [[{...props}, ...], ...]
@@ -1083,6 +1095,13 @@
                 textList.appendChild(row);
             });
         }
+        function textReplace(text, pageNumber) {
+            // Lazy
+            return text.replace('{pageLeft}', pageNumber)
+                .replace('{pageRight}', pageNumber)
+                .replace('{pageNumber}', pageNumber)
+                .replace('{pageIndex}', pageNumber);
+        }
         /**
          * Utility to take image data and update template
          */
@@ -1235,8 +1254,8 @@
                     ctx.textAlign = mapAlign[text.inline];
                     ctx.font = ` ${text.weight} ${text.size * mapGridType[customGridType]}px ${text.font}`;
                     ctx.fillStyle = '#000';
-                    for (var i = 0; i<lines.length; i++) {
-                        ctx.fillText(lines[i], x, y + (i * lineHeight));
+                    for (var i = 0; i < lines.length; i++) {
+                        ctx.fillText(textReplace(lines[i], pageNumber), x, y + (i * lineHeight));
                     }
                 });
             }
