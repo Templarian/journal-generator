@@ -555,7 +555,14 @@
                 flex: 1;
             }
 
-            section table th {
+            section .editor-wrapper {
+                display: grid;
+                grid-template-columns: 1.5rem auto;
+                gap: 0.25rem;
+                margin: 0.5rem 0;
+            }
+            section .editor-header-hideshow,
+            section .editor-header-text {
                 border-radius: 0.25rem;
                 background: #EEE;
                 padding: 0.125rem 0.25rem;
@@ -563,14 +570,13 @@
                 font-size: 0.825rem;
                 text-align: left;
             }
-            section table td {
-                padding: 0;
-            }
-
             section .editor-column {
                 display: flex;
                 flex-direction: column;
                 gap: 0.25rem;
+            }
+            section .editor-column-hideshow {
+                width: 1.5rem;
             }
             section .editor-row {
                 display: flex;
@@ -579,10 +585,14 @@
             section .editor-row input {
                 display: flex;
                 flex: 1;
-                width: 4rem;
                 border: 1px solid #111;
                 border-radius: 0.25rem;
                 padding: 0.25rem 0.5rem;
+            }
+            section .editor-row input[type=number],
+            section .editor-row input[type=text] {
+                min-width: 0;
+                width: 4rem;
             }
             section .editor-row select {
                 display: flex;
@@ -596,6 +606,9 @@
             }
             section .editor-row svg { 
                 align-self: center;
+            }
+            section .editor-list {
+                grid-column: 1 / span 2;
             }
             section .editor-select-inline,
             section .editor-select-block {
@@ -951,9 +964,12 @@
             const textList = document.getElementById('textList');
             textList.innerHTML = ''; // lazy clear out
             texts.forEach((text) => {
-                const row = document.createElement('tr');
+                const row = document.createElement('div');
+                row.classList.add('editor-row');
                 // Checkbox
-                const tdCheck = document.createElement('td');
+                const tdCheck = document.createElement('div');
+                tdCheck.classList.add('editor-column');
+                tdCheck.classList.add('editor-column-hideshow');
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = true;
@@ -964,7 +980,6 @@
                 tdCheck.appendChild(checkbox);
                 row.appendChild(tdCheck);
                 // Editor
-                const tdArea = document.createElement('td');
                 const areaInner = document.createElement('div');
                 areaInner.classList.add('editor-column');
                 // Editor - Textarea
@@ -1093,9 +1108,8 @@
                 deleteButton.appendChild(createIcon(iconTrash));
                 lineHeightDiv.appendChild(deleteButton);
                 areaInner.appendChild(lineHeightDiv);
-                tdArea.appendChild(areaInner);
                 // TD
-                row.appendChild(tdArea);
+                row.appendChild(areaInner);
                 // Append Row
                 textList.appendChild(row);
             });
@@ -2338,15 +2352,15 @@
                         <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
                     </div>
                 </div>
-                <table style="width:100%;border-spacing:0">
-                    <thead>
-                        <tr>
-                            <th style="width:1rem;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg></th>
-                            <th>Text</th>
-                        </tr>
-                    </thead>
-                    <tbody id="textList"></tbody>
-                </table>
+                <div class="editor-wrapper">
+                    <div class="editor-header-hideshow">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg>
+                    </div>
+                    <div class="editor-header-text">
+                        Text Items
+                    </div>
+                    <div id="textList" class="editor-list"></div>
+                </div>
                 <div class="editor-buttons">
                     <button id="textReset" class="editor-reset">Reset to Template</button>
                     <button id="textAdd" class="editor-add">Add Text</button>
