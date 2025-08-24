@@ -996,14 +996,49 @@
             });
             return select;
         }
-        function updateTemplatePresets() {
-            // Template
+        /**
+         * Since inner pages can be used on the detail page this
+         * should never return the template type!
+         */
+        function getCurrentType() {
+            if (currentIndex === 0) {
+                return 'cover';
+            }
+            if (currentIndex === 1) {
+                return 'detail';
+            }
+            return 'inner';
+        }
+        function getTemplate() {
             const templateEle = document.getElementById('template');
             const template = templates.find(t => t.value === templateEle.value);
+            return template;
+        }
+        function getTemplateByUuid(id) {
+            const template = templates.find(t => t.value === id);
+            return template;
+        }
+        function getPresetByUuid(id) {
+            // Template
+            const template = getTemplate();
+            if (template) {
+                const presets = template.preset.find(x => x.value === id);
+                if (presets) {
+                    return presets;
+                }
+                const type = getCurrentType();
+                const key = `${type}:${template.value}`;
+            }
+            return null;
+        }
+        function updateTemplatePresets() {
+            // Template
+            const template = getTemplate();
             // Actual Select
             const presetSelectEle = document.getElementById('presetSelect');
             presetSelectEle.innerHTML = '';
-            const presets = template.presets ?? [];
+            // todo: custom should ship a few presets
+            const presets = template ? template.presets ?? [] : [];
             const optgroupEle = document.createElement('optgroup');
             optgroupEle.label = `Presets (${presets.length})`;
             presets.forEach((preset) => {
@@ -1232,7 +1267,7 @@
             const ctx = canvas.getContext('2d');
             canvas.width = width;
             canvas.height = height;
-            const pageImage = await downloadTemplate('page.png');
+            const pageImage = await downloadImage('page.png');
             ctx.drawImage(
                 pageImage,
                 0, 0, width, height,
@@ -1690,20 +1725,40 @@
         }
         // Download Template Images
         const cacheTemplate = new Map();
-        async function downloadTemplate(value) {
-            if (cacheTemplate.has(value)) {
-                return cacheTemplate.get(value);
+        async function downloadTemplate(id) {
+            if (cacheTemplate.has(id)) {
+                return cacheTemplate.get(id);
+            }
+            const template = getTemplateByUuid(id);
+            const img = new Image();
+            const promise = new Promise(resolve => {
+                img.addEventListener('load', () => {
+                    console.log(`Completed '${template.src}'`);
+                    cacheTemplate.set(id, img);
+                    resolve(img);
+                }); 
+            });
+            console.log(`Downloading '${template.src}'...`);
+            img.src = template.src;
+            return promise;
+        }
+        /**
+         * Generic download and cache image asset
+         */
+        async function downloadImage(src) {
+            if (cacheTemplate.has(src)) {
+                return cacheTemplate.get(src);
             }
             const img = new Image();
             const promise = new Promise(resolve => {
                 img.addEventListener('load', () => {
-                    console.log(`Completed '${value}'`);
-                    cacheTemplate.set(value, img);
+                    console.log(`Completed '${src}'`);
+                    cacheTemplate.set(src, img);
                     resolve(img);
                 }); 
             });
-            console.log(`Downloading '${value}'...`);
-            img.src = value;
+            console.log(`Downloading '${src}'...`);
+            img.src = src;
             return promise;
         }
         // Setup
