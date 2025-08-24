@@ -131,7 +131,7 @@
         @media screen {
 
             input:focus,
-            button:focus,
+            button:focus-visible,
             select:focus {
                 outline: 0; /* meh */
                 box-shadow: 0 0 0 2px #0099f8;
@@ -627,12 +627,45 @@
                 background: #f8f9fa;
                 padding: 0 0.25rem;
             }
-            section .editor-row button:hover {
+            section .editor-row button:hover,
+            section .editor-row button:focus {
                 border-color: #111;
                 color: #0099f8;
+                z-index: 1;
             }
             section .editor-row button svg {
                 align-self: center;
+            }
+            /* Fancy group rounding */
+            section .editor-row button.editor-preset-add:not(:has(+.hide)) {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+                margin-right: calc(-0.25rem - 2px);
+            }
+            section .editor-row button.editor-preset-copy {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+            section .editor-row button.editor-page-left {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+                margin-right: calc(-0.25rem - 2px);
+            }
+            section .editor-row button.editor-page-left.selected { 
+                background-color: #1978D0;
+                color: #fff;
+                border: #1978D0;
+                padding-left: 0.375rem;
+            }
+            section .editor-row button.editor-page-right {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+            section .editor-row button.editor-page-right.selected { 
+                background-color: #1978D0;
+                color: #fff;
+                border: #1978D0;
+                padding-right: 0.375rem;
             }
             section .editor-flex-1 {
                 flex: 1;
@@ -876,11 +909,6 @@
         let currentIndex = 0;
         // Keep track of pages metaData
         let pages = [];
-        /**
-         * Rarely refresh the page, so this makes it snappy
-         * as you can swap between templates instantly
-         */
-        const cacheTemplate = new Map();
         // Google Fonts
         const googleFonts = [
             'https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap'
@@ -904,6 +932,8 @@
                 weight: '700'
             }
         };
+        const iconPageLeft = 'M2,3H19A2,2 0 0,1 21,5V9H19V5H2V19H19V15H21V19A2,2 0 0,1 19,21H2A2,2 0 0,1 0,19V5A2,2 0 0,1 2,3M17,15V13H24V11H17V9L13,12L17,15M4,13H11V11H4V13M4,9H11V7H4V9M4,17H8V15H4V17Z';
+        const iconPageRight = 'M22,3H5A2,2 0 0,0 3,5V9H5V5H22V19H5V15H3V19A2,2 0 0,0 5,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M7,15V13H0V11H7V9L11,12L7,15M20,13H13V11H20V13M20,9H13V7H20V9M17,17H13V15H17V17Z';
         const iconText = 'M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z';
         const iconCopy = 'M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z';
         const iconTrash = 'M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z';
@@ -966,6 +996,35 @@
             });
             return select;
         }
+        function updateTemplatePresets() {
+            // Template
+            const templateEle = document.getElementById('template');
+            const template = templates.find(t => t.value === templateEle.value);
+            // Actual Select
+            const presetSelectEle = document.getElementById('presetSelect');
+            presetSelectEle.innerHTML = '';
+            const presets = template.presets ?? [];
+            const optgroupEle = document.createElement('optgroup');
+            optgroupEle.label = `Presets (${presets.length})`;
+            presets.forEach((preset) => {
+                const option = document.createElement('option');
+                option.value = preset.value;
+                option.textContent = preset.label;
+                optgroupEle.appendChild(option);
+            });
+            presetSelectEle.appendChild(optgroupEle);
+            const optgroupEle2 = document.createElement('optgroup');
+            optgroupEle2.label = 'User Defined (0)';
+            presetSelectEle.appendChild(optgroupEle2);
+            presetSelectEle.addEventListener('change', (e) => {
+                
+            });
+            presetSelectEle.disabled = false;
+            // Update with selected
+            if (presets.length) {
+                updateTextList(presets[0].text);
+            }
+        }
         function updateTextList(texts) {
             const textList = document.getElementById('textList');
             textList.innerHTML = ''; // lazy clear out
@@ -988,6 +1047,7 @@
                 // Editor
                 const areaInner = document.createElement('div');
                 areaInner.classList.add('editor-column');
+                // Editor - Left or Right Site
                 // Editor - Textarea
                 const inputDiv = document.createElement('div');
                 inputDiv.classList.add('editor-row');
@@ -1105,6 +1165,33 @@
                 });
                 lineHeightSelect.classList.add('editor-flex-1');
                 lineHeightDiv.appendChild(lineHeightSelect);
+                // Left + Right Page Buttons
+                const leftButton = document.createElement('button');
+                leftButton.appendChild(createIcon(iconPageLeft));
+                leftButton.classList.add('editor-page-left');
+                if (text.side === 'left') {
+                    leftButton.classList.add('selected');
+                }
+                lineHeightDiv.appendChild(leftButton);
+                const rightButton = document.createElement('button');
+                rightButton.appendChild(createIcon(iconPageRight));
+                rightButton.classList.add('editor-page-right');
+                if (text.side === 'right') {
+                    rightButton.classList.add('selected');
+                }
+                leftButton.addEventListener('click', () => {
+                    leftButton.classList.add('selected');
+                    rightButton.classList.remove('selected');
+                    text.side = 'left';
+                    updateTemplate(currentIndex);
+                });
+                rightButton.addEventListener('click', () => {
+                    leftButton.classList.remove('selected');
+                    rightButton.classList.add('selected');
+                    text.side = 'right';
+                    updateTemplate(currentIndex);
+                });
+                lineHeightDiv.appendChild(rightButton);
                 // Copy Button
                 const copyButton = document.createElement('button');
                 copyButton.appendChild(createIcon(iconCopy));
@@ -1145,8 +1232,9 @@
             const ctx = canvas.getContext('2d');
             canvas.width = width;
             canvas.height = height;
+            const pageImage = await downloadTemplate('page.png');
             ctx.drawImage(
-                cacheTemplate.get('page.png'),
+                pageImage,
                 0, 0, width, height,
                 0, 0, width, height
             );
@@ -1168,7 +1256,7 @@
                 : templates.find(x => x.value === template).gridType ?? 'inch';
             const textNodes = template === 'custom'
                 ? [] // pull cache by cover, detail, innner
-                : templates.find(x => x.value === template).text ?? [];
+                : templates.find(x => x.value === template).presets[0].text ?? [];
             // This is to fix printer alignment
             const printerOffset = document.getElementById('offset').value;
             // This is the offset for nesting pages
@@ -1224,24 +1312,24 @@
                  * leadingOffset: 0.25
                  */
                 const mapX = {
-                    'back': {
+                    'left': {
                         'start': () => offsetX + (32 * convert),
                         'center': () => offsetX + (halfWidthInner / 2) + 12,
                         'end': () => offsetX - (24 * convert) + halfWidthInner
                     },
-                    'front': {
+                    'right': {
                         'start': () => offsetX + (24 * convert) + halfWidthInner,
                         'center': () => offsetX + halfWidthInner + (halfWidthInner / 2) - 12,
                         'end': () => offsetX - (32 * convert) + widthInner
                     }
                 };
                 const mapY = {
-                    'back': {
+                    'left': {
                         'start': () => offsetY + (32 * convert),
                         'center': (offset) => offsetY + (heightInner / 2) - (offset / 2),
                         'end': (offset) => offsetY - (32 * convert) + heightInner - offset
                     },
-                    'front': {
+                    'right': {
                         'start': () => offsetY + (32 * convert),
                         'center': (offset) => offsetY + (heightInner / 2) - (offset / 2),
                         'end': (offset) => offsetY - (32 * convert) + heightInner - offset
@@ -1368,7 +1456,8 @@
                 }
             } else {
                 // Use Template Path
-                draw(cacheTemplate.get(template));
+                const templateImage = await downloadTemplate(template);
+                draw(templateImage);
             }
             // Store selected template in localStorage
             if (pageNumber === 0) {
@@ -1561,8 +1650,10 @@
             const template = templateEle.value;
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
+            // Update Preset List
+            updateTemplatePresets();
             // Init Template Text
-            const textKey = pageIndex === 0
+            /*const textKey = pageIndex === 0
                 ? `cover:${template}`
                 : pageIndex === 1
                     ? `detail:${template}`
@@ -1571,7 +1662,7 @@
                 template === 'custom'
                     ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
                     : templates.find(x => x.value === template).text ?? []
-            );
+            );*/
             // Hide / Show Reset Button
             const textResetEle = document.getElementById('textReset');
             textResetEle.classList.toggle('hide', template === 'custom');
@@ -1598,13 +1689,29 @@
             return data;
         }
         // Download Template Images
-        async function downloadImages() {
-            
+        const cacheTemplate = new Map();
+        async function downloadTemplate(value) {
+            if (cacheTemplate.has(value)) {
+                return cacheTemplate.get(value);
+            }
+            const img = new Image();
+            const promise = new Promise(resolve => {
+                img.addEventListener('load', () => {
+                    console.log(`Completed '${value}'`);
+                    cacheTemplate.set(value, img);
+                    resolve(img);
+                }); 
+            });
+            console.log(`Downloading '${value}'...`);
+            img.src = value;
+            return promise;
         }
         // Setup
         window.addEventListener('load', async () => {
             // ToDo Show Loading!!!
             // ^^^^ do this
+            // DB Init
+            [dbCache] = await Promise.all([dbPromise]);
             // Download Template Data
             templates = await downloadTemplates();
             templateCovers = templates.filter(x => x.type === templateType.cover).map(x => x.value);
@@ -1620,7 +1727,8 @@
                 // Update visible template
                 updateTemplate(currentIndex);
                 // Update template text list
-                const textKey = pageIndex === 0
+                updateTemplatePresets();
+                /*const textKey = pageIndex === 0
                     ? `cover:${template}`
                     : pageIndex === 1
                         ? `detail:${template}`
@@ -1629,7 +1737,7 @@
                     template === 'custom'
                         ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
                         : templates.find(x => x.value === template).text ?? []
-                );
+                );*/
             });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
@@ -1749,9 +1857,9 @@
                 window.location.reload();
             });
             // Cache all images
-            const promises = [dbPromise];
+            const promises = [];
             const templateEle = document.getElementById('template');
-            const list = ['page.png', ...(templates.map(o => o.value))];
+            /*const list = ['page.png', ...(templates.map(o => o.value))];
             list.forEach((value) => {
                 const img = new Image();
                 promises.push(new Promise(resolve => {
@@ -1762,7 +1870,7 @@
                 }));
                 console.log(`Caching '${value}'...`);
                 img.src = value;
-            });
+            });*/
             const fontPromises = [];
             googleFonts.forEach((url) => {
                 fontPromises.push(new Promise((resolve) => {
@@ -1776,19 +1884,13 @@
                     document.head.appendChild(styleElement);
                 }));
             });
-            Promise.all(promises).then((imgs) => {
-                // DB
-                dbCache = imgs.shift();
-                // Images are all Cached
-                console.log('Cached all image templates.');
-                // Enable dropdown
-                templateEle.disabled = false;
-                // Init Template List
-                updateTemplateList(0);
-                // Init Defaults, this clicks the first page
-                Promise.all(fontPromises).then(() => {
-                    updateTotalPages();
-                });
+            // Enable dropdown
+            templateEle.disabled = false;
+            // Init Template List
+            updateTemplateList(0);
+            // Init Defaults, this clicks the first page
+            Promise.all(fontPromises).then(() => {
+                updateTotalPages();
             });
         });
         const templateType = {
@@ -1962,7 +2064,7 @@
                 </legend>
                 <div class="editor-column">
                     <div class="editor-row">
-                        <select id="presetSelect"></select>
+                        <select id="presetSelect" disabled></select>
                         <button id="presetAdd" class="editor-preset-add"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></button>
                         <button id="presetCopy" class="editor-preset-copy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                         <button id="presetRemove" class="editor-preset-remove"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></button>
@@ -1981,7 +2083,7 @@
                     <div id="textList" class="editor-list"></div>
                 </div>
                 <div class="editor-buttons">
-                    <button id="textReset" class="editor-reset">Reset to Template</button>
+                    <button id="textReset" class="editor-reset">Reset to Preset</button>
                     <button id="textAdd" class="editor-add">Add Text</button>
                 </div>
             </fieldset>
