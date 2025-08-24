@@ -65,7 +65,7 @@
             {
                 "label": "Campaign Notes",
                 "value": "6bfe762f-ccc5-4f64-87b4-aeeab8659ad5",
-                "text": [
+                "nodes": [
                     {
                         "value": "Campaign Notes",
                         "side": "right",
@@ -83,7 +83,7 @@
             {
                 "label": "Inventory Ideas",
                 "value": "88269554-80e4-414b-8f3a-1cf2179ed099",
-                "text": [
+                "nodes": [
                     {
                         "value": "Inventory Ideas",
                         "side": "right",
@@ -138,7 +138,7 @@
             {
                 "label": "Debug Text",
                 "value": "b34ec164-0a40-4888-9f49-7e9f46317bcc",
-                "text": [
+                "nodes": [
                     {
                         "value": "█ Text1 █\n█ Line1 █",
                         "side": "left",

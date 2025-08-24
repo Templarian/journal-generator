@@ -834,6 +834,7 @@
         }
     </style>
     <script>
+        // Hardcode a uuid
         let dbCache = null;
         // Local Storage
         //   Template Selection
@@ -1018,7 +1019,11 @@
             const template = templates.find(t => t.value === id);
             return template;
         }
+        /**
+         * First search built in presets then scan localstorage user defined
+         */
         function getPresetByUuid(id) {
+            const type = getCurrentType();
             // Template
             const template = getTemplate();
             if (template) {
@@ -1026,10 +1031,28 @@
                 if (presets) {
                     return presets;
                 }
-                const type = getCurrentType();
-                const key = `${type}:${template.value}`;
+                // Ex: cover:{templateUuid}
+                const key = `${type}:${template.value}:presets`;
+                if (localStorage.has(key)) {
+                    const presets = JSON.parse(localStorage.get(key));
+                    return presets.find(p => p.value === id) ?? null;
+                }
+                // Maybe it got deleted?
+                return null;
+            }
+            // Maybe it got deleted?
+            const key = `${type}:custom:presets`;
+            if (localStorage.has(key)) {
+                const presets = JSON.parse(localStorage.get(key));
+                return presets.find(p => p.value === id) ?? null;
             }
             return null;
+        }
+        /**
+         * Pull user defined from localstorage
+         */
+        function getUserDefinedPresets() {
+            return [];
         }
         function updateTemplatePresets() {
             // Template
@@ -1050,20 +1073,28 @@
             presetSelectEle.appendChild(optgroupEle);
             const optgroupEle2 = document.createElement('optgroup');
             optgroupEle2.label = 'User Defined (0)';
+            const userDefinedPrests = getUserDefinedPresets();
+            userDefinedPrests.forEach((preset) => {
+                const option = document.createElement('option');
+                option.value = preset.value;
+                option.textContent = preset.label;
+                optgroupEle.appendChild(option);
+            });
             presetSelectEle.appendChild(optgroupEle2);
             presetSelectEle.addEventListener('change', (e) => {
-                
+                const { nodes } = getPresetByUuid(e.target.value);
+                updateTextList(nodes);
             });
             presetSelectEle.disabled = false;
             // Update with selected
             if (presets.length) {
-                updateTextList(presets[0].text);
+                updateTextList(presets[0].nodes);
             }
         }
-        function updateTextList(texts) {
+        function updateTextList(nodes) {
             const textList = document.getElementById('textList');
             textList.innerHTML = ''; // lazy clear out
-            texts.forEach((text) => {
+            nodes.forEach((text) => {
                 const row = document.createElement('div');
                 row.classList.add('editor-row');
                 // Checkbox
