@@ -1,0 +1,436 @@
+[
+    {
+        "label": "Blank",
+        "value": "covers/cover-blank.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Map - Chicago",
+        "value": "covers/cover-chicago.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Map - St. Louis",
+        "value": "covers/cover-st-louis.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Map - Seattle",
+        "value": "covers/cover-seattle.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Map - New York",
+        "value": "covers/cover-new-york.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Map - Kansas",
+        "value": "covers/cover-kansas.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Contour - Boulder, CO",
+        "value": "covers/cover-boulder-contour.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Iso Dungeon",
+        "value": "covers/cover-iso.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "D20",
+        "value": "covers/cover-d20.png",
+        "type": "cover",
+        "gridType": "inch",
+        "presets": [
+            {
+                "label": "Campaign Notes",
+                "text": [
+                    {
+                        "value": "Campaign Notes",
+                        "side": "front",
+                        "block": "end",
+                        "blockOffset": -2.75,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.9,
+                        "font": "Rubik",
+                        "weight": 100,
+                        "leadingOffset": 0.25
+                    }
+                ]
+            },
+            {
+                "label": "Inventory Ideas",
+                "text": [
+                    {
+                        "value": "Inventory Ideas",
+                        "side": "front",
+                        "block": "end",
+                        "blockOffset": -2.75,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.9,
+                        "font": "Rubik",
+                        "weight": 100,
+                        "leadingOffset": 0.25
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "label": "Dice",
+        "value": "covers/cover-dice.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Grid Dice",
+        "value": "covers/cover-grid-dice.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Grid Fallout Survival Guide",
+        "value": "covers/cover-grid-survival-guide.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Grid Elder Scrolls",
+        "value": "covers/cover-grid-elder-scrolls.png",
+        "type": "cover",
+        "gridType": "inch"
+    },
+    {
+        "label": "Debug Inch",
+        "value": "covers/cover-inch-debug.png",
+        "type": "cover",
+        "gridType": "inch",
+        "presets": [
+            {
+                "label": "Debug Text",
+                "text": [
+                    {
+                        "value": "█ Text1 █\n█ Line1 █",
+                        "side": "back",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text2 █\n█ Line2 █",
+                        "side": "back",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text3 █\n█ Line3 █",
+                        "side": "back",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "lineHeight": 1,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text4 █\n█ Line4 █",
+                        "side": "back",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text5 █\n█ Line5 █",
+                        "side": "back",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text6 █\n█ Line6 █",
+                        "side": "back",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text7 █\n█ Line7 █",
+                        "side": "back",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text8 █\n█ Line8 █",
+                        "side": "back",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text9 █\n█ Line9 █",
+                        "side": "back",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text1 █\n█ Line1 █",
+                        "side": "front",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text2 █\n█ Line2 █",
+                        "side": "front",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text3 █\n█ Line3 █",
+                        "side": "front",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text4 █\n█ Line4 █",
+                        "side": "front",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text5 █\n█ Line5 █",
+                        "side": "front",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text6 █\n█ Line6 █",
+                        "side": "front",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text7 █\n█ Line7 █",
+                        "side": "front",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text8 █\n█ Line8 █",
+                        "side": "front",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "█ Text9 █\n█ Line9 █",
+                        "side": "front",
+                        "block": "end",
+                        "blockOffset": 0,
+                        "inline": "end",
+                        "inlineOffset": 0,
+                        "size": 0.5,
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "label": "1/4\" Basic - Blank",
+        "value": "details/details-basic-blank.png",
+        "type": "detail",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Basic - Dots",
+        "value": "details/details-basic-dot.png",
+        "type": "detail",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Basic - Grid",
+        "value": "details/details-basic-grid.png",
+        "type": "detail",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Basic - Isometric",
+        "value": "details/details-basic-iso.png",
+        "type": "detail",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Dots",
+        "value": "inner/inner-dot.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Grid",
+        "value": "inner/inner-grid.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Line Rule",
+        "value": "inner/inner-line.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Isometric Grid",
+        "value": "inner/inner-iso.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/2\" Hexagon",
+        "value": "inner/inner-hex.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Line Rule | Dots",
+        "value": "inner/inner-left-line-right-dot.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Dots | Line Rule",
+        "value": "inner/inner-left-dot-right-line.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" Dots + Grid + Cross",
+        "value": "inner/inner-dot-grid-cross.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1/4\" RPG - Item",
+        "value": "inner/inner-rpg-item.png",
+        "type": "inner",
+        "gridType": "inch"
+    },
+    {
+        "label": "1cm Dot",
+        "value": "inner/inner-1cm-dot.png",
+        "type": "inner",
+        "gridType": "cm"
+    },
+    {
+        "label": "5mm Dot",
+        "value": "inner/inner-5mm-dot.png",
+        "type": "inner",
+        "gridType": "mm"
+    }
+]
