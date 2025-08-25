@@ -1035,9 +1035,9 @@
             // Template
             const template = getTemplate();
             if (template) {
-                const presets = template.preset.find(x => x.value === id);
-                if (presets) {
-                    return presets;
+                const preset = template.presets.find(p => p.value === id);
+                if (preset) {
+                    return preset;
                 }
                 // Ex: cover:{templateUuid}:presets
                 const key = `${type}:${template.value}:presets`;
@@ -1109,6 +1109,14 @@
         function deleteUserDefinedPreset() {
 
         }
+        function getSelectPreset() {
+            const presetSelectEle = document.getElementById('presetSelect');
+            return presetSelectEle.value ?? (
+                presetSelectEle.options.length
+                    ? presetSelectEle.options[0].value
+                    : null
+            );
+        }
         function getLocalStoragePreset() {
             const type = getCurrentType();
             const template = getTemplate();
@@ -1146,10 +1154,6 @@
                 optgroupEle2.appendChild(option);
             });
             presetSelectEle.appendChild(optgroupEle2);
-            presetSelectEle.addEventListener('change', (e) => {
-                const { nodes } = getPresetByUuid(e.target.value);
-                updateTextList(nodes);
-            });
             presetSelectEle.disabled = false;
             const id = getLocalStoragePreset();
             if (id) {
@@ -1446,7 +1450,7 @@
             const customGridType = template === 'custom'
                 ? customGridTypeEle.value
                 : templates.find(x => x.value === template).gridType ?? 'inch';
-            const id = getLocalStoragePreset();
+            const id = getLocalStoragePreset() ?? getSelectPreset();
             const preset = getPresetByUuid(id);
             // This is to fix printer alignment
             const printerOffset = document.getElementById('offset').value;
@@ -1485,7 +1489,7 @@
                 // Draw Custom Text
                 const customText = document.getElementById('customText');
                 const show = customText.checked;
-                if (!show) {
+                if (!show || !preset) {
                     return;
                 }
                 /**
@@ -2120,6 +2124,18 @@
             templateEle.disabled = false;
             // Init Template List
             updateTemplateList(0);
+            // Update Preset Lists
+            const presetSelectEle = document.getElementById('presetSelect');
+            presetSelectEle.addEventListener('change', (e) => {
+                const { nodes } = getPresetByUuid(e.target.value);
+                updateTextList(nodes);
+            });
+            const currentPreset = getLocalStoragePreset() ?? getSelectPreset();
+            if (currentPreset) {
+                presetSelectEle.value = currentPreset;
+                const preset = getPresetByUuid(currentPreset);
+                updateTextList(preset.nodes);
+            }
             // Init Defaults, this clicks the first page
             Promise.all(fontPromises).then(() => {
                 updateTotalPages();
