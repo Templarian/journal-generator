@@ -1085,6 +1085,8 @@
             localStorage.setItem(key, JSON.stringify(presets));
             // Automatically select newly created preset
             localStorage.setItem(`${key}:selected`, preset.value);
+            // Update Select
+            updateTemplatePresets();
         }
         function setUserDefinedPreset({ value, label, nodes }) {
             if (!value) {
@@ -1106,8 +1108,19 @@
             }
             localStorage.setItem(key, JSON.stringify(presets));
         }
-        function deleteUserDefinedPreset() {
-
+        function deleteUserDefinedPreset(id) {
+            const type = getCurrentType();
+            // Template
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets`;
+            const item = localStorage.getItem(key);
+            const presets = item ? JSON.parse(item) : [];
+            localStorage.setItem(key, JSON.stringify(presets.filter(p => p.value !== id)));
+            // Automatically select newly created preset
+            localStorage.removeItem(`${key}:selected`);
+            // Update Select
+            updateTemplatePresets();
         }
         function getSelectPreset() {
             const presetSelectEle = document.getElementById('presetSelect');
@@ -2090,7 +2103,31 @@
                         "leadingOffset": 0.25
                     }]
                 });
-                updateTemplatePresets();
+                updateTemplate(currentIndex);
+            });
+            document.getElementById('presetAdd').addEventListener('click', () => {
+                customText.checked = true;
+                addUserDefinedPreset({
+                    label: 'New Text Overlay',
+                    value: uuid(),
+                    nodes: [{
+                        "value": "Text",
+                        "side": "right",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 1.0,
+                        "font": "Rubik",
+                        "weight": 100,
+                        "leadingOffset": 0.25
+                    }]
+                });
+                updateTemplate(currentIndex);
+            });
+            document.getElementById('presetRemove').addEventListener('click', () => {
+                const id = getSelectPreset();
+                deleteUserDefinedPreset(id);
             });
             // Cache all images
             const promises = [];
