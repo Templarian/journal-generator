@@ -982,15 +982,15 @@
             style: "font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;",
             label: 'Gill Sans MT'
         }, {
-            value: 'Rubik Light:100',
+            value: 'Rubik:100',
             style: "font-family: 'Rubik';font-weight:100;font-size:20px;",
             label: 'Rubik Light'
         }, {
-            value: 'Rubik Regular:400',
+            value: 'Rubik:400',
             style: "font-family: 'Rubik';font-size:20px;",
             label: 'Rubik Regular',
         }, {
-            value: 'Rubik Bold:700',
+            value: 'Rubik:700',
             style: "font-family: 'Rubik';font-weight:700;font-size:20px;",
             label: 'Rubik Bold'
         }];
@@ -1101,7 +1101,9 @@
             if (label) {
                 preset.label = label;
             }
-            preset.nodes = nodes;
+            if (nodes) {
+                preset.nodes = nodes;
+            }
             localStorage.setItem(key, JSON.stringify(presets));
         }
         function deleteUserDefinedPreset() {
@@ -1221,6 +1223,10 @@
                 blockSelect.value = text.block;
                 blockSelect.addEventListener('change', (e) => {
                     text.block = e.target.value;
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 blockDiv.appendChild(blockSelect);
@@ -1230,6 +1236,10 @@
                 blockOffsetInput.value = text.blockOffset;
                 blockOffsetInput.addEventListener('input', (e) => {
                     text.blockOffset = parseFloat(e.target.value);
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 blockDiv.appendChild(blockOffsetInput);
@@ -1246,6 +1256,10 @@
                 inlineSelect.value = text.inline;
                 inlineSelect.addEventListener('change', (e) => {
                     text.inline = e.target.value;
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 inlineDiv.appendChild(inlineSelect);
@@ -1255,6 +1269,10 @@
                 inlineOffsetInput.value = text.inlineOffset;
                 inlineOffsetInput.addEventListener('input', (e) => {
                     text.inlineOffset = parseFloat(e.target.value);
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 inlineDiv.appendChild(inlineOffsetInput);
@@ -1263,8 +1281,18 @@
                 const fontDiv = document.createElement('div');
                 fontDiv.classList.add('editor-row');
                 fontDiv.appendChild(createIcon(iconFont));
-                const fontSelect = createFontSelect('select');
+                const fontSelect = createFontSelect();
                 fontSelect.classList.add('editor-select-font');
+                fontSelect.addEventListener('change', (e) => {
+                    const [font, weight] = e.target.value.split(':');
+                    text.font = font;
+                    text.weight = parseInt(weight, 10);
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
+                    updateTemplate(currentIndex);
+                });
                 fontDiv.appendChild(fontSelect);
                 const sizeSelect = createSelect([
                     ['0.5', '0.50 Inch'],
@@ -1285,6 +1313,10 @@
                 sizeSelect.value = text.size;
                 sizeSelect.addEventListener('change', (e) => {
                     text.size = parseFloat(e.target.value);
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 fontDiv.appendChild(sizeSelect);
@@ -1309,6 +1341,10 @@
                 lineHeightSelect.value = text.leadingOffset;
                 lineHeightSelect.addEventListener('change', (e) => {
                     text.leadingOffset = parseFloat(e.target.value);
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 lineHeightSelect.classList.add('editor-flex-1');
@@ -1331,12 +1367,20 @@
                     leftButton.classList.add('selected');
                     rightButton.classList.remove('selected');
                     text.side = 'left';
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 rightButton.addEventListener('click', () => {
                     leftButton.classList.remove('selected');
                     rightButton.classList.add('selected');
                     text.side = 'right';
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 lineHeightDiv.appendChild(rightButton);
