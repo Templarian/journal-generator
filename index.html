@@ -1080,14 +1080,14 @@
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:presets`;
             const item = localStorage.getItem(key);
-            const existing = item ? JSON.parse(item) : [];
-            existing.push(preset);
-            localStorage.setItem(key, JSON.stringify(existing));
+            const presets = item ? JSON.parse(item) : [];
+            presets.push(preset);
+            localStorage.setItem(key, JSON.stringify(presets));
             // Automatically select newly created preset
             localStorage.setItem(`${key}:selected`, preset.value);
         }
-        function setUserDefinedPreset(preset) {
-            if (!preset.value) {
+        function setUserDefinedPreset({ value, label, nodes }) {
+            if (!value) {
                 throw new Error('Invalid value, must be a valid uuid');
             }
             const type = getCurrentType();
@@ -1096,12 +1096,13 @@
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:presets`;
             const item = localStorage.getItem(key);
-            const existing = item ? JSON.parse(item) : [];
-            if (preset.label) {
-                existing.label = preset.label;
+            const presets = item ? JSON.parse(item) : [];
+            const preset = presets.find(p => p.value === value);
+            if (label) {
+                preset.label = label;
             }
-            existing.find(p => p.value === preset.value).nodes = preset.nodes;
-            localStorage.setItem(key, JSON.stringify(existing));
+            preset.nodes = nodes;
+            localStorage.setItem(key, JSON.stringify(presets));
         }
         function deleteUserDefinedPreset() {
 
