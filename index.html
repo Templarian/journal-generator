@@ -862,6 +862,10 @@
         //   - cover:{templateUuid|custom}:presets = [{...props}, ...]
         //   - detail:{templateUuid|custom}:presets = [{...props}, ...]
         //   - inner:{templateUuid|custom}:presets = [{...props}, ...]
+        //   Text Preset Selected
+        //   - cover:{templateUuid|custom}:presets:selected = uuid
+        //   - detail:{templateUuid|custom}:presets:selected = uuid
+        //   - inner:{templateUuid|custom}:presets:selected = uuid
         // IndexedDB
         //   Open a DB, these images are large ~6mb+ for
         //   - Cover
@@ -1061,21 +1065,53 @@
             const type = getCurrentType();
             // Template
             const template = getTemplate();
-            if (template) {
-                // Ex: cover:{templateUuid}:presets
-                const key = `${type}:${template.value}:presets`;
-                const item = localStorage.getItem(key);
-                if (item) {
-                    return JSON.parse(item);
-                }
-                return [];
-            }
-            const key = `${type}:custom:presets`;
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets`;
             const item = localStorage.getItem(key);
             if (item) {
                 return JSON.parse(item);
             }
             return [];
+        }
+        function addUserDefinedPreset(preset) {
+            const type = getCurrentType();
+            // Template
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets`;
+            const item = localStorage.getItem(key);
+            const existing = item ? JSON.parse(item) : [];
+            existing.push(preset);
+            localStorage.setItem(key, JSON.stringify(existing));
+            // Automatically select newly created preset
+            localStorage.setItem(`${key}:selected`, preset.value);
+        }
+        function setUserDefinedPreset(preset) {
+            if (!preset.value) {
+                throw new Error('Invalid value, must be a valid uuid');
+            }
+            const type = getCurrentType();
+            // Template
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets`;
+            const item = localStorage.getItem(key);
+            const existing = item ? JSON.parse(item) : [];
+            if (preset.label) {
+                existing.label = preset.label;
+            }
+            existing.find(p => p.value === preset.value).nodes = preset.nodes;
+            localStorage.setItem(key, JSON.stringify(existing));
+        }
+        function deleteUserDefinedPreset() {
+
+        }
+        function getLocalStoragePreset() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets:selected`;
+            return localStorage.getItem(key);
         }
         function updateTemplatePresets() {
             // Template
@@ -1098,13 +1134,13 @@
                 presetSelectEle.appendChild(optgroupEle);
             }
             const optgroupEle2 = document.createElement('optgroup');
-            optgroupEle2.label = 'User Defined (0)';
             const userDefinedPrests = getUserDefinedPresets();
+            optgroupEle2.label = `User Defined (${userDefinedPrests.length})`;
             userDefinedPrests.forEach((preset) => {
                 const option = document.createElement('option');
                 option.value = preset.value;
                 option.textContent = preset.label;
-                optgroupEle.appendChild(option);
+                optgroupEle2.appendChild(option);
             });
             presetSelectEle.appendChild(optgroupEle2);
             presetSelectEle.addEventListener('change', (e) => {
@@ -1112,11 +1148,21 @@
                 updateTextList(nodes);
             });
             presetSelectEle.disabled = false;
+            const id = getLocalStoragePreset();
+            if (id) {
+                presetSelectEle.value = id;
+                const currentPreset = getPresetByUuid(id);
+                updateTextList(currentPreset.nodes);
+            }
+            // Update Preset
+            const presetNameWrapperEle = document.getElementById('presetNameWrapper');
+            const presetNameEle = document.getElementById('presetName');
+            presetNameWrapperEle.classList.toggle('hide', !template);
             // Show the giant add preset button if none
             const noPresetsEle = document.getElementById('noPresets');
             const hasPresetsEle = document.getElementById('hasPresets');
             noPresetsEle.classList.toggle('hide', hasPresets || userDefinedPrests.length !== 0);
-            hasPresetsEle.classList.toggle('hide', !hasPresets || userDefinedPrests.length === 0);
+            hasPresetsEle.classList.toggle('hide', !hasPresets && userDefinedPrests.length === 0);
             // Update with selected
             //if (presets.length) {
             //    updateTextList(presets[0].nodes);
@@ -1154,6 +1200,10 @@
                 textarea.rows = 3;
                 textarea.addEventListener('input', (e) => {
                     text.value = e.target.value;
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
                 });
                 inputDiv.appendChild(textarea);
@@ -1222,7 +1272,7 @@
                     ['0.75', '0.75 Inch'],
                     ['0.8', '0.8 Inch'],
                     ['0.9', '0.9 Inch'],
-                    ['1.0', '1.00 Inch'],
+                    ['1', '1.00 Inch'],
                     ['1.1', '1.10 Inch'],
                     ['1.2', '1.20 Inch'],
                     ['1.25', '1.25 Inch'],
@@ -1351,9 +1401,8 @@
             const customGridType = template === 'custom'
                 ? customGridTypeEle.value
                 : templates.find(x => x.value === template).gridType ?? 'inch';
-            const textNodes = template === 'custom'
-                ? [] // pull cache by cover, detail, innner
-                : templates.find(x => x.value === template).presets[0].text ?? [];
+            const id = getLocalStoragePreset();
+            const preset = getPresetByUuid(id);
             // This is to fix printer alignment
             const printerOffset = document.getElementById('offset').value;
             // This is the offset for nesting pages
@@ -1446,7 +1495,7 @@
                     'inch': 100,
                     'cm': 100 / 2.54
                 };
-                textNodes.forEach((text) => {
+                preset.nodes.forEach((text) => {
                     if (text.hidden === true) { return; }
                     const lines = text.value.split('\n');
                     const lineCount = lines.length;
@@ -1973,6 +2022,27 @@
                 indexedDB.deleteDatabase("CachePages");
                 window.location.reload();
             });
+            // No Presets - Add Button
+            document.getElementById('noPresetsAdd').addEventListener('click', () => {
+                customText.checked = true;
+                addUserDefinedPreset({
+                    label: 'New Text Overlay',
+                    value: uuid(),
+                    nodes: [{
+                        "value": "Text",
+                        "side": "right",
+                        "block": "center",
+                        "blockOffset": 0,
+                        "inline": "center",
+                        "inlineOffset": 0,
+                        "size": 1.0,
+                        "font": "Rubik",
+                        "weight": 100,
+                        "leadingOffset": 0.25
+                    }]
+                });
+                updateTemplatePresets();
+            });
             // Cache all images
             const promises = [];
             const templateEle = document.getElementById('template');
@@ -2190,7 +2260,7 @@
                             <button id="presetCopy" class="editor-preset-copy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
                             <button id="presetRemove" class="editor-preset-remove"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></button>
                         </div>
-                        <div class="editor-row">
+                        <div id="presetNameWrapper" class="editor-row">
                             <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
                         </div>
                     </div>
