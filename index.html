@@ -1035,7 +1035,7 @@
             // Template
             const template = getTemplate();
             if (template) {
-                const preset = template.presets.find(p => p.value === id);
+                const preset = template.presets?.find(p => p.value === id);
                 if (preset) {
                     return preset;
                 }
@@ -1136,6 +1136,15 @@
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:presets:selected`;
             return localStorage.getItem(key);
+        }
+        function setLocalStoragePreset() {
+            const presetSelectEle = document.getElementById('presetSelect');
+            const id = presetSelectEle.value;
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets:selected`;
+            localStorage.setItem(key, id);
         }
         function updateTemplatePresets() {
             // Template
@@ -2166,6 +2175,7 @@
             presetSelectEle.addEventListener('change', (e) => {
                 const { nodes } = getPresetByUuid(e.target.value);
                 updateTextList(nodes);
+                setLocalStoragePreset();
             });
             const currentPreset = getLocalStoragePreset() ?? getSelectPreset();
             if (currentPreset) {
