@@ -630,6 +630,13 @@
                 transform: translate(0.5rem, 0);
                 border-radius: 0.25rem;
             }
+            section .editor-row .alpha-dot {
+                margin: 0.25rem -0.25rem 0.25rem;
+                width: 0.25rem;
+                background: linear-gradient(0deg,#FFF 0%, #AAA 100%);
+                transform: translate(0.5rem, 0);
+                border-radius: 0.25rem;
+            }
             section .editor-row select {
                 display: flex;
             }
@@ -852,20 +859,6 @@
             }
             section .fontPreview.disabled::before {
                 color: #999;
-            }
-            section .fontPreview.fontGillSans span {
-                font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            }
-            section .fontPreview.fontRubikLight span {
-                font-family: 'Rubik';
-                font-weight: 100;
-            }
-            section .fontPreview.fontRubikRegular span {
-                font-family: 'Rubik';
-            }
-            section .fontPreview.fontRubikBold span {
-                font-family: 'Rubik';
-                font-weight: Bold;
             }
         }
     </style>
@@ -1365,6 +1358,7 @@
                 red.type = 'number';
                 red.min = 0;
                 red.max = 255;
+                red.value = text.color.red;
                 colorDiv.appendChild(redDot);
                 colorDiv.appendChild(red);
                 // Green
@@ -1375,6 +1369,7 @@
                 green.type = 'number';
                 green.min = 0;
                 green.max = 255;
+                green.value = text.color.green;
                 colorDiv.appendChild(greenDot);
                 colorDiv.appendChild(green);
                 // Blue
@@ -1385,15 +1380,20 @@
                 blue.type = 'number';
                 blue.min = 0;
                 blue.max = 255;
+                blue.value = text.color.blue;
                 colorDiv.appendChild(blueDot);
                 colorDiv.appendChild(blue);
                 // Alpha
                 const alpha = document.createElement('input');
+                const alphaDot = document.createElement('div');
+                alphaDot.classList.add('alpha-dot');
                 alpha.type = 'number';
                 alpha.classList.add('no-arrows', 'alpha');
                 alpha.min = 0;
                 alpha.max = 1;
                 alpha.step = 0.01;
+                alpha.value = text.color.alpha;
+                colorDiv.appendChild(alphaDot);
                 colorDiv.appendChild(alpha);
                 areaInner.appendChild(colorDiv);
                 // Font
@@ -1618,6 +1618,7 @@
                  * inline: 'start' | 'center' | 'end',
                  * inlineOffset: 0,
                  * size: 0.9, // inch or cm
+                 * color: { red, green, blue, alpha }
                  * font: 'Rubik',
                  * weight: 100,
                  * leadingOffset: 0.25
@@ -2203,6 +2204,7 @@
                         "inline": "center",
                         "inlineOffset": 0,
                         "size": 1.0,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
                         "font": "Rubik",
                         "weight": 100,
                         "leadingOffset": 0.25
@@ -2224,6 +2226,7 @@
                         "inline": "center",
                         "inlineOffset": 0,
                         "size": 1.0,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
                         "font": "Rubik",
                         "weight": 100,
                         "leadingOffset": 0.25
