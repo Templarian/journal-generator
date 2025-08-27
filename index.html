@@ -594,6 +594,42 @@
                 min-width: 0;
                 width: 4rem;
             }
+            section .editor-row input[type=number].no-arrows {
+                -moz-appearance: textfield;
+            }
+            section .editor-row input[type=number].no-arrows::-webkit-outer-spin-button,
+            section .editor-row input[type=number].no-arrows::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            section .editor-row input.red,
+            section .editor-row input.green,
+            section .editor-row input.blue,
+            section .editor-row input.alpha {
+                width: 1.5rem;
+                padding-left: 0.75rem;
+            }
+            section .editor-row .red-dot {
+                margin: 0.25rem -0.25rem 0.25rem;
+                width: 0.25rem;
+                background: #A00;
+                transform: translate(0.5rem, 0);
+                border-radius: 0.25rem;
+            }
+            section .editor-row .green-dot {
+                margin: 0.25rem -0.25rem 0.25rem;
+                width: 0.25rem;
+                background: #0A0;
+                transform: translate(0.5rem, 0);
+                border-radius: 0.25rem;
+            }
+            section .editor-row .blue-dot {
+                margin: 0.25rem -0.25rem 0.25rem;
+                width: 0.25rem;
+                background: #00A;
+                transform: translate(0.5rem, 0);
+                border-radius: 0.25rem;
+            }
             section .editor-row select {
                 display: flex;
             }
@@ -837,6 +873,8 @@
         // Hardcode a uuid
         let dbCache = null;
         // Local Storage
+        //   Page Number Font
+        //   - font
         //   Template Selection
         //   - cover   = custom | cover/page.png
         //   - detail  = custom | detail/page.png
@@ -854,10 +892,10 @@
         //   - totalPages
         //   Include Page Numbers on Cover
         //   - includeCover
-        //   Text Enabled
-        //   - cover:{templateUuid|custom}:textDisabled
-        //   - detail:{templateUuid|custom}:textDisabled
-        //   - inner:{templateUuid|custom}:textDisabled
+        //   Text Preset Disabled
+        //   - cover:{templateUuid|custom}:presets:disabled
+        //   - detail:{templateUuid|custom}:presets:disabled
+        //   - inner:{templateUuid|custom}:presets:disabled
         //   Text Preset Lists
         //   - cover:{templateUuid|custom}:presets = [{...props}, ...]
         //   - detail:{templateUuid|custom}:presets = [{...props}, ...]
@@ -922,25 +960,7 @@
         const googleFonts = [
             'https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap'
         ];
-        // Fonts
-        const fonts = {
-            'Gill Sans MT': {
-                font: 'Gill Sans MT',
-                weight: '400'
-            },
-            'Rubik Light': {
-                font: 'Rubik',
-                weight: '100'
-            },
-            'Rubik Regular': {
-                font: 'Rubik',
-                weight: '400'
-            },
-            'Rubik Bold': {
-                font: 'Rubik',
-                weight: '700'
-            }
-        };
+        // Icons
         const iconPageLeft = 'M2,3H19A2,2 0 0,1 21,5V9H19V5H2V19H19V15H21V19A2,2 0 0,1 19,21H2A2,2 0 0,1 0,19V5A2,2 0 0,1 2,3M17,15V13H24V11H17V9L13,12L17,15M4,13H11V11H4V13M4,9H11V7H4V9M4,17H8V15H4V17Z';
         const iconPageRight = 'M22,3H5A2,2 0 0,0 3,5V9H5V5H22V19H5V15H3V19A2,2 0 0,0 5,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M7,15V13H0V11H7V9L11,12L7,15M20,13H13V11H20V13M20,9H13V7H20V9M17,17H13V15H17V17Z';
         const iconText = 'M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z';
@@ -950,6 +970,7 @@
         const iconBlock = 'M17.45,17.55L12,23L6.55,17.55L7.96,16.14L11,19.17V4.83L7.96,7.86L6.55,6.45L12,1L17.45,6.45L16.04,7.86L13,4.83V19.17L16.04,16.14L17.45,17.55Z';
         const iconInline = 'M6.45,17.45L1,12L6.45,6.55L7.86,7.96L4.83,11H19.17L16.14,7.96L17.55,6.55L23,12L17.55,17.45L16.14,16.04L19.17,13H4.83L7.86,16.04L6.45,17.45Z';
         const iconFont = 'M17,8H20V20H21V21H17V20H18V17H14L12.5,20H14V21H10V20H11L17,8M18,9L14.5,16H18V9M5,3H10C11.11,3 12,3.89 12,5V16H9V11H6V16H3V5C3,3.89 3.89,3 5,3M6,5V9H9V5H6Z';
+        const iconColor = 'M19,11.5C19,11.5 17,13.67 17,15A2,2 0 0,0 19,17A2,2 0 0,0 21,15C21,13.67 19,11.5 19,11.5M5.21,10L10,5.21L14.79,10M16.56,8.94L7.62,0L6.21,1.41L8.59,3.79L3.44,8.94C2.85,9.5 2.85,10.47 3.44,11.06L8.94,16.56C9.23,16.85 9.62,17 10,17C10.38,17 10.77,16.85 11.06,16.56L16.56,11.06C17.15,10.47 17.15,9.5 16.56,8.94Z';
         function createIcon(data) {
             const ns = "http://www.w3.org/2000/svg";
             const svg = document.createElementNS(ns, "svg");
@@ -977,22 +998,31 @@
                 return v.toString(16);
             });
         }
+        // Fonts
         const fontOptions = [{
             value: 'Gill Sans MT:400',
             style: "font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;",
-            label: 'Gill Sans MT'
+            label: 'Gill Sans MT',
+            font: 'Gill Sans MT',
+            weight: 400
         }, {
             value: 'Rubik:100',
             style: "font-family: 'Rubik';font-weight:100;font-size:20px;",
-            label: 'Rubik Light'
+            label: 'Rubik Light',
+            font: 'Rubik',
+            weight: 100
         }, {
             value: 'Rubik:400',
             style: "font-family: 'Rubik';font-size:20px;",
             label: 'Rubik Regular',
+            font: 'Rubik',
+            weight: 400
         }, {
             value: 'Rubik:700',
             style: "font-family: 'Rubik';font-weight:700;font-size:20px;",
-            label: 'Rubik Bold'
+            label: 'Rubik Bold',
+            font: 'Rubik',
+            weight: 700
         }];
         function createFontSelect() {
             const select = document.createElement('select');
@@ -1129,6 +1159,26 @@
                     ? presetSelectEle.options[0].value
                     : null
             );
+        }
+        function getLocalStoragePresetDisabled() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets:disabled`;
+            return localStorage.getItem(key) ?? false;
+        }
+        function setLocalStoragePresetDisabled() {
+            const presetDisabled = document.getElementById('presetDisabled');
+            const value = !presetDisabled.checked;
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:presets:disabled`;
+            if (value) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, value);
+            }
         }
         function getLocalStoragePreset() {
             const type = getCurrentType();
@@ -1303,6 +1353,49 @@
                 });
                 inlineDiv.appendChild(inlineOffsetInput);
                 areaInner.appendChild(inlineDiv);
+                // Color
+                const colorDiv = document.createElement('div');
+                colorDiv.classList.add('editor-row');
+                colorDiv.appendChild(createIcon(iconColor));
+                // Red
+                const red = document.createElement('input');
+                const redDot = document.createElement('div');
+                redDot.classList.add('red-dot');
+                red.classList.add('no-arrows', 'red');
+                red.type = 'number';
+                red.min = 0;
+                red.max = 255;
+                colorDiv.appendChild(redDot);
+                colorDiv.appendChild(red);
+                // Green
+                const green = document.createElement('input');
+                const greenDot = document.createElement('div');
+                greenDot.classList.add('green-dot');
+                green.classList.add('no-arrows', 'green');
+                green.type = 'number';
+                green.min = 0;
+                green.max = 255;
+                colorDiv.appendChild(greenDot);
+                colorDiv.appendChild(green);
+                // Blue
+                const blue = document.createElement('input');
+                const blueDot = document.createElement('div');
+                blueDot.classList.add('blue-dot');
+                blue.classList.add('no-arrows', 'blue');
+                blue.type = 'number';
+                blue.min = 0;
+                blue.max = 255;
+                colorDiv.appendChild(blueDot);
+                colorDiv.appendChild(blue);
+                // Alpha
+                const alpha = document.createElement('input');
+                alpha.type = 'number';
+                alpha.classList.add('no-arrows', 'alpha');
+                alpha.min = 0;
+                alpha.max = 1;
+                alpha.step = 0.01;
+                colorDiv.appendChild(alpha);
+                areaInner.appendChild(colorDiv);
                 // Font
                 const fontDiv = document.createElement('div');
                 fontDiv.classList.add('editor-row');
@@ -1487,20 +1580,21 @@
                 // Draw Page Numbers
                 if (isEnabled) {
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                    const font = fontOptions.find(f => f.value === fontEle.value);
                     if (customGridType === 'inch') {
-                        ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
+                        ctx.font = `${font.weight} 14mm ${font.font}`;
                         ctx.textAlign = 'right';
                         page.start && ctx.fillText(page.start, 263, height - 72);
                         ctx.textAlign = 'left';
                         page.end && ctx.fillText(page.end, width - 263, height - 72);
                     } else if (customGridType === 'cm') {
-                        ctx.font = `${fonts[fontEle.value].weight} 14mm ${fonts[fontEle.value].font}`;
+                        ctx.font = `${font.weight} 14mm ${font.font}`;
                         ctx.textAlign = 'left';
                         page.start && ctx.fillText(page.start, 254, height - 96);
                         ctx.textAlign = 'right';
                         page.end && ctx.fillText(page.end, width - 254, height - 96);
                     } else {
-                        ctx.font = `${fonts[fontEle.value].weight} 13mm ${fonts[fontEle.value].font}`;
+                        ctx.font = `${font.weight} 13mm ${font.font}`;
                         ctx.textAlign = 'left';
                         page.start && ctx.fillText(page.start, 246, height - 93);
                         ctx.textAlign = 'right';
@@ -1509,8 +1603,8 @@
                     // Test placement with: ██
                 }
                 // Draw Custom Text
-                const customText = document.getElementById('customText');
-                const show = customText.checked;
+                const presetDisabled = document.getElementById('presetDisabled');
+                const show = presetDisabled.checked;
                 if (!show || !preset) {
                     return;
                 }
@@ -1885,12 +1979,10 @@
             textResetEle.classList.toggle('hide', template === 'custom');
         }
         // Set font
-        function setFont(font) {
+        function setFont(font, weight) {
             const fontPreviewEle = document.getElementById('fontPreview');
-            fontPreviewEle.classList.toggle('fontGillSans', font === 'Gill Sans MT');
-            fontPreviewEle.classList.toggle('fontRubikLight', font === 'Rubik Light');
-            fontPreviewEle.classList.toggle('fontRubikRegular', font === 'Rubik Regular');
-            fontPreviewEle.classList.toggle('fontRubikBold', font === 'Rubik Bold');
+            fontPreviewEle.style.font = font;
+            fontPreviewEle.style.fontWeight = `${weight}`;
         }
         // Create a single edit text node
         function createEditTextItem() {
@@ -2015,13 +2107,17 @@
             document.getElementById('totalPages').addEventListener('change', () => {
                 updateTotalPages();
             });
-            document.getElementById('font').addEventListener('change', (e) => {
-                setFont(e.target.value);
+            const fontSelect = createFontSelect();
+            document.getElementById('font').appendChild(fontSelect);
+            fontSelect.addEventListener('change', (e) => {
+                const [font, weight] = e.target.value.split(':');
+                setFont(font, weight);
                 updateTemplate(currentIndex);
                 localStorage.setItem('font', e.target.value);
             });
-            const currentFont = localStorage.getItem('font') ?? 'Gill Sans MT';
-            setFont(currentFont);
+            const currentFont = localStorage.getItem('font') ?? 'Rubik:400';
+            const [cacheFont, cacheWeight] = currentFont;
+            setFont(cacheFont, cacheWeight);
             document.getElementById('font').value = currentFont;
             document.getElementById('zoom').addEventListener('change', (e) => {
                 document.getElementById('body').style.zoom = e.target.value;
@@ -2080,13 +2176,12 @@
             const cacheTotalPages = localStorage.getItem('totalPages') ?? '6';
             totalPagesEle.value = cacheTotalPages;
             // Text Show
-            const customText = document.getElementById('customText');
-            customText.addEventListener('change', (e) => {
-                localStorage.setItem('customText', e.target.checked ? 'true' : 'false');
+            const presetDisabled = document.getElementById('presetDisabled');
+            presetDisabled.addEventListener('change', (e) => {
+                setLocalStoragePresetDisabled();
                 updateTemplate(currentIndex);
             });
-            const customTextChecked = localStorage.getItem('customText') ?? 'false';
-            customText.checked = customTextChecked === 'true';
+            presetDisabled.checked = getLocalStoragePresetDisabled();
             // Clear Cache
             document.getElementById('clearCache').addEventListener('click', (e) => {
                 localStorage.clear();
@@ -2095,7 +2190,8 @@
             });
             // No Presets - Add Button
             document.getElementById('noPresetsAdd').addEventListener('click', () => {
-                customText.checked = true;
+                presetDisabled.checked = true;
+                setLocalStoragePresetDisabled();
                 addUserDefinedPreset({
                     label: 'New Text Overlay',
                     value: uuid(),
@@ -2115,7 +2211,8 @@
                 updateTemplate(currentIndex);
             });
             document.getElementById('presetAdd').addEventListener('click', () => {
-                customText.checked = true;
+                presetDisabled.checked = true;
+                setLocalStoragePresetDisabled();
                 addUserDefinedPreset({
                     label: 'New Text Overlay',
                     value: uuid(),
@@ -2268,13 +2365,8 @@
         </div>
         <div>
             <div style="display: flex;gap:0.5rem;align-items: center">
-                <label style="white-space: pre;"><input type="checkbox" id="enablePageNumbers" checked /> Page Numbers</label>
-                <select id="font">
-                    <option value="Gill Sans MT" style="font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-size:20px;">Gill Sans MT</option>
-                    <option value="Rubik Light" style="font-family: 'Rubik';font-weight:100;font-size:20px;">Rubik Light</option>
-                    <option value="Rubik Regular" style="font-family: 'Rubik';font-size:20px;">Rubik Regular</option>
-                    <option value="Rubik Bold" style="font-family: 'Rubik';font-weight:700;font-size:20px;">Rubik Bold</option>
-                </select>
+                <label style="white-space: pre;flex:1;"><input type="checkbox" id="enablePageNumbers" checked /> Page Numbers</label>
+                <div id="font"></div>
             </div>
             <label>
                 <input type="checkbox" id="includeCover" />
@@ -2354,7 +2446,7 @@
             </fieldset>
             <fieldset style="margin-block-start: 1rem;border: 2px solid #999;border-radius: 0.5rem;">
                 <legend style="cursor: default;">
-                    <input type="checkbox" id="customText" style="vertical-align: text-bottom;" />
+                    <input type="checkbox" id="presetDisabled" style="vertical-align: text-bottom;" />
                     Overlay Text
                 </legend>
                 <div id="noPresets" class="editor-buttons">
