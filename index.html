@@ -677,7 +677,7 @@
             }
             section .editor-row button {
                 display: flex;
-                border: 2px solid #666;
+                border: 1px solid #666;
                 border-radius: 0.5rem;
                 background: #f8f9fa;
                 padding: 0 0.25rem;
@@ -704,27 +704,40 @@
             section .editor-row button.editor-page-left {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
-                margin-right: calc(-0.25rem - 2px);
+                margin-right: -0.125rem;
+                padding-left: 0.375rem;
             }
             section .editor-row button.editor-page-left.selected { 
                 background-color: #1978D0;
                 color: #fff;
-                border: #1978D0;
-                padding-left: 0.375rem;
+                border-color: #1978D0;
+            }
+            section .editor-row button.editor-page-left.change:not(.selected) {
+                background-color: rgba(255, 165, 0, 0.1);
+                border-color: #7f5200;
+            }
+            section .editor-row button.editor-page-left.change.selected {
+                background-color: #7f5200;
+                border-color: #7f5200;
             }
             section .editor-row button.editor-page-right {
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
+                margin-left: -0.125rem;
+                padding-right: 0.375rem;
             }
             section .editor-row button.editor-page-right.selected { 
                 background-color: #1978D0;
                 color: #fff;
                 border-color: #1978D0;
-                padding-right: 0.375rem;
+            }
+            section .editor-row button.editor-page-right.change:not(.selected) {
+                background-color: rgba(255, 165, 0, 0.1);
+                border-color: #7f5200;
             }
             section .editor-row button.editor-page-right.change.selected {
                 background-color: #7f5200;
-                border-color: #1978D0;
+                border-color: #7f5200;
             }
             section .editor-flex-1 {
                 flex: 1;
@@ -1081,21 +1094,16 @@
             const template = getTemplate();
             if (template) {
                 const cache = localStorage.getItem(`${type}:${template.value}:presets`);
-                const presets = cache
-                    ? JSON.parse(cache)
-                    : template.presets ?? [];
+                let cachePresets = cache ? JSON.parse(cache) : [];
+                let cachePreset = cachePresets.find(p => p.value === id);
+                if (cachePreset) {
+                    return cachePreset;
+                }
+                const presets = template.presets ?? [];
                 const preset = presets.find(p => p.value === id);
                 if (preset) {
                     return preset;
                 }
-                // Ex: cover:{templateUuid}:presets
-                const key = `${type}:${template.value}:presets`;
-                const item = localStorage.getItem(key);
-                if (item) {
-                    const presets = JSON.parse(item);
-                    return presets.find(p => p.value === id) ?? null;
-                }
-                // Maybe it got deleted?
                 return null;
             }
             const key = `${type}:custom:presets`;
@@ -1152,7 +1160,7 @@
             if (!preset) {
                 // if not found create a copy
                 const copyPreset = getPresetByUuid(value);
-                copyPreset.label = `${template.label} [debug]`;
+                copyPreset.label = `${copyPreset.label} [debug]`;
                 copyPreset.nodes = nodes;
                 presets.push(copyPreset);
             } else {
@@ -1254,7 +1262,7 @@
             });
             presetSelectEle.appendChild(optgroupEle2);
             presetSelectEle.disabled = false;
-            const id = getLocalStoragePreset();
+            const id = getLocalStoragePreset() ?? getSelectPreset();
             if (id) {
                 presetSelectEle.value = id;
                 const currentPreset = getPresetByUuid(id);
@@ -1552,7 +1560,11 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(fontSelect, 'font', text.font);
+                    check(fontSelect, 'weight', text.weight);
                 });
+                check(fontSelect, 'font', text.font);
+                check(fontSelect, 'weight', text.weight);
                 fontDiv.appendChild(fontSelect);
                 const sizeSelect = createSelect([
                     ['0.5', '0.50 Inch'],
@@ -1578,7 +1590,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(sizeSelect, 'size', text.size);
                 });
+                check(sizeSelect, 'size', text.size);
                 fontDiv.appendChild(sizeSelect);
                 areaInner.appendChild(fontDiv);
                 // Line Height
@@ -1606,7 +1620,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(lineHeightSelect, 'leadingOffset', text.leadingOffset);
                 });
+                check(lineHeightSelect, 'leadingOffset', text.leadingOffset);
                 lineHeightSelect.classList.add('editor-flex-1');
                 lineHeightDiv.appendChild(lineHeightSelect);
                 // Left + Right Page Buttons
@@ -1623,6 +1639,12 @@
                 if (text.side === 'right') {
                     rightButton.classList.add('selected');
                 }
+                function checkSide(value) {
+                    if (templateText) {
+                        leftButton.classList.toggle('change', templateText.side !== value);
+                        rightButton.classList.toggle('change', templateText.side !== value);
+                    }
+                }
                 leftButton.addEventListener('click', () => {
                     leftButton.classList.add('selected');
                     rightButton.classList.remove('selected');
@@ -1632,6 +1654,7 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    checkSide(text.side);
                 });
                 rightButton.addEventListener('click', () => {
                     leftButton.classList.remove('selected');
@@ -1642,7 +1665,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    checkSide(text.side);
                 });
+                checkSide(text.side);
                 lineHeightDiv.appendChild(rightButton);
                 // Copy Button
                 const copyButton = document.createElement('button');
@@ -2107,16 +2132,7 @@
             // Update Preset List
             updateTemplatePresets();
             // Init Template Text
-            /*const textKey = pageIndex === 0
-                ? `cover:${template}`
-                : pageIndex === 1
-                    ? `detail:${template}`
-                    : `inner:${template}`;
-            updateTextList(
-                template === 'custom'
-                    ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
-                    : templates.find(x => x.value === template).text ?? []
-            );*/
+
             // Hide / Show Reset Button
             const textResetEle = document.getElementById('textReset');
             textResetEle.classList.toggle('hide', template === 'custom');
@@ -2200,16 +2216,6 @@
                 updateTemplate(currentIndex);
                 // Update template text list
                 updateTemplatePresets();
-                /*const textKey = pageIndex === 0
-                    ? `cover:${template}`
-                    : pageIndex === 1
-                        ? `detail:${template}`
-                        : `inner:${template}`;
-                updateTextList(
-                    template === 'custom'
-                        ? JSON.parse(localStorage.getItem(textKey) ?? '[]') // pull cache by cover, detail, innner
-                        : templates.find(x => x.value === template).text ?? []
-                );*/
             });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
@@ -2383,18 +2389,6 @@
             // Cache all images
             const promises = [];
             const templateEle = document.getElementById('template');
-            /*const list = ['page.png', ...(templates.map(o => o.value))];
-            list.forEach((value) => {
-                const img = new Image();
-                promises.push(new Promise(resolve => {
-                    img.addEventListener('load', () => {
-                        cacheTemplate.set(value, img);
-                        resolve(img);
-                    }); 
-                }));
-                console.log(`Caching '${value}'...`);
-                img.src = value;
-            });*/
             const fontPromises = [];
             googleFonts.forEach((url) => {
                 fontPromises.push(new Promise((resolve) => {
