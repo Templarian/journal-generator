@@ -594,6 +594,13 @@
                 background: rgba(255, 0, 0, 0.05);
                 outline-offset: -1px;
             }
+            section .editor-row select.change,
+            section .editor-row input.change,
+            section .editor-row textarea.change {
+                border-color: rgb(127, 82, 0);
+                background: rgba(255, 165, 0, 0.1);
+                outline-offset: -1px;
+            }
             section .editor-row input[type=number],
             section .editor-row input[type=text] {
                 min-width: 0;
@@ -712,8 +719,12 @@
             section .editor-row button.editor-page-right.selected { 
                 background-color: #1978D0;
                 color: #fff;
-                border: #1978D0;
+                border-color: #1978D0;
                 padding-right: 0.375rem;
+            }
+            section .editor-row button.editor-page-right.change.selected {
+                background-color: #7f5200;
+                border-color: #1978D0;
             }
             section .editor-flex-1 {
                 flex: 1;
@@ -1055,6 +1066,12 @@
             const template = templates.find(t => t.value === id);
             return template;
         }
+        function getTemplatePreset() {
+            const presetSelectEle = document.getElementById('presetSelect');
+            const id = presetSelectEle.value;
+            const template = getTemplate();
+            return template.presets.find(p => p.value === id);
+        }
         /**
          * First search built in presets then scan localstorage user defined
          */
@@ -1258,9 +1275,16 @@
             //}
         }
         function updateTextList(nodes) {
+            const templatePreset = getTemplatePreset();
             const textList = document.getElementById('textList');
             textList.innerHTML = ''; // lazy clear out
-            nodes.forEach((text) => {
+            nodes.forEach((text, i) => {
+                const templateText = templatePreset.nodes[i];
+                function check(element, prop, value) {
+                    if (templateText) {
+                        element.classList.toggle('change', templateText[prop] !== value);
+                    }
+                }
                 const row = document.createElement('div');
                 row.classList.add('editor-row');
                 // Checkbox
@@ -1272,8 +1296,14 @@
                 checkbox.checked = text.hidden ?? true;
                 checkbox.addEventListener('change', (e) => {
                     text.hidden = !e.target.checked;
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
+                        nodes
+                    });
                     updateTemplate(currentIndex);
+                    check(checkbox, 'hidden');
                 });
+                check(checkbox, 'hidden');
                 tdCheck.appendChild(checkbox);
                 row.appendChild(tdCheck);
                 // Editor
@@ -1294,7 +1324,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(textarea, 'value', text.value);
                 });
+                check(textarea, 'value', text.value);
                 inputDiv.appendChild(textarea);
                 areaInner.appendChild(inputDiv);
                 const blockDiv = document.createElement('div');
@@ -1314,7 +1346,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(blockSelect, 'block', text.block);
                 });
+                check(blockSelect, 'block', text.block);
                 blockDiv.appendChild(blockSelect);
                 const blockOffsetInput = document.createElement('input');
                 blockOffsetInput.type = 'number';
@@ -1327,7 +1361,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(blockOffsetInput, 'blockOffset', text.blockOffset);
                 });
+                check(blockOffsetInput, 'blockOffset', text.blockOffset);
                 blockDiv.appendChild(blockOffsetInput);
                 areaInner.appendChild(blockDiv);
                 const inlineDiv = document.createElement('div');
@@ -1347,7 +1383,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(inlineSelect, 'inline', text.inline);
                 });
+                check(inlineSelect, 'inline', text.inline);
                 inlineDiv.appendChild(inlineSelect);
                 const inlineOffsetInput = document.createElement('input');
                 inlineOffsetInput.type = 'number';
@@ -1360,7 +1398,9 @@
                         nodes
                     });
                     updateTemplate(currentIndex);
+                    check(inlineOffsetInput, 'inlineOffset', text.inlineOffset);
                 });
+                check(inlineOffsetInput, 'inlineOffset', text.inlineOffset);
                 inlineDiv.appendChild(inlineOffsetInput);
                 areaInner.appendChild(inlineDiv);
                 // Color
@@ -1376,6 +1416,11 @@
                 red.min = 0;
                 red.max = 255;
                 red.value = text.color.red;
+                function checkRed(value) {
+                    if (templateText) {
+                        red.classList.toggle('change', templateText.color.red !== value);
+                    }
+                }
                 red.addEventListener('input', (e) => {
                     const { value } = e.target;
                     if (isNaN(value) || value.includes('e')) {
@@ -1388,8 +1433,10 @@
                             nodes
                         });
                         updateTemplate(currentIndex);
+                        checkRed(text.color.red);
                     }
                 });
+                checkRed(text.color.red);
                 colorDiv.appendChild(redDot);
                 colorDiv.appendChild(red);
                 // Green
@@ -1401,6 +1448,11 @@
                 green.min = 0;
                 green.max = 255;
                 green.value = text.color.green;
+                function checkGreen(value) {
+                    if (templateText) {
+                        green.classList.toggle('change', templateText.color.green !== value);
+                    }
+                }
                 green.addEventListener('input', (e) => {
                     const { value } = e.target;
                     if (isNaN(value) || value.includes('e')) {
@@ -1413,8 +1465,10 @@
                             nodes
                         });
                         updateTemplate(currentIndex);
+                        checkGreen(text.color.green);
                     }
                 });
+                checkGreen(text.color.green);
                 colorDiv.appendChild(greenDot);
                 colorDiv.appendChild(green);
                 // Blue
@@ -1426,6 +1480,11 @@
                 blue.min = 0;
                 blue.max = 255;
                 blue.value = text.color.blue;
+                function checkBlue(value) {
+                    if (templateText) {
+                        blue.classList.toggle('change', templateText.color.blue !== value);
+                    }
+                }
                 blue.addEventListener('input', (e) => {
                     const { value } = e.target;
                     if (isNaN(value) || value.includes('e')) {
@@ -1438,8 +1497,10 @@
                             nodes
                         });
                         updateTemplate(currentIndex);
+                        checkBlue(text.color.blue);
                     }
                 });
+                checkBlue(text.color.blue);
                 colorDiv.appendChild(blueDot);
                 colorDiv.appendChild(blue);
                 // Alpha
@@ -1452,6 +1513,11 @@
                 alpha.max = 1;
                 alpha.step = 0.01;
                 alpha.value = text.color.alpha;
+                function checkAlpha(value) {
+                    if (templateText) {
+                        alpha.classList.toggle('change', templateText.color.alpha !== value);
+                    }
+                }
                 alpha.addEventListener('input', (e) => {
                     const { value } = e.target;
                     if (isNaN(value) || value.includes('e')) {
@@ -1464,8 +1530,10 @@
                             nodes
                         });
                         updateTemplate(currentIndex);
+                        checkAlpha(text.color.alpha);
                     }
                 });
+                checkAlpha(text.color.alpha);
                 colorDiv.appendChild(alphaDot);
                 colorDiv.appendChild(alpha);
                 areaInner.appendChild(colorDiv);
@@ -1742,7 +1810,7 @@
                     const offset = lineHeight * (lineCount - 1);
                     let x = mapX[text.side][text.inline]();
                     if (text.inlineOffset) {
-                        x += text.innerOffset * mapGridType[customGridType];
+                        x += text.inlineOffset * mapGridType[customGridType];
                     }
                     let y = mapY[text.side][text.block](offset);
                     if (text.blockOffset) {
