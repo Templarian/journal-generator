@@ -589,6 +589,11 @@
                 border-radius: 0.25rem;
                 padding: 0.25rem 0.5rem;
             }
+            section .editor-row input:invalid {
+                outline: 2px solid red;
+                background: rgba(255, 0, 0, 0.05);
+                outline-offset: -1px;
+            }
             section .editor-row input[type=number],
             section .editor-row input[type=text] {
                 min-width: 0;
@@ -1058,7 +1063,11 @@
             // Template
             const template = getTemplate();
             if (template) {
-                const preset = template.presets?.find(p => p.value === id);
+                const cache = localStorage.getItem(`${type}:${template.value}:presets`);
+                const presets = cache
+                    ? JSON.parse(cache)
+                    : template.presets ?? [];
+                const preset = presets.find(p => p.value === id);
                 if (preset) {
                     return preset;
                 }
@@ -1122,12 +1131,20 @@
             const key = `${type}:${templateKey}:presets`;
             const item = localStorage.getItem(key);
             const presets = item ? JSON.parse(item) : [];
-            const preset = presets.find(p => p.value === value);
-            if (label) {
-                preset.label = label;
-            }
-            if (nodes) {
-                preset.nodes = nodes;
+            let preset = presets.find(p => p.value === value);
+            if (!preset) {
+                // if not found create a copy
+                const copyPreset = getPresetByUuid(value);
+                copyPreset.label = `${template.label} [debug]`;
+                copyPreset.nodes = nodes;
+                presets.push(copyPreset);
+            } else {
+                if (label) {
+                    preset.label = label;
+                }
+                if (nodes) {
+                    preset.nodes = nodes;
+                }
             }
             localStorage.setItem(key, JSON.stringify(presets));
         }
@@ -1273,7 +1290,7 @@
                 textarea.addEventListener('input', (e) => {
                     text.value = e.target.value;
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1293,7 +1310,7 @@
                 blockSelect.addEventListener('change', (e) => {
                     text.block = e.target.value;
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1306,7 +1323,7 @@
                 blockOffsetInput.addEventListener('input', (e) => {
                     text.blockOffset = parseFloat(e.target.value);
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1326,7 +1343,7 @@
                 inlineSelect.addEventListener('change', (e) => {
                     text.inline = e.target.value;
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1339,7 +1356,7 @@
                 inlineOffsetInput.addEventListener('input', (e) => {
                     text.inlineOffset = parseFloat(e.target.value);
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1359,6 +1376,20 @@
                 red.min = 0;
                 red.max = 255;
                 red.value = text.color.red;
+                red.addEventListener('input', (e) => {
+                    const { value } = e.target;
+                    if (isNaN(value) || value.includes('e')) {
+                        e.target.setCustomValidity('Invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        text.color.red = parseInt(value, 10);
+                        setUserDefinedPreset({
+                            value: getLocalStoragePreset() ?? getSelectPreset(),
+                            nodes
+                        });
+                        updateTemplate(currentIndex);
+                    }
+                });
                 colorDiv.appendChild(redDot);
                 colorDiv.appendChild(red);
                 // Green
@@ -1370,6 +1401,20 @@
                 green.min = 0;
                 green.max = 255;
                 green.value = text.color.green;
+                green.addEventListener('input', (e) => {
+                    const { value } = e.target;
+                    if (isNaN(value) || value.includes('e')) {
+                        e.target.setCustomValidity('Invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        text.color.green = parseInt(value, 10);
+                        setUserDefinedPreset({
+                            value: getLocalStoragePreset() ?? getSelectPreset(),
+                            nodes
+                        });
+                        updateTemplate(currentIndex);
+                    }
+                });
                 colorDiv.appendChild(greenDot);
                 colorDiv.appendChild(green);
                 // Blue
@@ -1381,6 +1426,20 @@
                 blue.min = 0;
                 blue.max = 255;
                 blue.value = text.color.blue;
+                blue.addEventListener('input', (e) => {
+                    const { value } = e.target;
+                    if (isNaN(value) || value.includes('e')) {
+                        e.target.setCustomValidity('Invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        text.color.blue = parseInt(value, 10);
+                        setUserDefinedPreset({
+                            value: getLocalStoragePreset() ?? getSelectPreset(),
+                            nodes
+                        });
+                        updateTemplate(currentIndex);
+                    }
+                });
                 colorDiv.appendChild(blueDot);
                 colorDiv.appendChild(blue);
                 // Alpha
@@ -1393,6 +1452,20 @@
                 alpha.max = 1;
                 alpha.step = 0.01;
                 alpha.value = text.color.alpha;
+                alpha.addEventListener('input', (e) => {
+                    const { value } = e.target;
+                    if (isNaN(value) || value.includes('e')) {
+                        e.target.setCustomValidity('Invalid');
+                    } else {
+                        e.target.setCustomValidity('');
+                        text.color.alpha = parseFloat(value);
+                        setUserDefinedPreset({
+                            value: getLocalStoragePreset() ?? getSelectPreset(),
+                            nodes
+                        });
+                        updateTemplate(currentIndex);
+                    }
+                });
                 colorDiv.appendChild(alphaDot);
                 colorDiv.appendChild(alpha);
                 areaInner.appendChild(colorDiv);
@@ -1407,7 +1480,7 @@
                     text.font = font;
                     text.weight = parseInt(weight, 10);
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1433,7 +1506,7 @@
                 sizeSelect.addEventListener('change', (e) => {
                     text.size = parseFloat(e.target.value);
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1461,7 +1534,7 @@
                 lineHeightSelect.addEventListener('change', (e) => {
                     text.leadingOffset = parseFloat(e.target.value);
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1487,7 +1560,7 @@
                     rightButton.classList.remove('selected');
                     text.side = 'left';
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1497,7 +1570,7 @@
                     rightButton.classList.add('selected');
                     text.side = 'right';
                     setUserDefinedPreset({
-                        value: getLocalStoragePreset(),
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
                         nodes
                     });
                     updateTemplate(currentIndex);
@@ -1678,7 +1751,8 @@
                     ctx.textBaseline = mapBaseline[text.block];
                     ctx.textAlign = mapAlign[text.inline];
                     ctx.font = ` ${text.weight} ${text.size * mapGridType[customGridType]}px ${text.font}`;
-                    ctx.fillStyle = '#000';
+                    const { red, green, blue, alpha } = text.color;
+                    ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
                     for (var i = 0; i < lines.length; i++) {
                         ctx.fillText(textReplace(lines[i], pageNumber), x, y + (i * lineHeight));
                     }
