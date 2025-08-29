@@ -665,6 +665,11 @@
             section .editor-list {
                 grid-column: 1 / span 2;
             }
+            section .editor-list > .editor-row:not(:first-child) {
+                border-top: 1px dashed #AAA;
+                margin-top: 0.25rem;
+                padding-top: 0.25rem;
+            }
             section .editor-select-inline,
             section .editor-select-block {
                 width: 5rem;
@@ -1672,6 +1677,15 @@
                 // Copy Button
                 const copyButton = document.createElement('button');
                 copyButton.appendChild(createIcon(iconCopy));
+                copyButton.addEventListener('click', (e) => {
+                    nodes.splice(i, 0, structuredClone(text));
+                    setUserDefinedPreset({
+                        value: getLocalStoragePreset() ?? getSelectPreset(),
+                        nodes
+                    });
+                    updateTextList(nodes);
+                    updateTemplate(currentIndex);
+                });
                 lineHeightDiv.appendChild(copyButton);
                 // Delete Button
                 const deleteButton = document.createElement('button');
