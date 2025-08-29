@@ -377,6 +377,38 @@
                         "leadingOffset": 0.2
                     }
                 ]
+            },
+            {
+                "label": "Debug Replacements",
+                "value": "460873f8-e677-46d2-a3d0-e9eb9e374d0e",
+                "nodes": [
+                    {
+                        "value": "pageCount={pageCount}\npageNumber={pageNumber}\npageIndex={pageIndex}\nyear={year}\nshortYear={shortYear}\nmonth={month}\nmonthPadded={monthPadded}\nmonthFull={monthFull}\nmonthShort={monthShort}\nday={day}\ndayPadded={dayPadded}",
+                        "side": "left",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.75,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "pageCount={pageCount}\npageNumber={pageNumber}\npageIndex={pageIndex}\nyear={year}\nshortYear={shortYear}\nmonth={month}\nmonthPadded={monthPadded}\nmonthFull={monthFull}\nmonthShort={monthShort}\nday={day}\ndayPadded={dayPadded}",
+                        "side": "right",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.75,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    }
+                ]
             }
         ]
     },
@@ -484,5 +516,46 @@
         "src": "inner/inner-5mm-dot.png",
         "type": "inner",
         "gridType": "mm"
+    },
+    {
+        "label": "Debug Inch",
+        "value": "d2cc1413-5220-40d7-9f50-49cefb88841f",
+        "src": "inner/inner-grid.png",
+        "type": "inner",
+        "gridType": "inch",
+        "presets": [
+            {
+                "label": "Debug Replacements",
+                "value": "5270e333-06d4-40ed-b7c6-f31c140bf143",
+                "nodes": [
+                    {
+                        "value": "pageCount={pageCount}\npageNumber={pageNumber}\npageIndex={pageIndex}\nyear={year}\nshortYear={shortYear}\nmonth={month}\nmonthPadded={monthPadded}\nmonthFull={monthFull}\nmonthShort={monthShort}\nday={day}\ndayPadded={dayPadded}",
+                        "side": "left",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.75,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    },
+                    {
+                        "value": "pageCount={pageCount}\npageNumber={pageNumber}\npageIndex={pageIndex}\nyear={year}\nshortYear={shortYear}\nmonth={month}\nmonthPadded={monthPadded}\nmonthFull={monthFull}\nmonthShort={monthShort}\nday={day}\ndayPadded={dayPadded}",
+                        "side": "right",
+                        "block": "start",
+                        "blockOffset": 0,
+                        "inline": "start",
+                        "inlineOffset": 0,
+                        "size": 0.75,
+                        "color": { "red": 0, "green": 0, "blue": 0, "alpha": 1 },
+                        "font": "Rubik",
+                        "weight": 400,
+                        "leadingOffset": 0.2
+                    }
+                ]
+            }
+        ]
     }
 ]

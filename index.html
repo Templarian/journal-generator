@@ -234,6 +234,19 @@
                 text-decoration-color: #0099f8;
             }
 
+            section ul li {
+                margin-bottom: 0.125rem;
+            }
+
+            section code {
+                font-family: 'Consolas', 'Monaco', monospace;
+                background: #F1F1F1;
+                font-size: 0.875rem;
+                padding: 0.125rem 0.125rem;
+                border: 1px solid #DDD;
+                border-radius: 0.25rem;
+            }
+
             section h1 {
                 font-weight: normal;
                 margin: 0 0 0.5rem 0;
@@ -1088,7 +1101,9 @@
             const presetSelectEle = document.getElementById('presetSelect');
             const id = presetSelectEle.value;
             const template = getTemplate();
-            return template.presets.find(p => p.value === id);
+            return template
+                ? template.presets.find(p => p.value === id)
+                : null;
         }
         /**
          * First search built in presets then scan localstorage user defined
@@ -1186,9 +1201,21 @@
             const key = `${type}:${templateKey}:presets`;
             const item = localStorage.getItem(key);
             const presets = item ? JSON.parse(item) : [];
-            localStorage.setItem(key, JSON.stringify(presets.filter(p => p.value !== id)));
-            // Automatically select newly created preset
+            const updatedPresets = presets.filter(p => p.value !== id);
+            if (updatedPresets.length === 0) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, JSON.stringify(updatedPresets));
+            }
+            // Remove selected
             localStorage.removeItem(`${key}:selected`);
+            // Update check if no items
+            const templatePresets = template.presets ?? [];
+            const presetDisabled = document.getElementById('presetDisabled');
+            if (templatePresets.length === 0 && updatedPresets.length === 0) {
+                presetDisabled.checked = false;
+                presetDisabled.disabled = true;
+            }
             // Update Select
             updateTemplatePresets();
         }
@@ -1292,7 +1319,7 @@
             const textList = document.getElementById('textList');
             textList.innerHTML = ''; // lazy clear out
             nodes.forEach((text, i) => {
-                const templateText = templatePreset.nodes[i];
+                const templateText = templatePreset?.nodes[i];
                 function check(element, prop, value) {
                     if (templateText) {
                         element.classList.toggle('change', templateText[prop] !== value);
@@ -1556,6 +1583,7 @@
                 fontDiv.appendChild(createIcon(iconFont));
                 const fontSelect = createFontSelect();
                 fontSelect.classList.add('editor-select-font');
+                fontSelect.value = `${text.font}:${text.weight}`;
                 fontSelect.addEventListener('change', (e) => {
                     const [font, weight] = e.target.value.split(':');
                     text.font = font;
@@ -1698,12 +1726,30 @@
                 textList.appendChild(row);
             });
         }
-        function textReplace(text, pageNumber) {
-            // Lazy
-            return text.replace('{pageLeft}', pageNumber)
-                .replace('{pageRight}', pageNumber)
+        function textReplace(text, { pageIndex, pageNumber, pageCount, index }) {
+            // Date
+            const date = new Date();
+            const year = date.getFullYear().toString();
+            const shortYear = year.slice(-2);
+            const month = (date.getMonth() + 1).toString();
+            const monthPadded = month.padStart(2, '0'); // Months are 0-indexed
+            const monthFull = date.toLocaleString('default', { month: 'long' });
+            const monthShort = date.toLocaleString('default', { month: 'short' });
+            const day = date.getDate().toString();
+            const dayPadded = day.padStart(2, '0');
+            // Replace values
+            return text.replace('{pageCount}', pageCount)
                 .replace('{pageNumber}', pageNumber)
-                .replace('{pageIndex}', pageNumber);
+                .replace('{pageIndex}', pageIndex)
+                .replace('{year}', year)
+                .replace('{shortYear}', shortYear)
+                .replace('{month}', month)
+                .replace('{monthPadded}', monthPadded)
+                .replace('{monthFull}', monthFull)
+                .replace('{monthShort}', monthShort)
+                .replace('{day}', day)
+                .replace('{dayPadded}', dayPadded)
+                .replace('{index}', index);
         }
         /**
          * Utility to take image data and update template
@@ -1756,6 +1802,7 @@
                 : Math.floor(pageNumber / 2) * innerOffset;
             // Draw Text
             function drawText() {
+                const pageCount = pages.length * 2;
                 const page = pages.find(x => x.index === pageNumber);
                 // Draw Page Numbers
                 if (isEnabled) {
@@ -1841,7 +1888,7 @@
                     'inch': 100,
                     'cm': 100 / 2.54
                 };
-                preset.nodes.forEach((text) => {
+                preset.nodes.forEach((text, index) => {
                     if (text.hidden === true) { return; }
                     const lines = text.value.split('\n');
                     const lineCount = lines.length;
@@ -1861,7 +1908,16 @@
                     const { red, green, blue, alpha } = text.color;
                     ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
                     for (var i = 0; i < lines.length; i++) {
-                        ctx.fillText(textReplace(lines[i], pageNumber), x, y + (i * lineHeight));
+                        ctx.fillText(
+                            textReplace(lines[i], {
+                                pageIndex: pageNumber,
+                                pageNumber: text.side === 'left' ? page.start ?? '' : page.end ?? '',
+                                pageCount,
+                                index
+                            }),
+                            x,
+                            y + (i * lineHeight)
+                        );
                     }
                 });
             }
@@ -2157,9 +2213,24 @@
             fontPreviewEle.style.font = font;
             fontPreviewEle.style.fontWeight = `${weight}`;
         }
-        // Create a single edit text node
-        function createEditTextItem() {
-
+        // Verify typos
+        function assertTemplatesData(data) {
+            const uuids = new Set();
+            data.forEach((template) => {
+                if (uuids.has(template.value)) {
+                    alert(`Duplicate uuid ${template.value} in templates.json`);
+                }
+                uuids.add(template.value);
+                if (template.presets) {
+                    template.presets.forEach((preset) => {
+                        if (uuids.has(preset.value)) {
+                            alert(`Duplicate uuid ${preset.value} in templates.json`);
+                        }
+                        uuids.add(preset.value);
+                    });
+                }
+            });
+            console.log('Valid uuid total', uuids.size);
         }
         // Download templates.json
         async function downloadTemplates() {
@@ -2168,6 +2239,7 @@
                 throw new Error(`Handle errors eventually?`);
             }
             const data = await response.json();
+            assertTemplatesData(data);
             return data;
         }
         // Download Template Images
@@ -2426,6 +2498,7 @@
                 const { nodes } = getPresetByUuid(e.target.value);
                 updateTextList(nodes);
                 setLocalStoragePreset();
+                updateTemplate(currentIndex);
             });
             const currentPreset = getLocalStoragePreset() ?? getSelectPreset();
             if (currentPreset) {
@@ -2599,7 +2672,7 @@
             </fieldset>
             <fieldset style="margin-block-start: 1rem;border: 2px solid #999;border-radius: 0.5rem;">
                 <legend style="cursor: default;">
-                    <input type="checkbox" id="presetDisabled" style="vertical-align: text-bottom;" />
+                    <input type="checkbox" id="presetDisabled" disabled style="vertical-align: text-bottom;" />
                     Overlay Text
                 </legend>
                 <div id="noPresets" class="editor-buttons">
@@ -2644,7 +2717,6 @@
             <p>Select an existing template or upload your own.</p>
             <h3>How to Print</h3>
             <p>Start by printing the cover page, then decide if your notebook pages will have page numbers.</p>
-
             <h4>Without Page Numbers</h4>
             <p>Since there are no page numbers each inner sheet will have a standard front and back. Print an info page on the cover back or any template.</p>
             <h4>With Page Numbers</h4>
@@ -2654,6 +2726,21 @@
                 <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+ (199gsm) Cardstock paper recommended.</li>
                 <li><strong>Detail (Cover Back)</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock. If this is not the case then print the inner page on the back of the cover page.</li>
                 <li><strong>Inner</strong> - This paper stock can vary depending on the usage. 65lb is common. Too many pages can cause a notebook to be difficult to close or staple.</li>
+            </ul>
+            <h3>Text Overlays</h3>
+            <p>Some templates ship with presets, but these can be fully customized.</p>
+            <ul>
+                <li><code>{pageNumber}</code> Current page number</li>
+                <li><code>{pageIndex}</code> Page index</li>
+                <li><code>{year}</code> ex: 2025</li>
+                <li><code>{shortYear}</code> ex: 25</li>
+                <li><code>{month}</code> ex: 1</li>
+                <li><code>{monthPadded}</code> ex: 01</li>
+                <li><code>{monthFull}</code> ex: January</li>
+                <li><code>{monthShort}</code> ex: Jan</li>
+                <li><code>{day}</code> ex: 8</li>
+                <li><code>{dayPadded}</code> ex: 08</li>
+                <li><code>{index}</code> Text entry index</li>
             </ul>
             <hr/>
             <h2>Source Code</h2>
