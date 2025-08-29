@@ -2234,7 +2234,7 @@
         }
         // Download templates.json
         async function downloadTemplates() {
-            const response = await fetch('templates.json');
+            const response = await fetch('templates.json', { cache: 'no-store' });
             if (!response.ok) {
                 throw new Error(`Handle errors eventually?`);
             }
