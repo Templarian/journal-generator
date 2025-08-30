@@ -591,6 +591,37 @@
             section .editor-column-hideshow {
                 width: 1.5rem;
             }
+            section .editor-row.editor-presets {
+                display: grid;
+                gap: 0.25rem;
+                grid-template-columns: 1fr auto auto auto;
+            }
+            section .editor-presets select {
+                grid-row: 1;
+                grid-column: 1;
+            }
+            section .editor-presets .editor-preset-add {
+                grid-row: 1;
+                grid-column: 2;
+            }
+            section .editor-presets .editor-preset-copy {
+                grid-row: 1;
+                grid-column: 3;
+            }
+            section .editor-presets .editor-preset-menu {
+                grid-row: 1;
+                grid-column: 4;
+            }
+            section .editor-presets .editor-preset-rename {
+                grid-row: 1;
+                grid-column: 1;
+                display: flex;
+            }
+            section .editor-presets .editor-preset-rename input {
+                width: auto !important;
+                flex: 1;
+                border: 2px solid #666;
+            }
             section .editor-row {
                 display: flex;
                 gap: 0.25rem;
@@ -718,6 +749,55 @@
             section .editor-row button.editor-preset-copy {
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
+            }
+            section .editor-row .editor-preset-menu {
+                display: flex;
+                position: relative;
+            }
+            section .editor-row .editor-preset-menu-button {
+                
+            }
+            section .editor-row .editor-preset-menu-item {
+                display: flex;
+                border: 0;
+                border-radius: 0.25rem;
+                padding: 0.25rem;
+                background: transparent;
+                gap: 0.25rem;
+                align-items: center;
+                font-size: 1rem;
+            }
+            section .editor-row .editor-preset-menu-list {
+                position: absolute;
+                right: 0;
+                top: 1.75rem;
+            }
+            section .editor-row .editor-preset-menu-list::before {
+                content: ' ';
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.1);
+                z-index: 1;
+                position: fixed;
+                left: 0;
+                top: 0;
+            }
+            section .editor-row .editor-preset-menu-items {
+                position: relative;
+                background: #FFF;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                border-radius: 0.5rem;
+                padding: 0.25rem;
+                border: 1px solid #666;
+                z-index: 1;
+            }
+            section .editor-row .editor-preset-menu-seperator {
+                border-top: 1px solid #AAA;
+                margin-top: 0.25rem;
+                padding-top: 0.25rem;
+            }
+            .hide + .editor-preset-menu-seperator {
+                display: none;
             }
             section .editor-row button.editor-page-left {
                 border-top-right-radius: 0;
@@ -1606,6 +1686,12 @@
                 check(fontSelect, 'weight', text.weight);
                 fontDiv.appendChild(fontSelect);
                 const sizeSelect = createSelect([
+                    ['0.2', '0.20 Inch'],
+                    ['0.25', '0.25 Inch'],
+                    ['0.3', '0.30 Inch'],
+                    ['0.35', '0.30 Inch'],
+                    ['0.4', '0.40 Inch'],
+                    ['0.45', '0.45 Inch'],
                     ['0.5', '0.50 Inch'],
                     ['0.6', '0.60 Inch'],
                     ['0.7', '0.70 Inch'],
@@ -1738,9 +1824,9 @@
                 : iconTrash
             );
             // Toggle Rename Feature
-            const presetNameWrapperEle = document.getElementById('presetNameWrapper');
+            const presetRenameEle = document.getElementById('presetRename');
             const presetNameEle = document.getElementById('presetName');
-            presetNameWrapperEle.classList.toggle('hide', templatePreset !== null);
+            presetRenameEle.classList.toggle('hide', templatePreset !== null);
             presetNameEle.value = preset.label;
         }
         function textReplace(text, { pageIndex, pageNumber, pageCount, index }) {
@@ -2492,18 +2578,81 @@
                 });
                 updateTemplate(currentIndex);
             });
-            document.getElementById('presetRemove').addEventListener('click', () => {
-                const id = getSelectPreset();
-                deleteUserDefinedPreset(id);
+            document.getElementById('presetRename').addEventListener('click', () => {
+                const presetNameWrapperEle = document.getElementById('presetNameWrapper');
+                const presetNameEle = document.getElementById('presetName');
+                presetNameWrapperEle.classList.toggle('hide', false);
+                presetNameEle.focus();
             });
+            document.getElementById('presetImport').addEventListener('click', async () => {
+                const [fileHandle] = await window.showOpenFilePicker({
+                    types: [{
+                        description: 'JSON Files',
+                        accept: {
+                            'application/json': ['.json']
+                        }
+                    }],
+                    multiple: false
+                });
+                const file = await fileHandle.getFile();
+                const content = await file.text();
+                console.log(content);
+            });
+            document.getElementById('presetExport').addEventListener('click', async () => {
+                const fileHandle = await window.showSaveFilePicker({
+                    types: [{
+                        description: 'JSON Files',
+                        accept: {
+                            'application/json': ['.json']
+                        }
+                    }]
+                });
+                const id = getSelectPreset();
+                const dataToSave = getPresetByUuid(id);
+                const jsonString = JSON.stringify(dataToSave, null, 2);
+                const writableStream = await fileHandle.createWritable();
+                await writableStream.write(jsonString);
+                await writableStream.close();
+            });
+            document.getElementById('presetRemove').addEventListener('click', () => {
+                const yes = confirm('Are you sure?');
+                if (yes) {
+                    const id = getSelectPreset();
+                    deleteUserDefinedPreset(id);
+                }
+            });
+            const presetNameWrapperEle = document.getElementById('presetNameWrapper');
             const presetNameEle = document.getElementById('presetName');
-            presetNameEle.addEventListener('input', (e) => {
+            presetNameEle.addEventListener('blur', (e) => {
                 const id = getSelectPreset();
                 setUserDefinedPreset({
                     value: id,
                     label: e.target.value
                 });
                 updateTemplatePresets();
+                presetNameWrapperEle.classList.toggle('hide', true);
+            });
+            const presetMenuEle = document.getElementById('presetMenu');
+            const presetMenuItemsEle = document.getElementById('presetMenuItems');
+            let presetMenuVisible = false;
+            function hideMenu() {
+                presetMenuItemsEle.classList.toggle('hide', true);
+                presetMenuVisible = false;
+                document.removeEventListener('click', hideMenu);
+                document.removeEventListener('keydown', hideMenuEscape);
+            }
+            function hideMenuEscape(e) {
+                if (e.key === 'Escape') {
+                    hideMenu();
+                }
+            }
+            presetMenuEle.addEventListener('click', () => {
+                presetMenuVisible = !presetMenuVisible;
+                presetMenuItemsEle.classList.toggle('hide', !presetMenuVisible);
+                requestAnimationFrame(() => {
+                    document.addEventListener('keydown', hideMenuEscape);
+                    document.addEventListener('click', hideMenu);
+                });
             });
             // Cache all images
             const promises = [];
@@ -2713,14 +2862,40 @@
                 </div>
                 <div id="hasPresets">
                     <div class="editor-column">
-                        <div class="editor-row">
+                        <div class="editor-row editor-presets">
                             <select id="presetSelect" disabled></select>
                             <button id="presetAdd" class="editor-preset-add"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></button>
                             <button id="presetCopy" class="editor-preset-copy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
-                            <button id="presetRemove" class="editor-preset-remove"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" id="presetRemoveIcon" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg></button>
-                        </div>
-                        <div id="presetNameWrapper" class="editor-row">
-                            <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
+                            <div class="editor-preset-menu">
+                                <button class="editor-preset-menu-button" id="presetMenu">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M18,9V10.5L12,16.5L6,10.5V9H18M12,13.67L14.67,11H9.33L12,13.67Z" /></svg>
+                                </button>
+                                <div id="presetMenuItems" class="editor-preset-menu-list hide">
+                                    <div class="editor-preset-menu-items">
+                                        <button id="presetRename" class="editor-preset-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z" /></svg>
+                                            <span>Rename</span>
+                                        </button>
+                                        <div class="editor-preset-menu-seperator"></div>
+                                        <button id="presetImport" class="editor-preset-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H18C19.11 22 20 21.11 20 20V8L14 2M18 20H6V4H13V9H18V20M15 11.93V19H7.93L10.05 16.88L7.22 14.05L10.05 11.22L12.88 14.05L15 11.93Z" /></svg>
+                                            <span>Import</span>
+                                        </button>
+                                        <button id="presetExport" class="editor-preset-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2M18 20H6V4H13V9H18V20M16 11V18.1L13.9 16L11.1 18.8L8.3 16L11.1 13.2L8.9 11H16Z" /></svg>
+                                            <span>Export</span>
+                                        </button>
+                                        <div class="editor-preset-menu-seperator"></div>
+                                        <button id="presetRemove" class="editor-preset-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" id="presetRemoveIcon" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="presetNameWrapper" class="editor-preset-rename hide">
+                                <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
+                            </div>
                         </div>
                     </div>
                     <div class="editor-wrapper">
