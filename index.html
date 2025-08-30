@@ -1387,21 +1387,24 @@
             optgroupEle2.label = `User Defined (${userdefinedCount})`;
             presetSelectEle.appendChild(optgroupEle2);
             presetSelectEle.disabled = false;
+            const presetDisabledEle = document.getElementById('presetDisabled');
             const id = getLocalStoragePreset() ?? getSelectPreset();
             if (id) {
                 presetSelectEle.value = id;
                 const currentPreset = getPresetByUuid(id);
                 updateTextList(currentPreset.nodes);
+                // Update with selected
+                presetDisabledEle.checked = getLocalStoragePresetDisabled();
+                presetDisabledEle.disabled = false;
+            } else {
+                presetDisabledEle.checked = false;
+                presetDisabledEle.disabled = true;
             }
             // Show the giant add preset button if none
             const noPresetsEle = document.getElementById('noPresets');
             const hasPresetsEle = document.getElementById('hasPresets');
             noPresetsEle.classList.toggle('hide', hasPresets || userDefinedPrests.length !== 0);
             hasPresetsEle.classList.toggle('hide', !hasPresets && userDefinedPrests.length === 0);
-            // Update with selected
-            //if (presets.length) {
-            //    updateTextList(presets[0].nodes);
-            //}
         }
         function updateTextList(nodes) {
             const templatePreset = getTemplatePreset();
@@ -2530,7 +2533,6 @@
                 setLocalStoragePresetDisabled();
                 updateTemplate(currentIndex);
             });
-            presetDisabledEle.checked = getLocalStoragePresetDisabled();
             // Clear Cache
             document.getElementById('clearCache').addEventListener('click', (e) => {
                 const yes = window.confirm('If you do this it resets all config changes and text overlays.')
@@ -2583,6 +2585,18 @@
                         "leadingOffset": 0.25
                     }]
                 });
+                updateTemplate(currentIndex);
+            });
+            document.getElementById('presetCopy').addEventListener('click', () => {
+                presetDisabled.checked = true;
+                const id = getSelectPreset();
+                const preset = getPresetByUuid(id);
+                addUserDefinedPreset({
+                    value: uuid(),
+                    label: preset.label,
+                    nodes: structuredClone(preset.nodes)
+                });
+                updateTemplatePresets();
                 updateTemplate(currentIndex);
             });
             document.getElementById('presetRename').addEventListener('click', () => {
