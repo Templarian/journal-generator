@@ -1898,7 +1898,7 @@
             const enabledEle = document.getElementById('enablePageNumbers');
             const isEnabled = enabledEle.checked;
             // Font Preview
-            const fontEle = document.getElementById('font');
+            const fontEle = document.getElementById('font').querySelector('select');
             const fontPreviewEle = document.getElementById('fontPreview');
             fontPreviewEle.classList.toggle('disabled', !isEnabled);
             // Elements
@@ -2469,8 +2469,8 @@
             fontSelect.addEventListener('change', (e) => {
                 const [font, weight] = e.target.value.split(':');
                 setFont(font, weight);
-                updateTemplate(currentIndex);
                 localStorage.setItem('font', e.target.value);
+                updateTemplate(currentIndex);
             });
             const currentFont = localStorage.getItem('font') ?? 'Rubik:400';
             const [cacheFont, cacheWeight] = currentFont;
