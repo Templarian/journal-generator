@@ -1245,6 +1245,10 @@
             localStorage.setItem(key, JSON.stringify(presets));
             // Automatically select newly created preset
             localStorage.setItem(`${key}:selected`, preset.value);
+            const isEnabled = getLocalStoragePresetDisabled();
+            if (!isEnabled) {
+                setLocalStoragePresetDisabled(false);
+            }
             // Update Select
             updateTemplatePresets();
         }
@@ -1320,19 +1324,21 @@
             const template = getTemplate();
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:presets:disabled`;
-            return localStorage.getItem(key) ?? false;
+            return localStorage.getItem(key) ?? true;
         }
-        function setLocalStoragePresetDisabled() {
+        function setLocalStoragePresetDisabled(override) {
             const presetDisabledEle = document.getElementById('presetDisabled');
-            const value = !presetDisabledEle.checked;
+            const value = override === undefined
+                ? !presetDisabledEle.checked
+                : override;
             const type = getCurrentType();
             const template = getTemplate();
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:presets:disabled`;
             if (value) {
-                localStorage.removeItem(key);
-            } else {
                 localStorage.setItem(key, value);
+            } else {
+                localStorage.removeItem(key);
             }
         }
         function getLocalStoragePreset() {
