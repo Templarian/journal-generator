@@ -1264,14 +1264,14 @@
                 // if not found create a copy
                 const copyPreset = getPresetByUuid(value);
                 copyPreset.label = copyPreset.label;
-                copyPreset.nodes = nodes;
+                copyPreset.nodes = structuredClone(nodes);
                 presets.push(copyPreset);
             } else {
                 if (label) {
                     preset.label = label;
                 }
                 if (nodes) {
-                    preset.nodes = nodes;
+                    preset.nodes = structuredClone(nodes);
                 }
             }
             localStorage.setItem(key, JSON.stringify(presets));
