@@ -2639,13 +2639,21 @@
                 if (templatePreset) {
                     const yes = confirm('Revert text overlay to template configuration?');
                     if (yes) {
-                        console.log('boop');
+                        const id = getSelectPreset();
+                        setUserDefinedPreset({
+                            value: id,
+                            label: templatePreset.label,
+                            nodes: structuredClone(templatePreset.nodes)
+                        });
+                        updateTemplatePresets();
+                        updateTemplate(currentIndex);
                     }
                 } else {
                     const yes = confirm('Are you sure you want to remove this text overlay?');
                     if (yes) {
                         const id = getSelectPreset();
                         deleteUserDefinedPreset(id);
+                        updateTemplate(currentIndex);
                     }
                 }
             });
