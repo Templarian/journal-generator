@@ -1263,7 +1263,7 @@
             if (!preset) {
                 // if not found create a copy
                 const copyPreset = getPresetByUuid(value);
-                copyPreset.label = `${copyPreset.label} [debug]`;
+                copyPreset.label = copyPreset.label;
                 copyPreset.nodes = nodes;
                 presets.push(copyPreset);
             } else {
@@ -1353,6 +1353,7 @@
         }
         function updateTemplatePresets() {
             // Template
+            const uuids = new Set();
             const template = getTemplate();
             // Actual Select
             let hasPresets = false;
@@ -1368,18 +1369,22 @@
                     option.value = preset.value;
                     option.textContent = preset.label;
                     optgroupEle.appendChild(option);
+                    uuids.add(preset.value);
                 });
                 presetSelectEle.appendChild(optgroupEle);
             }
             const optgroupEle2 = document.createElement('optgroup');
             const userDefinedPrests = getUserDefinedPresets();
-            optgroupEle2.label = `User Defined (${userDefinedPrests.length})`;
+            let userdefinedCount = 0;
             userDefinedPrests.forEach((preset) => {
+                if (uuids.has(preset.value)) { return; }
                 const option = document.createElement('option');
                 option.value = preset.value;
                 option.textContent = preset.label;
                 optgroupEle2.appendChild(option);
+                userdefinedCount++;
             });
+            optgroupEle2.label = `User Defined (${userdefinedCount})`;
             presetSelectEle.appendChild(optgroupEle2);
             presetSelectEle.disabled = false;
             const id = getLocalStoragePreset() ?? getSelectPreset();
@@ -2598,7 +2603,19 @@
                 });
                 const file = await fileHandle.getFile();
                 const content = await file.text();
-                console.log(content);
+                const preset = JSON.parse(content);
+                if (typeof preset === 'object' && !Array.isArray(preset) && preset !== null) {
+                    preset.value = uuid();
+                    if (!preset.label) {
+                        alert(`Invalid file, missing 'label'.`);
+                    }
+                    if (!preset.nodes) {
+                        alert(`Invalid file, missing 'nodes'.`);
+                    }
+                    addUserDefinedPreset(preset);
+                } else {
+                    alert('Invalid file.');
+                }
             });
             document.getElementById('presetExport').addEventListener('click', async () => {
                 const fileHandle = await window.showSaveFilePicker({
@@ -2610,7 +2627,8 @@
                     }]
                 });
                 const id = getSelectPreset();
-                const dataToSave = getPresetByUuid(id);
+                const dataToSave = structuredClone(getPresetByUuid(id));
+                delete dataToSave.value;
                 const jsonString = JSON.stringify(dataToSave, null, 2);
                 const writableStream = await fileHandle.createWritable();
                 await writableStream.write(jsonString);
