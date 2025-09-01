@@ -614,7 +614,7 @@
             }
             section .editor-presets .editor-preset-rename {
                 grid-row: 1;
-                grid-column: 1;
+                grid-column: 1 / span 3;
                 display: flex;
             }
             section .editor-presets .editor-preset-rename input {
@@ -1842,8 +1842,7 @@
             // Toggle Rename Feature
             const presetRenameEle = document.getElementById('presetRename');
             const presetNameEle = document.getElementById('presetName');
-            presetRenameEle.classList.toggle('hide', templatePreset !== null);
-            presetNameEle.value = preset.label;
+            presetRenameEle.classList.toggle('hide', templatePreset !== undefined);
         }
         function textReplace(text, { pageIndex, pageNumber, pageCount, index }) {
             // Date
@@ -2609,6 +2608,9 @@
                 const presetNameWrapperEle = document.getElementById('presetNameWrapper');
                 const presetNameEle = document.getElementById('presetName');
                 presetNameWrapperEle.classList.toggle('hide', false);
+                const id = getSelectPreset();
+                const preset = getPresetByUuid(id);
+                presetNameEle.value = preset.label;
                 presetNameEle.focus();
             });
             document.getElementById('presetImport').addEventListener('click', async () => {
@@ -2679,14 +2681,29 @@
             });
             const presetNameWrapperEle = document.getElementById('presetNameWrapper');
             const presetNameEle = document.getElementById('presetName');
-            presetNameEle.addEventListener('blur', (e) => {
-                const id = getSelectPreset();
-                setUserDefinedPreset({
-                    value: id,
-                    label: e.target.value
-                });
-                updateTemplatePresets();
+            let ignoreNext = false;
+            function closePresetName(newValue) {
+                if (newValue && !ignoreNext) {
+                    const id = getSelectPreset();
+                    setUserDefinedPreset({
+                        value: id,
+                        label: newValue
+                    });
+                    updateTemplatePresets();
+                    ignoreNext = false;
+                }
                 presetNameWrapperEle.classList.toggle('hide', true);
+            }
+            presetNameEle.addEventListener('blur', (e) => {
+                closePresetName(e.target.value);
+            });
+            presetNameEle.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closePresetName(null);
+                    ignoreNext = true;
+                } else if (e.key === 'Enter') {
+                    closePresetName(e.target.value);
+                }
             });
             const presetMenuEle = document.getElementById('presetMenu');
             const presetMenuItemsEle = document.getElementById('presetMenuItems');
