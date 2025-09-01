@@ -1218,6 +1218,23 @@
             // Maybe it got deleted?
             return null;
         }
+        function setLocalStoragePrinterOffset() {
+            // Printer Offset, only 'cover:printerOffset' and 'inner:pageOffset'
+            let printerOffsetKey = 'inner:printerOffset';
+                if (currentIndex === 0 || currentIndex === 1) {
+                printerOffsetKey = 'cover:printerOffset';
+            }
+            const value = document.getElementById('offset').value;
+            localStorage.setItem(printerOffsetKey, value);
+        }
+        function getLocalStoragePrinterOffset() {
+            // Printer Offset, only 'cover:printerOffset' and 'inner:pageOffset'
+            let printerOffsetKey = 'inner:printerOffset';
+                if (currentIndex === 0 || currentIndex === 1) {
+                printerOffsetKey = 'cover:printerOffset';
+            }
+            return localStorage.getItem(printerOffsetKey) ?? '0';
+        }
         /**
          * Pull user defined from localstorage
          */
@@ -2159,6 +2176,10 @@
                 : pageNumber === 1
                     ? 'detailText'
                     : 'innerText';
+            // Update Offsets
+            const currentOffset = getLocalStoragePrinterOffset();
+            document.getElementById('offset').value = currentOffset;
+            body.style.setProperty('--config-innerOffset', `${currentOffset}mm`);
         }
         /**
          * Utility to visibly show page numbers. Personally find it easier
@@ -2508,18 +2529,12 @@
                 document.getElementById('typeDetail').classList.remove('selected');
                 document.getElementById('typeInner').classList.add('selected');
             });
-            // Offset
+            // Printer Offset
             document.getElementById('offset').addEventListener('change', (e) => {
                 const { value } = e.target;
-                const body = document.getElementById('body');
-                body.style.setProperty('--config-innerOffset', `${value}mm`);
-                localStorage.setItem('offset', value);
+                setLocalStoragePrinterOffset();
                 updateTemplate(currentIndex);
             });
-            const currentOffset = localStorage.getItem('offset') ?? '0';
-            document.getElementById('offset').value = currentOffset;
-            const body = document.getElementById('body');
-            body.style.setProperty('--config-innerOffset', `${currentOffset}mm`);
             // Inner Offset
             document.getElementById('innerOffset').addEventListener('change', (e) => {
                 const { value } = e.target;
