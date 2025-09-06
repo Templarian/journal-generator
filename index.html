@@ -39,7 +39,7 @@
 
             div.page {
                 /* Overridden by JS... */
-                background-image: url('page.png');
+                background-image: url('assets/page.png');
             }
 
             div.page:first-child {
@@ -165,7 +165,7 @@
 
             div.page {
                 /* Overridden by JS... */
-                background-image: url('page.png');
+                background-image: url('assets/page.png');
             }
 
             div.page:first-child {
@@ -1002,6 +1002,8 @@
     <script>
         // Hardcode a uuid
         let dbCache = null;
+        // minMaxRGBA
+        const minMaxRGBA = new Map();
         // Local Storage
         //   Page Number Font
         //   - font
@@ -1914,7 +1916,7 @@
             const ctx = canvas.getContext('2d');
             canvas.width = width;
             canvas.height = height;
-            const pageImage = await downloadImage('page.png');
+            const pageImage = await downloadImage('assets/page.png');
             ctx.drawImage(
                 pageImage,
                 0, 0, width, height,
@@ -2069,7 +2071,43 @@
                     }
                 });
             }
-            // Draw Image
+            // Calculate min max RGBA
+            function calculateMinMaxRGBA() {
+                const imageData = ctx.getImageData(
+                    offsetX,
+                    offsetY,
+                    canvas.width - (offsetX * 2),
+                    canvas.height - (offsetY + (7 * convert))
+                );
+                const pixels = imageData.data;
+                let first = true, red = 0, blue = 0, green = 0, alpha = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
+                        // Ignore White
+                        continue;
+                    }
+                    if (!first) {
+
+                    } else {
+                        red = pixels[i];
+                        green = pixels[i + 1];
+                        blue = pixels[i + 2];
+                        alpha = pixels[i + 3];
+                    }
+                }
+                const type = getCurrentType();
+                const template = getTemplate();
+                if (template) {
+                    minMaxRGBA.set(
+                        template.value,
+                        {}
+                    );
+                } else {
+                    minMaxRGBA.set()
+                }
+                //minMaxRGBA.set()
+            }
+            // Draw Image, not really hue
             function applyHue(r, g, b) {
                 const imageData = ctx.getImageData(
                     offsetX,
@@ -2111,8 +2149,9 @@
                 }
                 // Draw Page Numbers
                 drawPageNumbers();
+                // Cache minMaxRGBA
+                //calculateMinMaxRGBA();
                 // Shift Colors
-                // 150 75 0
                 applyHue(150, 75, 0);
                 // Draw Text
                 drawText();

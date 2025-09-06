@@ -35,7 +35,13 @@ For templates with dynamic text use the export accessible from the dropdown to g
 
 ## Templates
 
-All templates are stored in black and white. Use the tint feature to shift the color profile.
+All templates are stored in black and white (no transparent support). Use the tint feature to shift the color profile. The tint works as a basic color shift to the grayscale pixels.
+
+|   | Red | Green | Blue |
+|---|-----|-------|------|
+| Original Pixel | 0 | 0 | 0 |
+| Brown | 150 | 75 | 0 |
+| Updated Pixel | 150 | 75 | 0 |
 
 ## Source
 
