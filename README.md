@@ -29,9 +29,13 @@ Steps to use the app are in the left section of the app.
 
 Use the issues tab to request new templates. Explain the new template request or upload an image.
 
-For templates with dynamic text include a default value and placement information.
+For templates with dynamic text use the export accessible from the dropdown to generate the JSON.
 
-**Note:** All templates need a base grid type (inch, cm, or mm). Offset values use this as their unit of measure. Page number placement will vary slightly based on this value.
+**Note:** All templates need a base grid measurement (inch, cm, or mm). Text values use this as their unit of measure. Page number placement will vary slightly based on this value.
+
+## Templates
+
+All templates are stored in black and white. Use the tint feature to shift the color profile.
 
 ## Source
 

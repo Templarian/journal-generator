@@ -880,6 +880,16 @@
                 color: #198754;
             }
 
+            section .tint {
+                border: 1px solid #666;
+                border-radius: 0.25rem;
+                padding: 0.25rem;
+                outline: #FFF solid 2px;
+                outline-offset: -3px;
+                background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="100" viewBox="0 0 4442 720"><path d="M36,297.64c317.62,0,428,134.58,696,136.74S1160,364,1436,389s431.72-102.09,618-91.36,505.93,73.37,715,72.29,339,72,674,64.45,712.27,157.83,920,174l46,111.14H36Z" ></path></svg>');
+                background-color: #F0F;
+            }
+
             ul {
                 padding: 0 0 0 1.5rem;
             }
@@ -1935,9 +1945,8 @@
             const offset = Math.floor(pageNumber / 2) === 0
                 ? 0
                 : Math.floor(pageNumber / 2) * innerOffset;
-            // Draw Text
-            function drawText() {
-                const pageCount = pages.length * 2;
+            // Draw Page Numbers
+            function drawPageNumbers() {
                 const page = pages.find(x => x.index === pageNumber);
                 // Draw Page Numbers
                 if (isEnabled) {
@@ -1964,6 +1973,10 @@
                     }
                     // Test placement with: ██
                 }
+            }
+            function drawText() {
+                const pageCount = pages.length * 2;
+                const page = pages.find(x => x.index === pageNumber);
                 // Draw Custom Text
                 const presetDisabledEle = document.getElementById('presetDisabled');
                 const show = presetDisabledEle.checked;
@@ -2056,6 +2069,30 @@
                     }
                 });
             }
+            // Draw Image
+            function applyHue(r, g, b) {
+                const imageData = ctx.getImageData(
+                    offsetX,
+                    offsetY,
+                    canvas.width - (offsetX * 2),
+                    canvas.height - (offsetY * 2)
+                );
+                const pixels = imageData.data;
+                // Brown 165 42 42
+                const tintColor = { r, g, b };
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
+                        continue;
+                    }
+                    // Apply tint by blending (e.g., averaging or multiplying)
+                    pixels[i] = (pixels[i] + tintColor.r) / 2; // Red channel
+                    pixels[i + 1] = (pixels[i + 1] + tintColor.g) / 2; // Green channel
+                    pixels[i + 2] = (pixels[i + 2] + tintColor.b) / 2; // Blue channel
+                    // pixels[i + 3] = (pixels[i + 3] * tintColor.a) / 255; // Alpha channel (optional)
+                }
+                ctx.putImageData(imageData, offsetX, offsetY);
+            }
             // Draw pages
             function draw(img) {
                 if (img) {
@@ -2072,6 +2109,12 @@
                         (55 * 3) + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
                     );
                 }
+                // Draw Page Numbers
+                drawPageNumbers();
+                // Shift Colors
+                // 150 75 0
+                applyHue(150, 75, 0);
+                // Draw Text
                 drawText();
                 const pagesOld = [...document.querySelectorAll('div.page')];
                 pagesOld.forEach(page => {
@@ -2848,9 +2891,15 @@
             <div>First Sheet</div>
             <div>...</div>
         </div>
-        <div>
-            <label for="template">Template</label>
-            <select id="template" disabled></select>
+        <div style="display: flex;gap: 0.5rem;">
+            <div style="flex: 1;">
+                <label for="template">Template</label>
+                <select id="template" disabled></select>
+            </div>
+            <div style="display: flex;flex-direction: column;">
+                <div style="margin-bottom: 0.25rem;">Tint</div>
+                <button id="tint" class="tint">&nbsp;</button>
+            </div>
         </div>
         <div id="customTemplate" class="custom">
             <input type="file" id="upload"/>
