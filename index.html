@@ -2131,8 +2131,23 @@
                 }
                 ctx.putImageData(imageData, offsetX, offsetY);
             }
+            // Draw Empty
+            async function drawEmpty() {
+                const emptyImage = await downloadImage('assets/empty.png');
+                ctx.drawImage(
+                    emptyImage,
+                    0, 0, halfWidthInner - offset, heightInner,
+                    (55 * 3) + offset, 27 * 3, halfWidthInner - offset, heightInner
+                );
+                // Right Page
+                ctx.drawImage(
+                    emptyImage,
+                    halfWidthInner + offset, 0, halfWidthInner - offset, heightInner,
+                    (55 * 3) + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
+                );
+            }
             // Draw pages
-            function draw(img) {
+            async function draw(img) {
                 if (img) {
                     // Left Page
                     ctx.drawImage(
@@ -2155,6 +2170,11 @@
                 applyHue(150, 75, 0);
                 // Draw Text
                 drawText();
+                // Draw Empty
+                if (!img) {
+                    await drawEmpty();
+                }
+                // Update Background Image
                 const pagesOld = [...document.querySelectorAll('div.page')];
                 pagesOld.forEach(page => {
                     page.style.backgroundImage = `url('${canvas.toDataURL("image/png")}')`;
@@ -2167,11 +2187,11 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = new Image();
-                    img.onload = () => {
+                    img.onload = async () => {
                         if (img.width !== widthInner || img.height !== heightInner) {
                             alert(`Should really only use ${widthInner}x${heightInner} images.`);
                         }
-                        draw(img);
+                        await draw(img);
                         // Create cache
                         const canvas2 = document.createElement('canvas');
                         const ctx2 = canvas2.getContext('2d');
@@ -2208,11 +2228,12 @@
                         }
                         if (cachePage === null) {
                             console.info('custom selected, no file or cache');
-                            draw();
+                            await draw();
+                            await drawEmpty();
                         } else {
                             const img2 = document.createElement('img');
-                            img2.onload = () => {
-                                draw(img2);
+                            img2.onload = async () => {
+                                await draw(img2);
                             };
                             img2.src = cachePage;
                         }
@@ -2223,7 +2244,7 @@
             } else {
                 // Use Template Path
                 const templateImage = await downloadTemplate(template);
-                draw(templateImage);
+                await draw(templateImage);
             }
             // Store selected template in localStorage
             if (pageNumber === 0) {
