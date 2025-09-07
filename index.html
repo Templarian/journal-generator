@@ -650,11 +650,11 @@
                 min-width: 0;
                 width: 4rem;
             }
-            section .editor-row input[type=number].no-arrows {
+            section input[type=number].no-arrows {
                 -moz-appearance: textfield;
             }
-            section .editor-row input[type=number].no-arrows::-webkit-outer-spin-button,
-            section .editor-row input[type=number].no-arrows::-webkit-inner-spin-button {
+            section input[type=number].no-arrows::-webkit-outer-spin-button,
+            section input[type=number].no-arrows::-webkit-inner-spin-button {
                 -webkit-appearance: none;
                 margin: 0;
             }
@@ -887,11 +887,15 @@
                 border-right: 1px solid #111;
                 border-bottom: 1px solid #111;
                 border-left: 0;
-                border-radius: 0 0.25rem 0 0;
+                border-radius: 0 0.25rem 0.25rem 0;
                 padding: 0.25rem 0.75rem;
                 background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"><path fill="rgb(140,140,140)" d="M25,25H20V20H15V25H10V20H5V25H0V20H5V15H0V10H5V5H0V0H5V5H10V0H15V5H20V0H25V5H20V10H25V15H20V20H25ZM15,10V5H10V10ZM10,15V10H5V15ZM20,15V10H15V15ZM15,20V15H10V20Z" ></path></svg>');
                 background-color: #DDD;
                 background-position: center center;
+            }
+
+            section .tint.custom {
+                border-radius: 0 0.25rem 0 0;
             }
 
             section .tint-menu {
@@ -912,7 +916,7 @@
                 display: flex;
                 border-radius: 50%;
                 border: 1px solid rgb(160, 0, 0);
-                background: rgb(140, 0, 0);
+                background: rgb(200, 0, 0);
                 width: 1rem;
                 height: 1rem;
             }
@@ -920,7 +924,7 @@
                 display: flex;
                 border-radius: 50%;
                 border: 1px solid rgb(0, 160, 0);
-                background: rgb(0, 140, 0);
+                background: rgb(0, 200, 0);
                 width: 1rem;
                 height: 1rem;
             }
@@ -928,9 +932,32 @@
                 display: flex;
                 border-radius: 50%;
                 border: 1px solid rgb(0, 0, 160);
-                background: rgb(0, 0, 140);
+                background: rgb(0, 0, 200);
                 width: 1rem;
                 height: 1rem;
+            }
+            section .tint-list-header {
+                border-top: 1px solid #DDD;
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+            section .tint-menu input[type=number] {
+                border: 1px solid #333;
+                padding: 0.25rem;
+                width: 2rem;
+                border-radius: 0.25rem;
+                text-align: center;
+            }
+            section .tint-options {
+                
+            }
+            section .tint-info {
+                border-top: 1px solid #999;
+                padding-top: 0.25rem;
+                margin-top: 0.5rem;
+            }
+            section input[type="radio"] {
+                margin: 0;
             }
 
             ul {
@@ -1047,6 +1074,7 @@
         let dbCache = null;
         // minMaxRGBA
         const minMaxRGBA = new Map();
+        let tintRed = 0, tintGreen = 0, tintBlue = 0;
         // Local Storage
         //   Page Number Font
         //   - font
@@ -1174,6 +1202,14 @@
                 return v.toString(16);
             });
         }
+        // Tints
+        const tintOptions = [{
+            value: '150:40:0',
+            label: 'Light Brown'
+        }, {
+            value: '3:169:244',
+            label: 'Blue Print'
+        }];
         // Fonts
         const fontOptions = [{
             value: 'Gill Sans MT:400',
@@ -1975,6 +2011,7 @@
             // Elements
             const templateEle = document.getElementById('template');
             const customTemplateEle = document.getElementById('customTemplate');
+            const tintEle = document.getElementById('tint');
             const uploadEle = document.getElementById('upload');
             const template = templateEle.value || 'custom';
             const customGridTypeEle = document.getElementById('customGridType');
@@ -2116,6 +2153,14 @@
             }
             // Calculate min max RGBA
             function calculateMinMaxRGBA() {
+                const type = getCurrentType();
+                const template = getTemplate();
+                const key = template
+                    ? `${template.value}:tint`
+                    : `${type}:tint`;
+                if (minMaxRGBA.has(key)) {
+                    return minMaxRGBA.get(key);
+                }
                 const imageData = ctx.getImageData(
                     offsetX,
                     offsetY,
@@ -2139,19 +2184,10 @@
                         green = pixels[i + 1];
                         blue = pixels[i + 2];
                         alpha = pixels[i + 3];
+                        first = false;
                     }
                 }
-                const type = getCurrentType();
-                const template = getTemplate();
-                if (template) {
-                    minMaxRGBA.set(
-                        template.value,
-                        {}
-                    );
-                } else {
-                    minMaxRGBA.set()
-                }
-                //minMaxRGBA.set()
+                minMaxRGBA.set(key, `${red}:${green}:${blue}`);
             }
             // Draw Image, not really hue
             function applyHue(r, g, b) {
@@ -2208,12 +2244,13 @@
                         (55 * 3) + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
                     );
                 }
+                // Cache minMaxRGBA
+                calculateMinMaxRGBA();
+                console.log(minMaxRGBA);
                 // Draw Page Numbers
                 drawPageNumbers();
-                // Cache minMaxRGBA
-                //calculateMinMaxRGBA();
                 // Shift Colors
-                applyHue(150, 75, 0);
+                applyHue(tintRed, tintGreen, tintBlue);
                 // Draw Text
                 drawText();
                 // Draw Empty
@@ -2311,6 +2348,7 @@
             // Custom list
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
+            tintEle.classList.toggle('custom', template === 'custom');
             // Front or Back
             const body = document.getElementById('body');
             body.style.setProperty('--config-pageFront', pageNumber % 2 === 0 ? 'true' : 'false');
@@ -2454,6 +2492,7 @@
         function updateTemplateList(pageIndex) {
             const templateEle = document.getElementById('template');
             const customTemplateEle = document.getElementById('customTemplate');
+            const tintEle = document.getElementById('tint');
             const newOptions = [];
             const customOption = document.createElement('option');
             customOption.value = 'custom';
@@ -2490,6 +2529,7 @@
             const template = templateEle.value;
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
+            tintEle.classList.toggle('custom', template === 'custom');
             // Update Preset List
             updateTemplatePresets();
             // Init Template Text
@@ -2597,6 +2637,27 @@
             const tintEle = document.getElementById('tint');
             tintEle.addEventListener('click', () => {
                 console.log('foo');
+            });
+            const tintRedEle = document.getElementById('tintRed');
+            const tintRedValueEle = document.getElementById('tintRedValue');
+            tintRedEle.addEventListener('input', (e) => {
+                tintRed = parseInt(e.target.value, 10);
+                tintRedValueEle.value = tintRed;
+                updateTemplate(currentIndex);
+            });
+            const tintGreenEle = document.getElementById('tintGreen');
+            const tintGreenValueEle = document.getElementById('tintGreenValue');
+            tintGreenEle.addEventListener('input', (e) => {
+                tintGreen = parseInt(e.target.value, 10);
+                tintGreenValueEle.value = tintGreen;
+                updateTemplate(currentIndex);
+            });
+            const tintBlueEle = document.getElementById('tintBlue');
+            const tintBlueValueEle = document.getElementById('tintBlueValue');
+            tintBlueEle.addEventListener('input', (e) => {
+                tintBlue = parseInt(e.target.value, 10);
+                tintBlueValueEle.value = tintBlue;
+                updateTemplate(currentIndex);
             });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
@@ -3012,65 +3073,45 @@
                 <div class="tint-menu">
                     <div class="tint-menu-wrap">
                         <div style="display:flex; flex-direction: row;">
-                            <div style="display: flex;">
+                            <div style="display: flex;width: 1.5rem;">
                                 <div style="align-self: center;">
-                                    <input type="radio" />
+                                    <input type="radio" checked />
                                 </div>
                             </div>
                             <div style="display: flex;gap:0.25rem;flex-direction: column;">
-                                <div>&nbsp;</div>
                                 <div><div class="tint-red"></div></div>
                                 <div><div class="tint-green"></div></div>
                                 <div><div class="tint-blue"></div></div>
-                                <div>Alpha</div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
-                                <div>Min</div>
-                                <div>10</div>
-                                <div>10</div>
-                                <div>10</div>
-                                <div>10</div>
+                                <div><input id="tintRed" type="range" value="150" min="0" max="255" /></div>
+                                <div><input id="tintGreen" type="range" value="40" min="0" max="255" /></div>
+                                <div><input id="tintBlue" type="range" value="0" min="0" max="255" /></div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
-                                <div>&nbsp;</div>
-                                <div><input type="range" min="0" max="255" /></div>
-                                <div><input type="range" min="0" max="255" /></div>
-                                <div><input type="range" min="0" max="255" /></div>
-                                <div><input type="range" min="0" max="255" /></div>
-                            </div>
-                            <div style="display: flex;flex-direction: column;">
-                                <div>&nbsp;</div>
-                                <div>0</div>
-                                <div>0</div>
-                                <div>0</div>
-                                <div>0</div>
-                            </div>
-                            <div style="display: flex;flex-direction: column;">
-                                <div>Max</div>
-                                <div>10</div>
-                                <div>10</div>
-                                <div>10</div>
-                                <div>10</div>
+                                <div><input type="number" id="tintRedValue" class="no-arrows" value="150" /></div>
+                                <div><input type="number" id="tintGreenValue" class="no-arrows" value="40" /></div>
+                                <div><input type="number" id="tintBlueValue" class="no-arrows" value="0" /></div>
                             </div>
                         </div>
-                        <div style="display: flex;flex-direction: row;">
-                            <div style="flex:1;">Color</div>
+                        <div class="tint-list-header" style="display: flex;flex-direction: row;">
+                            <div style="flex:1;margin-left:1.5rem;font-weight: 500;">Color</div>
                             <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-red"></div></div>
                             <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-green"></div></div>
                             <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-blue"></div></div>
                         </div>
-                        <div id="tintOptions">
+                        <div class="tint-options" id="tintOptions">
                             <div style="display: flex;">
-                                <div><input type="radio" /></div>
-                                <div style="flex: 1">Light Brown</div>
-                                <div style="width: 2rem;text-align: center;">0</div>
-                                <div style="width: 2rem;text-align: center;">0</div>
+                                <div style="width: 1.5rem;"><input type="radio" /></div>
+                                <div style="flex: 1;">Light Brown</div>
+                                <div style="width: 2rem;text-align: center;">150</div>
+                                <div style="width: 2rem;text-align: center;">40</div>
                                 <div style="width: 2rem;text-align: center;">0</div>
                             </div>
                         </div>
-                        <p>
+                        <p class="tint-info">
                             <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                            Provided offsets are verified on an Epson with default color profiles.
+                            Provided offsets are tested, but will vary by each printer's color profile.
                         </p>
                     </div>
                 </div>

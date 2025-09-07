@@ -46,3 +46,5 @@ All templates are stored in black and white (no transparent support). Use the ti
 ## Source
 
 This was hacked together a while back and is one of those it meets my needs type projects, so it might not support everything. Would be interested to hear if you use this or find it useful. Contact me on Mastodon or open an issue in the tab above.
+
+The source code is basically unreadable as each new feature was cobbled onto the last. I do want to do a full rewrite, but it might be a bit.
