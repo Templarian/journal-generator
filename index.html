@@ -894,6 +894,45 @@
                 background-position: center center;
             }
 
+            section .tint-menu {
+                position: absolute;
+                z-index: 2;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+                background: #FFF;
+                top: calc(100% - 1px);
+                left: -16rem;
+                width: calc(100% + 16rem - 2px);
+                border: 1px solid #666;
+                border-radius: 0.5rem 0 0.5rem 0.5rem;
+            }
+            section .tint-menu-wrap {
+                padding: 0.5rem 0.75rem;
+            }
+            section .tint-red {
+                display: flex;
+                border-radius: 50%;
+                border: 1px solid rgb(160, 0, 0);
+                background: rgb(140, 0, 0);
+                width: 1rem;
+                height: 1rem;
+            }
+            section .tint-green {
+                display: flex;
+                border-radius: 50%;
+                border: 1px solid rgb(0, 160, 0);
+                background: rgb(0, 140, 0);
+                width: 1rem;
+                height: 1rem;
+            }
+            section .tint-blue {
+                display: flex;
+                border-radius: 50%;
+                border: 1px solid rgb(0, 0, 160);
+                background: rgb(0, 0, 140);
+                width: 1rem;
+                height: 1rem;
+            }
+
             ul {
                 padding: 0 0 0 1.5rem;
             }
@@ -2091,7 +2130,10 @@
                         continue;
                     }
                     if (!first) {
-
+                        red = Math.max(red, pixels[i]);
+                        green = Math.max(green, pixels[i + 1]);
+                        blue = Math.max(blue, pixels[i + 2]);
+                        alpha = Math.max(alpha, pixels[i + 3]);
                     } else {
                         red = pixels[i];
                         green = pixels[i + 1];
@@ -2552,6 +2594,10 @@
                 // Update template text list
                 updateTemplatePresets();
             });
+            const tintEle = document.getElementById('tint');
+            tintEle.addEventListener('click', () => {
+                console.log('foo');
+            });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
             });
@@ -2960,9 +3006,74 @@
                 <label for="template">Template</label>
                 <select id="template" disabled></select>
             </div>
-            <div style="display: flex;flex-direction: column;">
+            <div style="display: flex;flex-direction: column;position: relative;">
                 <div style="margin-bottom: 0.25rem;">Tint</div>
                 <button id="tint" class="tint">&nbsp;</button>
+                <div class="tint-menu">
+                    <div class="tint-menu-wrap">
+                        <div style="display:flex; flex-direction: row;">
+                            <div style="display: flex;">
+                                <div style="align-self: center;">
+                                    <input type="radio" />
+                                </div>
+                            </div>
+                            <div style="display: flex;gap:0.25rem;flex-direction: column;">
+                                <div>&nbsp;</div>
+                                <div><div class="tint-red"></div></div>
+                                <div><div class="tint-green"></div></div>
+                                <div><div class="tint-blue"></div></div>
+                                <div>Alpha</div>
+                            </div>
+                            <div style="display: flex;flex-direction: column;">
+                                <div>Min</div>
+                                <div>10</div>
+                                <div>10</div>
+                                <div>10</div>
+                                <div>10</div>
+                            </div>
+                            <div style="display: flex;flex-direction: column;">
+                                <div>&nbsp;</div>
+                                <div><input type="range" min="0" max="255" /></div>
+                                <div><input type="range" min="0" max="255" /></div>
+                                <div><input type="range" min="0" max="255" /></div>
+                                <div><input type="range" min="0" max="255" /></div>
+                            </div>
+                            <div style="display: flex;flex-direction: column;">
+                                <div>&nbsp;</div>
+                                <div>0</div>
+                                <div>0</div>
+                                <div>0</div>
+                                <div>0</div>
+                            </div>
+                            <div style="display: flex;flex-direction: column;">
+                                <div>Max</div>
+                                <div>10</div>
+                                <div>10</div>
+                                <div>10</div>
+                                <div>10</div>
+                            </div>
+                        </div>
+                        <div style="display: flex;flex-direction: row;">
+                            <div style="flex:1;">Color</div>
+                            <div style="width: 2rem;justify-self: center;"><div class="tint-red"></div></div>
+                            <div style="width: 2rem;justify-self: center;"><div class="tint-green"></div></div>
+                            <div style="width: 2rem;justify-self: center;"><div class="tint-blue"></div></div>
+                        </div>
+                        <div id="tintOptions">
+                            <div style="display: flex;">
+                                <div><input type="radio" /></div>
+                                <div style="flex: 1">Light Brown</div>
+                                <div style="width: 2rem;text-align: center;">0</div>
+                                <div style="width: 2rem;text-align: center;">0</div>
+                                <div style="width: 2rem;text-align: center;">0</div>
+                            </div>
+                        </div>
+                        <p>
+                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
+                            Provided offsets are verified on an Epson with default color profiles.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="customTemplate" class="custom">
