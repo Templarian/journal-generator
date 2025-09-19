@@ -955,8 +955,34 @@
             section .tint-options {
                 
             }
+            section .tint-option {
+                display: flex;
+            }
+            section .tint-option div:nth-child(1) {
+                width: 1.5rem;
+            }
+            section .tint-option div:nth-child(2) {
+                flex: 1;
+            }
+            section .tint-option div:nth-child(3) {
+                width: 2rem;
+                text-align: center;
+            }
+            section .tint-option div:nth-child(4) {
+                width: 2rem;
+                text-align: center;
+            }
+            section .tint-option div:nth-child(5) {
+                width: 2rem;
+                text-align: center;
+            }
+            section .tint-off {
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
+            }
             section .tint-info {
-                border-top: 1px solid #999;
+                border-top: 1px solid #ddd;
                 padding-top: 0.25rem;
                 margin-top: 0.5rem;
             }
@@ -1078,7 +1104,7 @@
         let dbCache = null;
         // minMaxRGBA
         const minMaxRGBA = new Map();
-        let tintRed = 0, tintGreen = 0, tintBlue = 0;
+        let tintRed = 170, tintGreen = 170, tintBlue = 170;
         // Local Storage
         //   Page Number Font
         //   - font
@@ -1206,9 +1232,12 @@
                 return v.toString(16);
             });
         }
+        function getBrightness(r, g, b) {
+            return (0.2126 * (r / 255)) + (0.7152 * (g / 255)) + (0.0722 * (b / 255));
+        }
         // Tints
         const tintOptions = [{
-            value: '150:40:0',
+            value: '160:102:28',
             label: 'Light Brown'
         }, {
             value: '3:169:244',
@@ -1329,6 +1358,28 @@
                 printerOffsetKey = 'cover:printerOffset';
             }
             return localStorage.getItem(printerOffsetKey) ?? '0';
+        }
+        function getLocalStorageTint() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:tint`;
+            return localStorage.getItem(key) ?? '';
+        }
+        function setLocalStorageTint() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:tint`;
+            const value = '';
+            if (value) {
+                localStorage.setItem(key, value);
+            } else {
+                localStorage.removeItem(key);
+            }
+        }
+        function getTintValue() {
+
         }
         /**
          * Pull user defined from localstorage
@@ -1981,6 +2032,43 @@
                 .replace('{dayPadded}', dayPadded)
                 .replace('{index}', index);
         }
+        function updateTint() {
+            const tintOptionsEle = document.getElementById('tint');
+            tintOptionsEle.innerHTML = '';
+            tintOptions.forEach(({ value, label }) => {
+                const [red, green, blue] = value.split(':');
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('tint-option');
+                // input
+                const checkDiv = document.createElement('div');
+                const check = document.createElement('input');
+                check.type = 'radio';
+                check.name = 'tint';
+                check.addEventListener('change', (e) => {
+                    console.log(e.target.value);
+                });
+                checkDiv.appendChild(check);
+                wrapper.appendChild(checkDiv);
+                // name
+                const nameDiv = document.createElement('div');
+                nameDiv.textContent = label;
+                wrapper.appendChild(nameDiv);
+                // red
+                const redDiv = document.createElement('div');
+                redDiv.textContent = red;
+                wrapper.appendChild(redDiv);
+                // green
+                const greenDiv = document.createElement('div');
+                greenDiv.textContent = green;
+                wrapper.appendChild(greenDiv);
+                // blue
+                const blueDiv = document.createElement('div');
+                blueDiv.textContent = blue;
+                wrapper.appendChild(blueDiv);
+                // Append Wrapper
+                tintOptionsEle.appendChild(wrapper);
+            });
+        }
         /**
          * Utility to take image data and update template
          */
@@ -2172,26 +2260,79 @@
                     canvas.height - (offsetY + (7 * convert))
                 );
                 const pixels = imageData.data;
-                let first = true, red = 0, blue = 0, green = 0, alpha = 0;
+                let first = true,
+                    redMax = 0, blueMax = 0, greenMax = 0, alphaMax = 0
+                    redMin = 255, blueMin = 255, greenMin = 255, alphaMin = 255;
                 for (let i = 0; i < pixels.length; i += 4) {
                     if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
                         // Ignore White
                         continue;
                     }
                     if (!first) {
-                        red = Math.max(red, pixels[i]);
-                        green = Math.max(green, pixels[i + 1]);
-                        blue = Math.max(blue, pixels[i + 2]);
-                        alpha = Math.max(alpha, pixels[i + 3]);
+                        redMax = Math.max(redMax, pixels[i]);
+                        greenMax = Math.max(greenMax, pixels[i + 1]);
+                        blueMax = Math.max(blueMax, pixels[i + 2]);
+                        alphaMax = Math.max(alphaMax, pixels[i + 3]);
+                        redMin = Math.min(redMin, pixels[i]);
+                        greenMin = Math.min(greenMin, pixels[i + 1]);
+                        blueMin = Math.min(blueMin, pixels[i + 2]);
+                        alphaMin = Math.min(alphaMin, pixels[i + 3]);
                     } else {
-                        red = pixels[i];
-                        green = pixels[i + 1];
-                        blue = pixels[i + 2];
-                        alpha = pixels[i + 3];
+                        redMax = redMin = pixels[i];
+                        greenMax = greenMin = pixels[i + 1];
+                        blueMax = blueMin = pixels[i + 2];
+                        alphaMax = alphaMin = pixels[i + 3];
                         first = false;
                     }
                 }
-                minMaxRGBA.set(key, `${red}:${green}:${blue}`);
+                minMaxRGBA.set(key, `${redMin}:${greenMin}:${blueMin}:${alphaMin}:${redMax}:${greenMax}:${blueMax}:${alphaMax}`);
+            }
+            const fade = [
+                [0.75, 0.80, 230],
+                [0.80, 0.85, 220],
+                [0.85, 0.90, 210],
+                [0.90, 0.95, 200],
+                [0.95, 1.00, 190]
+            ];
+            function levelPixels() {
+                const imageData = ctx.getImageData(
+                    offsetX,
+                    offsetY,
+                    canvas.width - (offsetX * 2),
+                    canvas.height - (offsetY + (7 * convert))
+                );
+                const pixels = imageData.data;
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
+                        continue;
+                    }
+                    const brightness = getBrightness(pixels[i], pixels[i + 1], pixels[i + 2]);
+                    const item = fade.find(x => brightness >= x[0] && brightness <= x[1]);
+                    if (item) {
+                        pixels[i + 3] -= item[2];
+                    }
+                }
+                ctx.putImageData(imageData, offsetX, offsetY);
+            }
+            function shiftPixels(r, g, b) {
+                const imageData = ctx.getImageData(
+                    offsetX,
+                    offsetY,
+                    canvas.width - (offsetX * 2),
+                    canvas.height - (offsetY + (7 * convert))
+                );
+                const pixels = imageData.data;
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
+                        continue;
+                    }
+                    pixels[i] = pixels[i] + r - 170; // Red channel
+                    pixels[i + 1] = pixels[i + 1] + g - 170; // Green channel
+                    pixels[i + 2] = pixels[i + 2] + b - 170; // Blue channel
+                }
+                ctx.putImageData(imageData, offsetX, offsetY);
             }
             // Draw Image, not really hue
             function applyHue(r, g, b) {
@@ -2203,7 +2344,7 @@
                 );
                 const pixels = imageData.data;
                 // Brown 165 42 42
-                const tintColor = { r, g, b };
+                const tintColor = { r, g, b, a: 255 };
 
                 for (let i = 0; i < pixels.length; i += 4) {
                     if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
@@ -2213,7 +2354,7 @@
                     pixels[i] = (pixels[i] + tintColor.r) / 2; // Red channel
                     pixels[i + 1] = (pixels[i + 1] + tintColor.g) / 2; // Green channel
                     pixels[i + 2] = (pixels[i + 2] + tintColor.b) / 2; // Blue channel
-                    // pixels[i + 3] = (pixels[i + 3] * tintColor.a) / 255; // Alpha channel (optional)
+                    //pixels[i + 3] = (pixels[i + 3] * tintColor.a) / 255; // Alpha channel (optional)
                 }
                 ctx.putImageData(imageData, offsetX, offsetY);
             }
@@ -2249,12 +2390,13 @@
                     );
                 }
                 // Cache minMaxRGBA
-                calculateMinMaxRGBA();
-                console.log(minMaxRGBA);
+                //calculateMinMaxRGBA();
                 // Draw Page Numbers
                 drawPageNumbers();
+                // Level
+                levelPixels();
                 // Shift Colors
-                applyHue(tintRed, tintGreen, tintBlue);
+                shiftPixels(tintRed, tintGreen, tintBlue);
                 // Draw Text
                 drawText();
                 // Draw Empty
@@ -2633,20 +2775,30 @@
             document.getElementById('template').addEventListener('change', (e) => {
                 const template = e.target.value;
                 updateTotalPages();
+                // Update Tint
+                updateTint();
                 // Update visible template
                 updateTemplate(currentIndex);
                 // Update template text list
                 updateTemplatePresets();
             });
+            let tintMenuHidden = true;
             const tintEle = document.getElementById('tint');
             tintEle.addEventListener('click', () => {
-                console.log('foo');
+                tintMenuHidden = !tintMenuHidden;
+                const tintMenuEle = document.getElementById('tintMenu');
+                tintMenuEle.classList.toggle('hide', tintMenuHidden);
             });
             const tintRedEle = document.getElementById('tintRed');
             const tintRedValueEle = document.getElementById('tintRedValue');
             tintRedEle.addEventListener('input', (e) => {
                 tintRed = parseInt(e.target.value, 10);
                 tintRedValueEle.value = tintRed;
+                updateTemplate(currentIndex);
+            });
+            tintRedValueEle.addEventListener('input', (e) => {
+                tintRed = parseInt(e.target.value, 10);
+                tintRedEle.value = tintRed;
                 updateTemplate(currentIndex);
             });
             const tintGreenEle = document.getElementById('tintGreen');
@@ -2656,11 +2808,21 @@
                 tintGreenValueEle.value = tintGreen;
                 updateTemplate(currentIndex);
             });
+            tintGreenValueEle.addEventListener('input', (e) => {
+                tintGreen = parseInt(e.target.value, 10);
+                tintGreenEle.value = tintGreen;
+                updateTemplate(currentIndex);
+            });
             const tintBlueEle = document.getElementById('tintBlue');
             const tintBlueValueEle = document.getElementById('tintBlueValue');
             tintBlueEle.addEventListener('input', (e) => {
                 tintBlue = parseInt(e.target.value, 10);
                 tintBlueValueEle.value = tintBlue;
+                updateTemplate(currentIndex);
+            });
+            tintBlueValueEle.addEventListener('input', (e) => {
+                tintBlue = parseInt(e.target.value, 10);
+                tintBlueEle.value = tintBlue;
                 updateTemplate(currentIndex);
             });
             document.getElementById('upload').addEventListener('change', () => {
@@ -3074,12 +3236,18 @@
             <div style="display: flex;flex-direction: column;position: relative;">
                 <div style="margin-bottom: 0.25rem;">Tint</div>
                 <button id="tint" class="tint">&nbsp;</button>
-                <div class="tint-menu">
+                <div id="tintMenu" class="tint-menu hide">
                     <div class="tint-menu-wrap">
+                        <div class="tint-off">
+                            <div style="display: flex;">
+                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" /></div>
+                                <div style="flex: 1;">No tint, 170, 170, 170 / #AAA</div>
+                            </div>
+                        </div>
                         <div style="display:flex; flex-direction: row;">
                             <div style="display: flex;width: 1.5rem;">
                                 <div style="align-self: center;">
-                                    <input type="radio" checked />
+                                    <input id="tintCustom" type="radio" name="tint" />
                                 </div>
                             </div>
                             <div style="display: flex;gap:0.25rem;flex-direction: column;">
@@ -3088,14 +3256,15 @@
                                 <div><div class="tint-blue"></div></div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
-                                <div><input id="tintRed" type="range" value="150" min="0" max="255" /></div>
-                                <div><input id="tintGreen" type="range" value="40" min="0" max="255" /></div>
-                                <div><input id="tintBlue" type="range" value="0" min="0" max="255" /></div>
+                                <div><input id="tintRed" type="range" value="170" min="0" max="255" /></div>
+                                <div><input id="tintGreen" type="range" value="170" min="0" max="255" /></div>
+                                <div><input id="tintBlue" type="range" value="170" min="0" max="255" /></div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
-                                <div><input type="number" id="tintRedValue" class="no-arrows" value="150" /></div>
-                                <div><input type="number" id="tintGreenValue" class="no-arrows" value="40" /></div>
-                                <div><input type="number" id="tintBlueValue" class="no-arrows" value="0" /></div>
+                                <div><input type="number" id="tintRedValue" class="no-arrows" value="170" /></div>
+                                <div><input type="number" id="tintGreenValue" class="no-arrows" value="170" /></div>
+                                <div><input type="number" id="tintBlueValue" class="no-arrows" value="170" /></div>
+                                <!-- Percentage Slider for levels -->
                             </div>
                         </div>
                         <div class="tint-list-header" style="display: flex;flex-direction: row;">
@@ -3104,18 +3273,17 @@
                             <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-green"></div></div>
                             <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-blue"></div></div>
                         </div>
-                        <div class="tint-options" id="tintOptions">
-                            <div style="display: flex;">
-                                <div style="width: 1.5rem;"><input type="radio" /></div>
-                                <div style="flex: 1;">Light Brown</div>
-                                <div style="width: 2rem;text-align: center;">150</div>
-                                <div style="width: 2rem;text-align: center;">40</div>
-                                <div style="width: 2rem;text-align: center;">0</div>
-                            </div>
-                        </div>
+                        <div class="tint-options" id="tintOptions"></div>
                         <p class="tint-info">
                             <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
                             Provided offsets are tested, but will vary by each printer's color profile.
+                        </p>
+                        <div style="display: flex;height:2.5rem;border-top:1px solid #999;padding-top:0.5rem;margin-top:0.5rem;">
+                            <button style="width: 2rem;background:#FFF;border: 1px solid #333;padding:0.125rem;border-radius:0.25rem;"></button>
+                        </div>
+                        <p class="tint-info">
+                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
+                            Fade low brightness pixels. Useful for printing on non-white paper.
                         </p>
                     </div>
                 </div>
