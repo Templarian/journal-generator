@@ -35,13 +35,23 @@ For templates with dynamic text use the export accessible from the dropdown to g
 
 ## Templates
 
-All templates are stored in black and white (no transparent support). Use the tint feature to shift the color profile. The tint works as a basic color shift to the grayscale pixels.
+All built-in templates are stored in black and white. Templates must have a base color of hex #AAA or RGB 170, 170, 170.
 
-|   | Red | Green | Blue |
-|---|-----|-------|------|
-| Original Pixel | 0 | 0 | 0 |
-| Brown | 150 | 75 | 0 |
-| Updated Pixel | 150 | 75 | 0 |
+### Tint
+
+Use the tint feature to shift the color profile to the newly selected color.
+
+A common cover paper when making journals is a light brown. Using the out of the box grayscale template without a tint will produced a washed out print. To correct for this select the preset tint `Light Brown`.
+
+Similarly when printing journals a small amount of color give each journal a more unique look. Try tinting the grid template with the `Blue Print`.
+
+> Note: These color profiles are tested on an calibrated CYMK Epson, but will vary based on the paper and your intended design.
+
+### Fade
+
+The fade feature is primarily used when printing on non-white paper to allow the natural paper's colors pop. Pixels are grouped by brightness and given a opacity modifier. Essentially letting the natural paper's color from being washed out by the ink.
+
+> The process of picking the right fade will require test printing. There are too many variables in play especiall when printing on different paper types.
 
 ## Source
 

@@ -986,6 +986,27 @@
                 padding-top: 0.25rem;
                 margin-top: 0.5rem;
             }
+            section .fade {
+                display: flex;
+                height: 2.375rem;
+                border-top: 1px solid #999;
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+                gap: 0.25rem;
+            }
+            section .fade button {
+                display: flex;
+                width: 2.5rem;
+                background: #FFF;
+                border: 2px solid #333;
+                padding: 0.125rem;
+                border-radius: 0.25rem;
+                align-items: center;
+                justify-items: center;
+            }
+            section .fade button.selected {
+                border-color: #0099f8;
+            }
             section input[type="radio"] {
                 margin: 0;
             }
@@ -1366,13 +1387,13 @@
             const key = `${type}:${templateKey}:tint`;
             return localStorage.getItem(key) ?? '';
         }
-        function setLocalStorageTint() {
+        function setLocalStorageTint(red, green, blue) {
             const type = getCurrentType();
             const template = getTemplate();
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:tint`;
-            const value = '';
-            if (value) {
+            const value = `${red}:${green}:${blue}`;
+            if (value !== 'null:null:null') {
                 localStorage.setItem(key, value);
             } else {
                 localStorage.removeItem(key);
@@ -2033,7 +2054,7 @@
                 .replace('{index}', index);
         }
         function updateTint() {
-            const tintOptionsEle = document.getElementById('tint');
+            const tintOptionsEle = document.getElementById('tintOptions');
             tintOptionsEle.innerHTML = '';
             tintOptions.forEach(({ value, label }) => {
                 const [red, green, blue] = value.split(':');
@@ -2044,8 +2065,9 @@
                 const check = document.createElement('input');
                 check.type = 'radio';
                 check.name = 'tint';
+                check.value = `${red}:${green}:${blue}`;
                 check.addEventListener('change', (e) => {
-                    console.log(e.target.value);
+                    setLocalStorageTint(red, green, blue);
                 });
                 checkDiv.appendChild(check);
                 wrapper.appendChild(checkDiv);
@@ -2634,6 +2656,8 @@
             // Toggle Preset Disabled
             const presetDisabledEle = document.getElementById('presetDisabled');
             presetDisabledEle.disabled = presetSelect.options.length === 0;
+            // Update Tint
+            updateTint();
         }
         function updateTemplateList(pageIndex) {
             const templateEle = document.getElementById('template');
@@ -2775,8 +2799,6 @@
             document.getElementById('template').addEventListener('change', (e) => {
                 const template = e.target.value;
                 updateTotalPages();
-                // Update Tint
-                updateTint();
                 // Update visible template
                 updateTemplate(currentIndex);
                 // Update template text list
@@ -2827,6 +2849,19 @@
             });
             document.getElementById('upload').addEventListener('change', () => {
                 updateTemplate(currentIndex);
+            });
+            // Tint None
+            const tintNoneEle = document.getElementById('tintNone');
+            tintNoneEle.addEventListener('change', () => {
+                setLocalStorageTint(null, null, null);
+            });
+            // Tint Custom
+            const tintCustomEle = document.getElementById('tintCustom');
+            tintCustomEle.addEventListener('change', () => {
+                const red = document.getElementById('tintRedValue').value;
+                const green = document.getElementById('tintGreenValue').value;
+                const blue = document.getElementById('tintBlueValue').value;
+                setLocalStorageTint(red, green, blue);
             });
             // Custom Grid Type
             const customGridTypeEle = document.getElementById('customGridType');
@@ -3240,25 +3275,25 @@
                     <div class="tint-menu-wrap">
                         <div class="tint-off">
                             <div style="display: flex;">
-                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" /></div>
-                                <div style="flex: 1;">No tint, 170, 170, 170 / #AAA</div>
+                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" checked /></div>
+                                <div style="flex: 1;">Disable Tint</div>
                             </div>
                         </div>
-                        <div style="display:flex; flex-direction: row;">
-                            <div style="display: flex;width: 1.5rem;">
+                        <div style="display:flex; flex-direction: row;gap:0.25rem;">
+                            <div style="display: flex;width: 1rem;">
                                 <div style="align-self: center;">
                                     <input id="tintCustom" type="radio" name="tint" />
                                 </div>
                             </div>
                             <div style="display: flex;gap:0.25rem;flex-direction: column;">
-                                <div><div class="tint-red"></div></div>
-                                <div><div class="tint-green"></div></div>
-                                <div><div class="tint-blue"></div></div>
+                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-red"></div></div>
+                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-green"></div></div>
+                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-blue"></div></div>
                             </div>
-                            <div style="display: flex;flex-direction: column;">
-                                <div><input id="tintRed" type="range" value="170" min="0" max="255" /></div>
-                                <div><input id="tintGreen" type="range" value="170" min="0" max="255" /></div>
-                                <div><input id="tintBlue" type="range" value="170" min="0" max="255" /></div>
+                            <div style="display: flex;flex-direction: column;gap:0.125rem;flex:1;">
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintRed" type="range" value="170" min="0" max="255" /></div>
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintGreen" type="range" value="170" min="0" max="255" /></div>
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintBlue" type="range" value="170" min="0" max="255" /></div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
                                 <div><input type="number" id="tintRedValue" class="no-arrows" value="170" /></div>
@@ -3276,10 +3311,31 @@
                         <div class="tint-options" id="tintOptions"></div>
                         <p class="tint-info">
                             <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                            Provided offsets are tested, but will vary by each printer's color profile.
+                            Provided tints are tested, but will vary by each printer's color profile.
                         </p>
-                        <div style="display: flex;height:2.5rem;border-top:1px solid #999;padding-top:0.5rem;margin-top:0.5rem;">
-                            <button style="width: 2rem;background:#FFF;border: 1px solid #333;padding:0.125rem;border-radius:0.25rem;"></button>
+                        <div class="fade">
+                            <button class="selected">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <path d="M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM7.65723 10.4873C6.61069 12.0679 6 13.9624 6 16C6 21.5228 10.4772 26 16 26C18.0378 26 19.932 25.3885 21.5127 24.3418L7.65723 10.4873ZM16 6C13.9616 6 12.0663 6.61094 10.4854 7.6582L24.3408 21.5137C25.388 19.9327 26 18.0383 26 16C26 10.4772 21.5228 6 16 6Z" fill="#AAAAAA"/>
+                                </svg>
+                            </button>
+                            <button>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <g clip-path="url(#clip0_1103_812)">
+                                    <rect width="32" height="12" fill="black"/>
+                                    <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9"/>
+                                    <rect y="16" width="32" height="4" fill="black" fill-opacity="0.86"/>
+                                    <rect y="20" width="32" height="4" fill="black" fill-opacity="0.82"/>
+                                    <rect y="24" width="32" height="4" fill="black" fill-opacity="0.78"/>
+                                    <rect y="28" width="32" height="4" fill="black" fill-opacity="0.75"/>
+                                    </g>
+                                    <defs>
+                                    <clipPath id="clip0_1103_812">
+                                    <rect width="32" height="32" fill="white"/>
+                                    </clipPath>
+                                    </defs>
+                                </svg>
+                            </button>
                         </div>
                         <p class="tint-info">
                             <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
