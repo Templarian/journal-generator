@@ -35,6 +35,7 @@
 
             div.body {
                 display: contents;
+                background-color: transparent !important;
             }
 
             div.page {
@@ -1116,6 +1117,7 @@
 
             section .fade button svg {
                 width: 2rem;
+                pointer-events: none;
             }
 
             section input[type="radio"] {
@@ -1270,6 +1272,9 @@
         //   Printer Offset
         //   - cover:printerOffset
         //   - inner:printerOffset
+        //   Paper Color (for preview only)
+        //   - cover:paperColor
+        //   - inner:paperColor
         //   Inner Page Offset
         //   - inner:offset
         //   Total Pages
@@ -1288,6 +1293,14 @@
         //   - cover:{templateUuid|custom}:presets:selected = uuid
         //   - detail:{templateUuid|custom}:presets:selected = uuid
         //   - inner:{templateUuid|custom}:presets:selected = uuid
+        //   Tint Color
+        //   - cover:{templateUuid|custom}:tint = 'red:green:blue'
+        //   - detail:{templateUuid|custom}:tint = 'red:green:blue'
+        //   - inner:{templateUuid|custom}:tint = 'red:green:blue'
+        //   Fade Index
+        //   - cover:{templateUuid|custom}:fade = index
+        //   - detail:{templateUuid|custom}:fade = index
+        //   - inner:{templateUuid|custom}:fade = index
         // IndexedDB
         //   Open a DB, these images are large ~6mb+ for
         //   - Cover
@@ -1546,22 +1559,49 @@
             const template = getTemplate();
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:tint`;
-            return localStorage.getItem(key) ?? '';
+            return localStorage.getItem(key) ?? 'null:null:null';
         }
         function setLocalStorageTint(red, green, blue) {
             const type = getCurrentType();
             const template = getTemplate();
             const templateKey = template ? template.value : 'custom';
             const key = `${type}:${templateKey}:tint`;
-            const value = `${red}:${green}:${blue}`;
-            if (value !== 'null:null:null') {
-                localStorage.setItem(key, value);
-            } else {
+            if (red === null && green === null && blue === null) {
                 localStorage.removeItem(key);
+                return;
+            }
+            if (red === null) {
+                red = getLocalStorageTint().split(':')[0];
+            }
+            if (green === null) {
+                green = getLocalStorageTint().split(':')[1];
+            }
+            if (blue === null) {
+                blue = getLocalStorageTint().split(':')[2];
+            }
+            const value = `${red}:${green}:${blue}`;
+            localStorage.setItem(key, value);
+        }
+        function setLocalStorageFade(value) {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:fade`;
+            if (value === -1) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, `${value}`);
             }
         }
-        function getTintValue() {
-
+        function getLocalStorageFade() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:fade`;
+            if (localStorage.getItem(key)) {
+                return parseInt(localStorage.getItem(key), 10);
+            }
+            return -1;
         }
         /**
          * Pull user defined from localstorage
@@ -1756,6 +1796,14 @@
             const hasPresetsEle = document.getElementById('hasPresets');
             noPresetsEle.classList.toggle('hide', hasPresets || userDefinedPrests.length !== 0);
             hasPresetsEle.classList.toggle('hide', !hasPresets && userDefinedPrests.length === 0);
+        }
+        function updateFade() {
+            const selected = getLocalStorageFade();
+            const fadeEle = document.getElementById('fade');
+            const buttons = Array.from(fadeEle.children);
+            buttons.forEach((button) => {
+                button.classList.toggle('selected', button.dataset.index === `${selected}`);
+            });
         }
         function updateTextList(nodes) {
             const templatePreset = getTemplatePreset();
@@ -2215,6 +2263,36 @@
                 .replace('{index}', index);
         }
         function updateTint() {
+            const tintNoneEle = document.getElementById('tintNone');
+            const tintCustomEle = document.getElementById('tintCustom');
+            const selected = getLocalStorageTint();
+            let isPreset = false;
+            const preset = document.querySelector(`input[value="${selected}"]`);
+            if (preset) {
+                preset.checked = true;
+                isPreset = true;
+            } else {
+                if (selected === 'null:null:null') {
+                    tintNoneEle.checked = true;
+                } else {
+                    tintCustomEle.checked = true;
+                    const [red, green, blue] = selected.split(':');
+                    const tintRedEle = document.getElementById('tintRed');
+                    const tintRedValueEle = document.getElementById('tintRedValue');
+                    tintRedEle.value = red;
+                    tintRedValueEle.value = red;
+                    const tintGreenEle = document.getElementById('tintGreen');
+                    const tintGreenValueEle = document.getElementById('tintGreenValue');
+                    tintGreenEle.value = green;
+                    tintGreenValueEle.value = green;
+                    const tintBlueEle = document.getElementById('tintBlue');
+                    const tintBlueValueEle = document.getElementById('tintBlueValue');
+                    tintBlueEle.value = blue;
+                    tintBlueValueEle.value = blue;
+                }
+            }
+        }
+        function updateTintList() {
             const tintOptionsEle = document.getElementById('tintOptions');
             tintOptionsEle.innerHTML = '';
             tintOptions.forEach(({ value, label }) => {
@@ -2229,6 +2307,8 @@
                 check.value = `${red}:${green}:${blue}`;
                 check.addEventListener('change', (e) => {
                     setLocalStorageTint(red, green, blue);
+                    updateTint();
+                    updateTemplate(currentIndex);
                 });
                 checkDiv.appendChild(check);
                 wrapper.appendChild(checkDiv);
@@ -2470,14 +2550,20 @@
                 }
                 minMaxRGBA.set(key, `${redMin}:${greenMin}:${blueMin}:${alphaMin}:${redMax}:${greenMax}:${blueMax}:${alphaMax}`);
             }
-            const fade = [
-                [0.75, 0.80, 230],
-                [0.80, 0.85, 220],
-                [0.85, 0.90, 210],
-                [0.90, 0.95, 200],
-                [0.95, 1.00, 190]
+            const fadeOptions = [
+                [
+                    [0.75, 0.80, 230],
+                    [0.80, 0.85, 220],
+                    [0.85, 0.90, 210],
+                    [0.90, 0.95, 200],
+                    [0.95, 1.00, 190]
+                ]
             ];
             function levelPixels() {
+                const index = getLocalStorageFade();
+                if (index === -1) {
+                    return;
+                }
                 const imageData = ctx.getImageData(
                     offsetX,
                     offsetY,
@@ -2490,6 +2576,7 @@
                         pixels[i + 3] = 0;
                         continue;
                     }
+                    const fade = fadeOptions[index];
                     const brightness = getBrightness(pixels[i], pixels[i + 1], pixels[i + 2]);
                     const item = fade.find(x => brightness >= x[0] && brightness <= x[1]);
                     if (item) {
@@ -2553,7 +2640,16 @@
                 // Draw Page Numbers
                 drawPageNumbers();
                 // Shift Colors
-                shiftPixels(tintRed, tintGreen, tintBlue);
+                const [red, green, blue] = getLocalStorageTint().split(':');
+                if (red === 'null' || green === 'null' || blue === 'null') {
+                    // Disable shift pixels
+                } else {
+                    shiftPixels(
+                        parseInt(red, 10),
+                        parseInt(green, 10),
+                        parseInt(blue, 10)
+                    );
+                }
                 // Draw Text
                 drawText();
                 // Draw Empty
@@ -2784,6 +2880,8 @@
                     currentIndex = page.index;
                     // Update Paper Color, cover vs inner
                     updatePaperColor(getLocalStoragePaperColor());
+                    updateTint();
+                    updateFade();
                 });
                 pageSelect.appendChild(pEle);
                 pageEles.push(pEle);
@@ -2796,8 +2894,6 @@
             // Toggle Preset Disabled
             const presetDisabledEle = document.getElementById('presetDisabled');
             presetDisabledEle.disabled = presetSelect.options.length === 0;
-            // Update Tint
-            updateTint();
         }
         function updateTemplateList(pageIndex) {
             const templateEle = document.getElementById('template');
@@ -2962,11 +3058,13 @@
             tintRedEle.addEventListener('input', (e) => {
                 tintRed = parseInt(e.target.value, 10);
                 tintRedValueEle.value = tintRed;
+                setLocalStorageTint(tintRed, null, null);
                 updateTemplate(currentIndex);
             });
             tintRedValueEle.addEventListener('input', (e) => {
                 tintRed = parseInt(e.target.value, 10);
                 tintRedEle.value = tintRed;
+                setLocalStorageTint(tintRed, null, null);
                 updateTemplate(currentIndex);
             });
             const tintGreenEle = document.getElementById('tintGreen');
@@ -2974,11 +3072,13 @@
             tintGreenEle.addEventListener('input', (e) => {
                 tintGreen = parseInt(e.target.value, 10);
                 tintGreenValueEle.value = tintGreen;
+                setLocalStorageTint(null, tintGreen, null);
                 updateTemplate(currentIndex);
             });
             tintGreenValueEle.addEventListener('input', (e) => {
                 tintGreen = parseInt(e.target.value, 10);
                 tintGreenEle.value = tintGreen;
+                setLocalStorageTint(null, tintGreen, null);
                 updateTemplate(currentIndex);
             });
             const tintBlueEle = document.getElementById('tintBlue');
@@ -2986,11 +3086,13 @@
             tintBlueEle.addEventListener('input', (e) => {
                 tintBlue = parseInt(e.target.value, 10);
                 tintBlueValueEle.value = tintBlue;
+                setLocalStorageTint(null, null, tintBlue);
                 updateTemplate(currentIndex);
             });
             tintBlueValueEle.addEventListener('input', (e) => {
                 tintBlue = parseInt(e.target.value, 10);
                 tintBlueEle.value = tintBlue;
+                setLocalStorageTint(null, null, tintBlue);
                 updateTemplate(currentIndex);
             });
             document.getElementById('upload').addEventListener('change', () => {
@@ -3000,6 +3102,7 @@
             const tintNoneEle = document.getElementById('tintNone');
             tintNoneEle.addEventListener('change', () => {
                 setLocalStorageTint(null, null, null);
+                updateTemplate(currentIndex);
             });
             // Tint Custom
             const tintCustomEle = document.getElementById('tintCustom');
@@ -3008,9 +3111,18 @@
                 const green = document.getElementById('tintGreenValue').value;
                 const blue = document.getElementById('tintBlueValue').value;
                 setLocalStorageTint(red, green, blue);
+                updateTemplate(currentIndex);
             });
             // Fade
-
+            const fadeEle = document.getElementById('fade');
+            fadeEle.addEventListener('click', (e) => {
+                if (e.target.nodeName === 'BUTTON') {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    setLocalStorageFade(index);
+                    updateFade();
+                    updateTemplate(currentIndex);
+                }
+            });
             // Color
             const pageBackgroundEle = document.getElementById('pageBackground');
             paperColors.forEach((item) => {
@@ -3355,6 +3467,9 @@
             }
             // Init Defaults, this clicks the first page
             Promise.all(fontPromises).then(() => {
+                // Update Tint
+                updateTintList();
+                // Start Rendering
                 updateTotalPages();
             });
         });
@@ -3440,7 +3555,8 @@
                     <div class="tint-menu-wrap">
                         <div class="tint-off">
                             <div style="display: flex;">
-                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" checked />
+                                <div style="width: 1.5rem;">
+                                    <input id="tintNone" type="radio" name="tint" />
                                 </div>
                                 <div style="flex: 1;">Disable Tint</div>
                             </div>
@@ -3497,29 +3613,22 @@
                             </svg>
                             Provided tints are tested, but will vary by each printer's color profile.
                         </p>
-                        <div class="fade">
-                            <button>
+                        <div class="fade" id="fade">
+                            <button data-index="-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                     <path
                                         d="M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM7.65723 10.4873C6.61069 12.0679 6 13.9624 6 16C6 21.5228 10.4772 26 16 26C18.0378 26 19.932 25.3885 21.5127 24.3418L7.65723 10.4873ZM16 6C13.9616 6 12.0663 6.61094 10.4854 7.6582L24.3408 21.5137C25.388 19.9327 26 18.0383 26 16C26 10.4772 21.5228 6 16 6Z"
                                         fill="#AAAAAA" />
                                 </svg>
                             </button>
-                            <button class="selected">
+                            <button data-index="0">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                    <g clip-path="url(#clip0_1103_812)">
-                                        <rect width="32" height="12" fill="black" />
-                                        <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9" />
-                                        <rect y="16" width="32" height="4" fill="black" fill-opacity="0.86" />
-                                        <rect y="20" width="32" height="4" fill="black" fill-opacity="0.82" />
-                                        <rect y="24" width="32" height="4" fill="black" fill-opacity="0.78" />
-                                        <rect y="28" width="32" height="4" fill="black" fill-opacity="0.75" />
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_1103_812">
-                                            <rect width="32" height="32" fill="white" />
-                                        </clipPath>
-                                    </defs>
+                                    <rect width="32" height="12" fill="black" />
+                                    <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9" />
+                                    <rect y="16" width="32" height="4" fill="black" fill-opacity="0.86" />
+                                    <rect y="20" width="32" height="4" fill="black" fill-opacity="0.82" />
+                                    <rect y="24" width="32" height="4" fill="black" fill-opacity="0.78" />
+                                    <rect y="28" width="32" height="4" fill="black" fill-opacity="0.75" />
                                 </svg>
                             </button>
                         </div>
@@ -3543,8 +3652,10 @@
         </div>
         <div>
             <div style="display: flex;gap:0.5rem;align-items: center">
-                <label style="white-space: pre;flex:1;"><input type="checkbox" id="enablePageNumbers" checked /> Page
-                    Numbers</label>
+                <label style="flex:1;">
+                    <input type="checkbox" id="enablePageNumbers" checked />
+                    Page Numbers
+                </label>
                 <div id="font"></div>
             </div>
             <label>
