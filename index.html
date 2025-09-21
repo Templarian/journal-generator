@@ -1389,10 +1389,10 @@
         }];
         function setLocalStoragePaperColor(value) {
             const defaultColor = paperColors[0].value;
-            const type = getCurrentType();
-            const template = getTemplate();
-            const templateKey = template ? template.value : 'custom';
-            const key = `${type}:${templateKey}:paperColor`;
+            let key = 'inner:paperColor';
+            if (currentIndex === 0 || currentIndex === 1) {
+                key = 'cover:paperColor';
+            }
             const pageBackgroundEle = document.getElementById('pageBackground');
             if (pageBackgroundEle.value === defaultColor) {
                 localStorage.removeItem(key);
@@ -1402,16 +1402,16 @@
         }
         function getLocalStoragePaperColor() {
             const defaultColor = paperColors[0].value;
-            const type = getCurrentType();
-            const template = getTemplate();
-            const templateKey = template ? template.value : 'custom';
-            const key = `${type}:${templateKey}:paperColor`;
+            let key = 'inner:paperColor';
+            if (currentIndex === 0 || currentIndex === 1) {
+                key = 'cover:paperColor';
+            }
             return localStorage.getItem(key) ?? defaultColor;
         }
         function setLocalStoragePrinterOffset() {
             // Printer Offset, only 'cover:printerOffset' and 'inner:pageOffset'
             let printerOffsetKey = 'inner:printerOffset';
-                if (currentIndex === 0 || currentIndex === 1) {
+            if (currentIndex === 0 || currentIndex === 1) {
                 printerOffsetKey = 'cover:printerOffset';
             }
             const value = document.getElementById('offset').value;
@@ -2636,6 +2636,7 @@
                 pEle.addEventListener('click', () => {
                     // Update template list
                     if (currentIndex !== page.index) {
+                        // Update templates list
                         updateTemplateList(page.index);
                     }
                     // Update page numbers
@@ -2665,6 +2666,8 @@
                         }
                     }
                     currentIndex = page.index;
+                    // Update Paper Color, cover vs inner
+                    updatePaperColor(getLocalStoragePaperColor());
                 });
                 pageSelect.appendChild(pEle);
                 pageEles.push(pEle);
@@ -2679,8 +2682,6 @@
             presetDisabledEle.disabled = presetSelect.options.length === 0;
             // Update Tint
             updateTint();
-            // Update Paper Color
-            updatePaperColor(getLocalStoragePaperColor());
         }
         function updateTemplateList(pageIndex) {
             const templateEle = document.getElementById('template');
