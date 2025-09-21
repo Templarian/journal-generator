@@ -51,7 +51,7 @@ Similarly when printing journals a small amount of color give each journal a mor
 
 The fade feature is primarily used when printing on non-white paper to allow the natural paper's colors pop. Pixels are grouped by brightness and given a opacity modifier. Essentially letting the natural paper's color from being washed out by the ink.
 
-> The process of picking the right fade will require test printing. There are too many variables in play especiall when printing on different paper types.
+> The process of picking the right fade will require test printing. There are too many variables in play especially when printing on different paper types.
 
 ## Source
 

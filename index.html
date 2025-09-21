@@ -996,16 +996,19 @@
             }
             section .fade button {
                 display: flex;
-                width: 2.5rem;
+                width: 2.375rem;
                 background: #FFF;
                 border: 2px solid #333;
-                padding: 0.125rem;
                 border-radius: 0.25rem;
                 align-items: center;
-                justify-items: center;
+                justify-content: center;
+                padding: 0;
             }
             section .fade button.selected {
                 border-color: #0099f8;
+            }
+            section .fade button svg {
+                width: 2rem;
             }
             section input[type="radio"] {
                 margin: 0;
@@ -1019,12 +1022,23 @@
                 opacity: 0.6;
             }
 
-            .zoom {
+            .corner {
+                display: flex;
                 grid-column: 2;
                 grid-row: 1;
                 position: absolute;
                 bottom: 1rem;
                 right: 1rem;
+                gap: 0.5rem;
+            }
+            .pageBackground {
+                border-radius: 0.25rem;
+                box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
+                z-index: 1;
+                outline: 2px solid #FFF;
+                font-size: 1.25rem;
+            }
+            .zoom {
                 border-radius: 0.25rem;
                 box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
                 z-index: 1;
@@ -1362,6 +1376,37 @@
             }
             // Maybe it got deleted?
             return null;
+        }
+        const paperColors = [{
+            label: 'White',
+            value: '#ffffff'
+        }, {
+            label: 'Tan',
+            value: '#d2b48c'
+        }, {
+            label: 'Charcoal',
+            value: '#444444'
+        }];
+        function setLocalStoragePaperColor(value) {
+            const defaultColor = paperColors[0].value;
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:paperColor`;
+            const pageBackgroundEle = document.getElementById('pageBackground');
+            if (pageBackgroundEle.value === defaultColor) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, pageBackgroundEle.value);
+            }
+        }
+        function getLocalStoragePaperColor() {
+            const defaultColor = paperColors[0].value;
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:paperColor`;
+            return localStorage.getItem(key) ?? defaultColor;
         }
         function setLocalStoragePrinterOffset() {
             // Printer Offset, only 'cover:printerOffset' and 'inner:pageOffset'
@@ -2324,9 +2369,9 @@
                     canvas.height - (offsetY + (7 * convert))
                 );
                 const pixels = imageData.data;
-
                 for (let i = 0; i < pixels.length; i += 4) {
                     if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
+                        pixels[i + 3] = 0;
                         continue;
                     }
                     const brightness = getBrightness(pixels[i], pixels[i + 1], pixels[i + 2]);
@@ -2353,30 +2398,6 @@
                     pixels[i] = pixels[i] + r - 170; // Red channel
                     pixels[i + 1] = pixels[i + 1] + g - 170; // Green channel
                     pixels[i + 2] = pixels[i + 2] + b - 170; // Blue channel
-                }
-                ctx.putImageData(imageData, offsetX, offsetY);
-            }
-            // Draw Image, not really hue
-            function applyHue(r, g, b) {
-                const imageData = ctx.getImageData(
-                    offsetX,
-                    offsetY,
-                    canvas.width - (offsetX * 2),
-                    canvas.height - (offsetY + (7 * convert))
-                );
-                const pixels = imageData.data;
-                // Brown 165 42 42
-                const tintColor = { r, g, b, a: 255 };
-
-                for (let i = 0; i < pixels.length; i += 4) {
-                    if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
-                        continue;
-                    }
-                    // Apply tint by blending (e.g., averaging or multiplying)
-                    pixels[i] = (pixels[i] + tintColor.r) / 2; // Red channel
-                    pixels[i + 1] = (pixels[i + 1] + tintColor.g) / 2; // Green channel
-                    pixels[i + 2] = (pixels[i + 2] + tintColor.b) / 2; // Blue channel
-                    //pixels[i + 3] = (pixels[i + 3] * tintColor.a) / 255; // Alpha channel (optional)
                 }
                 ctx.putImageData(imageData, offsetX, offsetY);
             }
@@ -2411,12 +2432,10 @@
                         (55 * 3) + halfWidthInner, 27 * 3, halfWidthInner - offset, heightInner
                     );
                 }
-                // Cache minMaxRGBA
-                //calculateMinMaxRGBA();
-                // Draw Page Numbers
-                drawPageNumbers();
                 // Level
                 levelPixels();
+                // Draw Page Numbers
+                drawPageNumbers();
                 // Shift Colors
                 shiftPixels(tintRed, tintGreen, tintBlue);
                 // Draw Text
@@ -2513,6 +2532,8 @@
             } else {
                 customGridTypeEle.value = localStorage.getItem('innerGridType') ?? 'inch';
             }
+            // Update Tint Selection
+            
             // Custom list
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
@@ -2658,6 +2679,8 @@
             presetDisabledEle.disabled = presetSelect.options.length === 0;
             // Update Tint
             updateTint();
+            // Update Paper Color
+            updatePaperColor(getLocalStoragePaperColor());
         }
         function updateTemplateList(pageIndex) {
             const templateEle = document.getElementById('template');
@@ -2781,6 +2804,12 @@
             img.src = src;
             return promise;
         }
+        function updatePaperColor(value) {
+            const pageBackgroundEle = document.getElementById('pageBackground');
+            const bodyEle = document.getElementById('body');
+            bodyEle.style.backgroundColor = value;
+            pageBackgroundEle.value = value;
+        }
         // Setup
         window.addEventListener('load', async () => {
             // ToDo Show Loading!!!
@@ -2863,6 +2892,22 @@
                 const blue = document.getElementById('tintBlueValue').value;
                 setLocalStorageTint(red, green, blue);
             });
+            // Fade
+
+            // Color
+            const pageBackgroundEle = document.getElementById('pageBackground');
+            paperColors.forEach((item) => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.textContent = item.label;
+                pageBackgroundEle.appendChild(option);
+            });
+            pageBackgroundEle.addEventListener('change', (e) => {
+                const { value } = e.target;
+                setLocalStoragePaperColor(value);
+                updatePaperColor(value);
+            });
+            updatePaperColor(getLocalStoragePaperColor());
             // Custom Grid Type
             const customGridTypeEle = document.getElementById('customGridType');
             customGridTypeEle.addEventListener('change', (e) => {
@@ -3215,11 +3260,14 @@
 </head>
 
 <body>
-    <select class="zoom no-print" id="zoom">
-        <option value="100%">100%</option>
-        <option value="125%">125%</option>
-        <option value="150%">150%</option>
-    </select>
+    <div class="corner no-print">
+        <select class="pageBackground" id="pageBackground"></select>
+        <select class="zoom" id="zoom">
+            <option value="100%">100%</option>
+            <option value="125%">125%</option>
+            <option value="150%">150%</option>
+        </select>
+    </div>
     <section class="no-print">
         <h1>Pocket Journal Generator</h1>
         <div>
@@ -3314,13 +3362,13 @@
                             Provided tints are tested, but will vary by each printer's color profile.
                         </p>
                         <div class="fade">
-                            <button class="selected">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <button>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                     <path d="M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM7.65723 10.4873C6.61069 12.0679 6 13.9624 6 16C6 21.5228 10.4772 26 16 26C18.0378 26 19.932 25.3885 21.5127 24.3418L7.65723 10.4873ZM16 6C13.9616 6 12.0663 6.61094 10.4854 7.6582L24.3408 21.5137C25.388 19.9327 26 18.0383 26 16C26 10.4772 21.5228 6 16 6Z" fill="#AAAAAA"/>
                                 </svg>
                             </button>
-                            <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <button class="selected">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                     <g clip-path="url(#clip0_1103_812)">
                                     <rect width="32" height="12" fill="black"/>
                                     <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9"/>
