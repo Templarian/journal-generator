@@ -2265,28 +2265,40 @@
         function updateTint() {
             const tintNoneEle = document.getElementById('tintNone');
             const tintCustomEle = document.getElementById('tintCustom');
+            const tintRedEle = document.getElementById('tintRed');
+            const tintRedValueEle = document.getElementById('tintRedValue');
+            const tintGreenEle = document.getElementById('tintGreen');
+            const tintGreenValueEle = document.getElementById('tintGreenValue');
+            const tintBlueEle = document.getElementById('tintBlue');
+            const tintBlueValueEle = document.getElementById('tintBlueValue');
             const selected = getLocalStorageTint();
             let isPreset = false;
             const preset = document.querySelector(`input[value="${selected}"]`);
             if (preset) {
                 preset.checked = true;
                 isPreset = true;
+                tintRedEle.value = 170;
+                tintRedValueEle.value = 170;
+                tintGreenEle.value = 170;
+                tintGreenValueEle.value = 170;
+                tintBlueEle.value = 170;
+                tintBlueValueEle.value = 170;
             } else {
                 if (selected === 'null:null:null') {
                     tintNoneEle.checked = true;
+                    tintRedEle.value = 170;
+                    tintRedValueEle.value = 170;
+                    tintGreenEle.value = 170;
+                    tintGreenValueEle.value = 170;
+                    tintBlueEle.value = 170;
+                    tintBlueValueEle.value = 170;
                 } else {
                     tintCustomEle.checked = true;
                     const [red, green, blue] = selected.split(':');
-                    const tintRedEle = document.getElementById('tintRed');
-                    const tintRedValueEle = document.getElementById('tintRedValue');
                     tintRedEle.value = red;
                     tintRedValueEle.value = red;
-                    const tintGreenEle = document.getElementById('tintGreen');
-                    const tintGreenValueEle = document.getElementById('tintGreenValue');
                     tintGreenEle.value = green;
                     tintGreenValueEle.value = green;
-                    const tintBlueEle = document.getElementById('tintBlue');
-                    const tintBlueValueEle = document.getElementById('tintBlueValue');
                     tintBlueEle.value = blue;
                     tintBlueValueEle.value = blue;
                 }
