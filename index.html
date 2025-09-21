@@ -83,7 +83,8 @@
                 align-items: flex-start;
                 justify-content: flex-end;
             }
-            div>span.arrow > span {
+
+            div>span.arrow>span {
                 transform: rotate(270deg) translate(0, 27px);
                 color: #999;
             }
@@ -102,7 +103,8 @@
                 align-items: flex-start;
                 justify-content: center;
             }
-            div>span.marker > span {
+
+            div>span.marker>span {
                 transform: translate(10px, 0px);
                 color: #999;
             }
@@ -122,7 +124,8 @@
                 justify-content: center;
                 transform: rotate(180deg);
             }
-            div>span.config > span {
+
+            div>span.config>span {
                 transform: translate(-10px, 10px);
                 color: #999;
             }
@@ -133,7 +136,8 @@
             input:focus,
             button:focus-visible,
             select:focus {
-                outline: 0; /* meh */
+                outline: 0;
+                /* meh */
                 box-shadow: 0 0 0 2px #0099f8;
             }
 
@@ -271,7 +275,7 @@
                 font-size: 0.875rem;
             }
 
-            section > div > button {
+            section>div>button {
                 border: 2px solid #666;
                 border-radius: 0.5rem;
                 background: #FFF;
@@ -283,7 +287,7 @@
                 color: #333;
             }
 
-            section > div > button:hover {
+            section>div>button:hover {
                 background: #EEE;
             }
 
@@ -294,6 +298,7 @@
                 grid-template-columns: auto auto auto;
                 grid-template-rows: auto auto auto;
             }
+
             section div.typeSteps-label {
                 justify-self: center;
                 color: #333;
@@ -301,6 +306,7 @@
                 font-weight: bold;
                 cursor: default;
             }
+
             section div.typeSteps-book button {
                 display: flex;
                 position: relative;
@@ -315,27 +321,34 @@
                 font-size: 0.75rem;
                 color: #222;
             }
+
             section div.typeSteps-book button:not(.selected):focus {
                 box-shadow: none;
             }
+
             section div.typeSteps-book button:not(.selected):hover:not(:active) {
                 border-bottom-width: 4px;
                 height: calc(7rem + 2px);
                 transform: translateY(-2px);
                 margin-bottom: -2px;
             }
+
             section div.typeSteps-book button:not(.selected):active {
                 box-shadow: inset 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
             }
+
             section div.typeSteps-book button:not(.selected):active .title {
                 transform: translate(-0.25rem, 1.125rem);
             }
+
             section div.typeSteps-book button:not(.selected):not(:active):hover .title {
                 transform: translate(-0.25rem, 1.25rem);
             }
+
             section div.typeSteps-book button:focus {
                 background: rgb(0, 153, 248, 0.05);
             }
+
             section div.typeSteps-book button .binding {
                 overflow: hidden;
                 position: absolute;
@@ -344,10 +357,12 @@
                 bottom: 0;
                 left: calc(50% - 1rem);
             }
+
             section div.typeSteps-book button .binding::before {
                 content: ' ';
                 position: absolute;
-                left: calc(50% - 0.125rem / 2);;
+                left: calc(50% - 0.125rem / 2);
+                ;
                 top: 0;
                 bottom: 0;
                 width: 0.125rem;
@@ -355,9 +370,11 @@
                 border-right: 1px dotted #DDD;
                 box-shadow: 0 0 2rem #FFF;
             }
+
             section div.typeSteps-book button .title {
                 transform: translate(-0.25rem, 1.125rem);
             }
+
             section div.typeSteps-book button .page-1-left {
                 border-left: 1px dashed #DDD;
                 border-top: 1px dashed #DDD;
@@ -369,6 +386,7 @@
                 bottom: calc(50% + 0.125rem);
                 background: rgba(200, 200, 200, 0.05);
             }
+
             section div.typeSteps-book button .page-1-right {
                 border-right: 1px dashed #DDD;
                 border-top: 1px dashed #DDD;
@@ -380,6 +398,7 @@
                 bottom: calc(50% + 0.125rem);
                 background: rgba(200, 200, 200, 0.05);
             }
+
             section div.typeSteps-book button .page-2-left {
                 border-left: 1px dashed #DDD;
                 border-top: 1px dashed #DDD;
@@ -391,6 +410,7 @@
                 bottom: 0.25rem;
                 background: rgba(200, 200, 200, 0.05);
             }
+
             section div.typeSteps-book button .page-2-right {
                 border-right: 1px dashed #DDD;
                 border-top: 1px dashed #DDD;
@@ -402,20 +422,24 @@
                 bottom: 0.25rem;
                 background: rgba(200, 200, 200, 0.05);
             }
+
             section div.typeSteps-book button.selected {
                 box-shadow: none;
                 border-color: #0099f8;
             }
+
             section div.typeSteps-book button.selected .page-1-left,
             section div.typeSteps-book button.selected .page-1-right,
             section div.typeSteps-book button.selected .page-2-left,
             section div.typeSteps-book button.selected .page-2-right {
                 border-color: rgba(0, 153, 248, 0.5);
             }
+
             section div.typeSteps-book button.selected .title {
                 color: #0099f8;
                 font-weight: bold;
             }
+
             section div.typeSteps div:nth-child(7) {
                 grid-column: 1 / span 2;
                 grid-row: 3;
@@ -425,6 +449,7 @@
                 height: 2rem;
                 align-items: end;
             }
+
             section div.typeSteps div:nth-child(8) {
                 grid-column: 3;
                 grid-row: 3;
@@ -434,6 +459,7 @@
                 height: 2rem;
                 align-items: end;
             }
+
             section div.typeSteps div:nth-child(7)::before,
             section div.typeSteps div:nth-child(8)::before {
                 content: ' ';
@@ -445,6 +471,7 @@
                 margin-right: 0.25rem;
                 align-self: start;
             }
+
             section div.typeSteps div:nth-child(7)::after,
             section div.typeSteps div:nth-child(8)::after {
                 content: ' ';
@@ -482,22 +509,28 @@
             section .pageSelect button:hover {
                 background: #EEE;
             }
+
             section .pageSelect button:hover::after {
                 background-color: #ddd;
             }
+
             section .pageSelect button.selected {
                 border-color: #0099f8;
                 border-width: 2px;
             }
+
             section .pageSelect button.selected::after {
                 background: rgba(0, 153, 248, 0.2);
             }
+
             section .pageSelect button.selected:hover {
                 background: #FFF;
             }
+
             section .pageSelect button:nth-child(even) {
                 border-top-right-radius: 0.5rem;
             }
+
             section .pageSelect button:nth-child(even)::after {
                 content: ' ';
                 position: absolute;
@@ -510,6 +543,7 @@
                 height: 0.5rem;
                 box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.10);
             }
+
             section .pageSelect button.selected:nth-child(even)::after {
                 border-bottom: 2px solid #0099f8;
                 border-left: 2px solid #0099f8;
@@ -539,6 +573,7 @@
                 padding: 0.25rem;
                 width: 1rem;
             }
+
             section .pageSelect .selected span.page-number {
                 background: rgba(0, 153, 248, 0.2);
                 color: #333;
@@ -578,6 +613,7 @@
                 gap: 0.25rem;
                 margin: 0.5rem 0;
             }
+
             section .editor-header-hideshow,
             section .editor-header-text {
                 border-radius: 0.25rem;
@@ -587,49 +623,60 @@
                 font-size: 0.825rem;
                 text-align: left;
             }
+
             section .editor-column {
                 display: flex;
                 flex-direction: column;
                 gap: 0.25rem;
             }
+
             section .editor-column-hideshow {
                 width: 1.5rem;
             }
+
             section .editor-row.editor-presets {
                 display: grid;
                 gap: 0.25rem;
                 grid-template-columns: 1fr auto auto auto;
             }
+
             section .editor-presets select {
                 grid-row: 1;
                 grid-column: 1;
             }
+
             section .editor-presets .editor-preset-add {
                 grid-row: 1;
                 grid-column: 2;
             }
+
             section .editor-presets .editor-preset-copy {
                 grid-row: 1;
                 grid-column: 3;
             }
+
             section .editor-presets .editor-preset-menu {
                 grid-row: 1;
                 grid-column: 4;
             }
+
             section .editor-presets .editor-preset-rename {
                 grid-row: 1;
                 grid-column: 1 / span 3;
                 display: flex;
             }
+
             section .editor-presets .editor-preset-rename input {
                 width: auto !important;
                 flex: 1;
                 border: 2px solid #666;
             }
+
             section .editor-row {
                 display: flex;
                 gap: 0.25rem;
             }
+
             section .editor-row input {
                 display: flex;
                 flex: 1;
@@ -637,11 +684,13 @@
                 border-radius: 0.25rem;
                 padding: 0.25rem 0.5rem;
             }
+
             section .editor-row input:invalid {
                 outline: 2px solid red;
                 background: rgba(255, 0, 0, 0.05);
                 outline-offset: -1px;
             }
+
             section .editor-row select.change,
             section .editor-row input.change,
             section .editor-row textarea.change {
@@ -649,19 +698,23 @@
                 background: rgba(255, 165, 0, 0.1);
                 outline-offset: -1px;
             }
+
             section .editor-row input[type=number],
             section .editor-row input[type=text] {
                 min-width: 0;
                 width: 4rem;
             }
+
             section input[type=number].no-arrows {
                 -moz-appearance: textfield;
             }
+
             section input[type=number].no-arrows::-webkit-outer-spin-button,
             section input[type=number].no-arrows::-webkit-inner-spin-button {
                 -webkit-appearance: none;
                 margin: 0;
             }
+
             section .editor-row input.red,
             section .editor-row input.green,
             section .editor-row input.blue,
@@ -669,6 +722,7 @@
                 width: 1.5rem;
                 padding-left: 0.75rem;
             }
+
             section .editor-row .red-dot {
                 margin: 0.25rem -0.25rem 0.25rem;
                 width: 0.25rem;
@@ -676,6 +730,7 @@
                 transform: translate(0.5rem, 0);
                 border-radius: 0.25rem;
             }
+
             section .editor-row .green-dot {
                 margin: 0.25rem -0.25rem 0.25rem;
                 width: 0.25rem;
@@ -683,6 +738,7 @@
                 transform: translate(0.5rem, 0);
                 border-radius: 0.25rem;
             }
+
             section .editor-row .blue-dot {
                 margin: 0.25rem -0.25rem 0.25rem;
                 width: 0.25rem;
@@ -690,44 +746,54 @@
                 transform: translate(0.5rem, 0);
                 border-radius: 0.25rem;
             }
+
             section .editor-row .alpha-dot {
                 margin: 0.25rem -0.25rem 0.25rem;
                 width: 0.25rem;
-                background: linear-gradient(0deg,#FFF 0%, #AAA 100%);
+                background: linear-gradient(0deg, #FFF 0%, #AAA 100%);
                 transform: translate(0.5rem, 0);
                 border-radius: 0.25rem;
             }
+
             section .editor-row select {
                 display: flex;
             }
-            section .editor-row textarea { 
+
+            section .editor-row textarea {
                 flex: 1;
                 border: 1px solid #111;
                 border-radius: 0.25rem;
                 padding: 0.25rem 0.5rem;
                 resize: vertical;
             }
-            section .editor-row svg { 
+
+            section .editor-row svg {
                 align-self: center;
             }
+
             section .editor-list {
                 grid-column: 1 / span 2;
             }
-            section .editor-list > .editor-row:not(:first-child) {
+
+            section .editor-list>.editor-row:not(:first-child) {
                 border-top: 1px dashed #AAA;
                 margin-top: 0.25rem;
                 padding-top: 0.25rem;
             }
+
             section .editor-select-inline,
             section .editor-select-block {
                 width: 5rem;
             }
+
             section .editor-select-font {
                 flex: 1;
             }
+
             section .editor-select-size {
                 width: 6rem;
             }
+
             section .editor-row button {
                 display: flex;
                 border: 1px solid #666;
@@ -735,32 +801,37 @@
                 background: #f8f9fa;
                 padding: 0 0.25rem;
             }
+
             section .editor-row button:hover,
             section .editor-row button:focus {
                 border-color: #111;
                 color: #0099f8;
                 z-index: 1;
             }
+
             section .editor-row button svg {
                 align-self: center;
             }
+
             /* Fancy group rounding */
             section .editor-row button.editor-preset-add:not(:has(+.hide)) {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
                 margin-right: calc(-0.25rem - 1px);
             }
+
             section .editor-row button.editor-preset-copy {
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
             }
+
             section .editor-row .editor-preset-menu {
                 display: flex;
                 position: relative;
             }
-            section .editor-row .editor-preset-menu-button {
-                
-            }
+
+            section .editor-row .editor-preset-menu-button {}
+
             section .editor-row .editor-preset-menu-item {
                 display: flex;
                 border: 0;
@@ -771,11 +842,13 @@
                 align-items: center;
                 font-size: 1rem;
             }
+
             section .editor-row .editor-preset-menu-list {
                 position: absolute;
                 right: 0;
                 top: 1.75rem;
             }
+
             section .editor-row .editor-preset-menu-list::before {
                 content: ' ';
                 width: 100vw;
@@ -786,6 +859,7 @@
                 left: 0;
                 top: 0;
             }
+
             section .editor-row .editor-preset-menu-items {
                 position: relative;
                 background: #FFF;
@@ -795,60 +869,73 @@
                 border: 1px solid #666;
                 z-index: 1;
             }
+
             section .editor-row .editor-preset-menu-seperator {
                 border-top: 1px solid #AAA;
                 margin-top: 0.25rem;
                 padding-top: 0.25rem;
             }
-            .hide + .editor-preset-menu-seperator {
+
+            .hide+.editor-preset-menu-seperator {
                 display: none;
             }
+
             section .editor-row button.editor-page-left {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
                 margin-right: -0.125rem;
                 padding-left: 0.375rem;
             }
-            section .editor-row button.editor-page-left.selected { 
+
+            section .editor-row button.editor-page-left.selected {
                 background-color: #1978D0;
                 color: #fff;
                 border-color: #1978D0;
             }
+
             section .editor-row button.editor-page-left.change:not(.selected) {
                 background-color: rgba(255, 165, 0, 0.1);
                 border-color: #7f5200;
             }
+
             section .editor-row button.editor-page-left.change.selected {
                 background-color: #7f5200;
                 border-color: #7f5200;
             }
+
             section .editor-row button.editor-page-right {
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
                 margin-left: -0.125rem;
                 padding-right: 0.375rem;
             }
-            section .editor-row button.editor-page-right.selected { 
+
+            section .editor-row button.editor-page-right.selected {
                 background-color: #1978D0;
                 color: #fff;
                 border-color: #1978D0;
             }
+
             section .editor-row button.editor-page-right.change:not(.selected) {
                 background-color: rgba(255, 165, 0, 0.1);
                 border-color: #7f5200;
             }
+
             section .editor-row button.editor-page-right.change.selected {
                 background-color: #7f5200;
                 border-color: #7f5200;
             }
+
             section .editor-flex-1 {
                 flex: 1;
             }
+
             section .editor-buttons {
                 display: flex;
                 flex-direction: row;
                 gap: 0.5rem;
             }
+
             section .editor-reset {
                 display: flex;
                 flex: 2;
@@ -861,11 +948,13 @@
                 color: #111;
                 justify-content: center;
             }
+
             section .editor-reset:hover {
                 background-color: #f8f9fa;
                 border-color: #dc3545;
                 color: #dc3545;
             }
+
             section .editor-add {
                 display: flex;
                 flex: 1;
@@ -878,6 +967,7 @@
                 color: #111;
                 justify-content: center;
             }
+
             section .editor-add:hover {
                 background-color: #f8f9fa;
                 border-color: #198754;
@@ -913,9 +1003,11 @@
                 border: 1px solid #666;
                 border-radius: 0.5rem 0 0.5rem 0.5rem;
             }
+
             section .tint-menu-wrap {
                 padding: 0.5rem 0.75rem;
             }
+
             section .tint-red {
                 display: flex;
                 border-radius: 50%;
@@ -924,6 +1016,7 @@
                 width: 1rem;
                 height: 1rem;
             }
+
             section .tint-green {
                 display: flex;
                 border-radius: 50%;
@@ -932,6 +1025,7 @@
                 width: 1rem;
                 height: 1rem;
             }
+
             section .tint-blue {
                 display: flex;
                 border-radius: 50%;
@@ -940,11 +1034,13 @@
                 width: 1rem;
                 height: 1rem;
             }
+
             section .tint-list-header {
                 border-top: 1px solid #DDD;
                 padding-top: 0.5rem;
                 margin-top: 0.5rem;
             }
+
             section .tint-menu input[type=number] {
                 border: 1px solid #333;
                 padding: 0.25rem;
@@ -952,40 +1048,48 @@
                 border-radius: 0.25rem;
                 text-align: center;
             }
-            section .tint-options {
-                
-            }
+
+            section .tint-options {}
+
             section .tint-option {
                 display: flex;
             }
+
             section .tint-option div:nth-child(1) {
                 width: 1.5rem;
             }
+
             section .tint-option div:nth-child(2) {
                 flex: 1;
             }
+
             section .tint-option div:nth-child(3) {
                 width: 2rem;
                 text-align: center;
             }
+
             section .tint-option div:nth-child(4) {
                 width: 2rem;
                 text-align: center;
             }
+
             section .tint-option div:nth-child(5) {
                 width: 2rem;
                 text-align: center;
             }
+
             section .tint-off {
                 border-bottom: 1px solid #ddd;
                 padding-bottom: 0.25rem;
                 margin-bottom: 0.5rem;
             }
+
             section .tint-info {
                 border-top: 1px solid #ddd;
                 padding-top: 0.25rem;
                 margin-top: 0.5rem;
             }
+
             section .fade {
                 display: flex;
                 height: 2.375rem;
@@ -994,6 +1098,7 @@
                 margin-top: 0.5rem;
                 gap: 0.25rem;
             }
+
             section .fade button {
                 display: flex;
                 width: 2.375rem;
@@ -1004,12 +1109,15 @@
                 justify-content: center;
                 padding: 0;
             }
+
             section .fade button.selected {
                 border-color: #0099f8;
             }
+
             section .fade button svg {
                 width: 2rem;
             }
+
             section input[type="radio"] {
                 margin: 0;
             }
@@ -1031,6 +1139,7 @@
                 right: 1rem;
                 gap: 0.5rem;
             }
+
             .pageBackground {
                 border-radius: 0.25rem;
                 box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
@@ -1038,6 +1147,7 @@
                 outline: 2px solid #FFF;
                 font-size: 1.25rem;
             }
+
             .zoom {
                 border-radius: 0.25rem;
                 box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
@@ -1064,7 +1174,8 @@
                 align-items: flex-start;
                 justify-content: flex-end;
             }
-            div>span.arrow > span {
+
+            div>span.arrow>span {
                 transform: rotate(270deg) translate(0, 2px);
                 color: #999;
             }
@@ -1083,7 +1194,8 @@
                 align-items: flex-start;
                 justify-content: center;
             }
-            div>span.marker > span {
+
+            div>span.marker>span {
                 color: #999;
                 padding-left: 1rem;
             }
@@ -1103,7 +1215,8 @@
                 justify-content: center;
                 transform: rotate(180deg);
             }
-            div>span.config > span {
+
+            div>span.config>span {
                 color: #999;
                 padding-right: 1rem;
             }
@@ -1118,6 +1231,7 @@
                 letter-spacing: 0.5rem;
                 cursor: default;
             }
+
             section .fontPreview::before {
                 content: 'Preview';
                 position: absolute;
@@ -1126,9 +1240,11 @@
                 font-size: 0.75rem;
                 letter-spacing: 0;
             }
+
             section .fontPreview.disabled {
                 color: #999;
             }
+
             section .fontPreview.disabled::before {
                 color: #999;
             }
@@ -1262,7 +1378,7 @@
             return select;
         }
         function uuid() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
@@ -1420,7 +1536,7 @@
         function getLocalStoragePrinterOffset() {
             // Printer Offset, only 'cover:printerOffset' and 'inner:pageOffset'
             let printerOffsetKey = 'inner:printerOffset';
-                if (currentIndex === 0 || currentIndex === 1) {
+            if (currentIndex === 0 || currentIndex === 1) {
                 printerOffsetKey = 'cover:printerOffset';
             }
             return localStorage.getItem(printerOffsetKey) ?? '0';
@@ -2329,7 +2445,7 @@
                 const pixels = imageData.data;
                 let first = true,
                     redMax = 0, blueMax = 0, greenMax = 0, alphaMax = 0
-                    redMin = 255, blueMin = 255, greenMin = 255, alphaMin = 255;
+                redMin = 255, blueMin = 255, greenMin = 255, alphaMin = 255;
                 for (let i = 0; i < pixels.length; i += 4) {
                     if (pixels[i] === 255 && pixels[i + 1] === 255 && pixels[i + 2] === 255) {
                         // Ignore White
@@ -2533,7 +2649,7 @@
                 customGridTypeEle.value = localStorage.getItem('innerGridType') ?? 'inch';
             }
             // Update Tint Selection
-            
+
             // Custom list
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
@@ -2592,7 +2708,7 @@
             if (includeCover) {
                 pages.push({ index: 1, name: 'Page 1 Details Back', number: 1, start: 1, end: total });
             } else {
-                pages.push({ index: 1,  name: 'Page 1 Details Back', number: 1, start: null, end: null });
+                pages.push({ index: 1, name: 'Page 1 Details Back', number: 1, start: null, end: null });
             }
             // Need to stop coding at 1am... but it works so don't touch it?
             for (let i = 1; i <= totalPages; i++) {
@@ -2693,7 +2809,7 @@
             customOption.textContent = 'Custom';
             newOptions.push(customOption);
             templates.filter((template) => {
-                if(pageIndex === 0) {
+                if (pageIndex === 0) {
                     return template.type === templateType.cover;
                 } else if (pageIndex === 1) {
                     return template.type === templateType.detail || template.type === templateType.inner;
@@ -2780,7 +2896,7 @@
                     console.log(`Completed '${template.src}'`);
                     cacheTemplate.set(id, img);
                     resolve(img);
-                }); 
+                });
             });
             console.log(`Downloading '${template.src}'...`);
             img.src = template.src;
@@ -2799,7 +2915,7 @@
                     console.log(`Completed '${src}'`);
                     cacheTemplate.set(src, img);
                     resolve(img);
-                }); 
+                });
             });
             console.log(`Downloading '${src}'...`);
             img.src = src;
@@ -2981,7 +3097,7 @@
             });
             document.getElementById('typeInner').addEventListener('click', (e) => {
                 document.getElementById('upload').value = '';
-                if (currentIndex < 2 ) {
+                if (currentIndex < 2) {
                     const pages2 = document.getElementById('pageSelect');
                     pages2.children[2].click();
                     currentIndex = 2;
@@ -3324,7 +3440,8 @@
                     <div class="tint-menu-wrap">
                         <div class="tint-off">
                             <div style="display: flex;">
-                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" checked /></div>
+                                <div style="width: 1.5rem;"><input id="tintNone" type="radio" name="tint" checked />
+                                </div>
                                 <div style="flex: 1;">Disable Tint</div>
                             </div>
                         </div>
@@ -3335,14 +3452,23 @@
                                 </div>
                             </div>
                             <div style="display: flex;gap:0.25rem;flex-direction: column;">
-                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-red"></div></div>
-                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-green"></div></div>
-                                <div style="flex:1;display: flex;align-items:center;"><div class="tint-blue"></div></div>
+                                <div style="flex:1;display: flex;align-items:center;">
+                                    <div class="tint-red"></div>
+                                </div>
+                                <div style="flex:1;display: flex;align-items:center;">
+                                    <div class="tint-green"></div>
+                                </div>
+                                <div style="flex:1;display: flex;align-items:center;">
+                                    <div class="tint-blue"></div>
+                                </div>
                             </div>
                             <div style="display: flex;flex-direction: column;gap:0.125rem;flex:1;">
-                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintRed" type="range" value="170" min="0" max="255" /></div>
-                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintGreen" type="range" value="170" min="0" max="255" /></div>
-                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintBlue" type="range" value="170" min="0" max="255" /></div>
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintRed" type="range"
+                                        value="170" min="0" max="255" /></div>
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintGreen"
+                                        type="range" value="170" min="0" max="255" /></div>
+                                <div style="flex:1;display: flex;"><input style="width:100%;" id="tintBlue" type="range"
+                                        value="170" min="0" max="255" /></div>
                             </div>
                             <div style="display: flex;flex-direction: column;">
                                 <div><input type="number" id="tintRedValue" class="no-arrows" value="170" /></div>
@@ -3353,41 +3479,55 @@
                         </div>
                         <div class="tint-list-header" style="display: flex;flex-direction: row;">
                             <div style="flex:1;margin-left:1.5rem;font-weight: 500;">Color</div>
-                            <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-red"></div></div>
-                            <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-green"></div></div>
-                            <div style="display: flex;width: 2rem;justify-content: center;"><div class="tint-blue"></div></div>
+                            <div style="display: flex;width: 2rem;justify-content: center;">
+                                <div class="tint-red"></div>
+                            </div>
+                            <div style="display: flex;width: 2rem;justify-content: center;">
+                                <div class="tint-green"></div>
+                            </div>
+                            <div style="display: flex;width: 2rem;justify-content: center;">
+                                <div class="tint-blue"></div>
+                            </div>
                         </div>
                         <div class="tint-options" id="tintOptions"></div>
                         <p class="tint-info">
-                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
+                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+                            </svg>
                             Provided tints are tested, but will vary by each printer's color profile.
                         </p>
                         <div class="fade">
                             <button>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                    <path d="M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM7.65723 10.4873C6.61069 12.0679 6 13.9624 6 16C6 21.5228 10.4772 26 16 26C18.0378 26 19.932 25.3885 21.5127 24.3418L7.65723 10.4873ZM16 6C13.9616 6 12.0663 6.61094 10.4854 7.6582L24.3408 21.5137C25.388 19.9327 26 18.0383 26 16C26 10.4772 21.5228 6 16 6Z" fill="#AAAAAA"/>
+                                    <path
+                                        d="M16 2C23.732 2 30 8.26801 30 16C30 23.732 23.732 30 16 30C8.26801 30 2 23.732 2 16C2 8.26801 8.26801 2 16 2ZM7.65723 10.4873C6.61069 12.0679 6 13.9624 6 16C6 21.5228 10.4772 26 16 26C18.0378 26 19.932 25.3885 21.5127 24.3418L7.65723 10.4873ZM16 6C13.9616 6 12.0663 6.61094 10.4854 7.6582L24.3408 21.5137C25.388 19.9327 26 18.0383 26 16C26 10.4772 21.5228 6 16 6Z"
+                                        fill="#AAAAAA" />
                                 </svg>
                             </button>
                             <button class="selected">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                     <g clip-path="url(#clip0_1103_812)">
-                                    <rect width="32" height="12" fill="black"/>
-                                    <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9"/>
-                                    <rect y="16" width="32" height="4" fill="black" fill-opacity="0.86"/>
-                                    <rect y="20" width="32" height="4" fill="black" fill-opacity="0.82"/>
-                                    <rect y="24" width="32" height="4" fill="black" fill-opacity="0.78"/>
-                                    <rect y="28" width="32" height="4" fill="black" fill-opacity="0.75"/>
+                                        <rect width="32" height="12" fill="black" />
+                                        <rect y="12" width="32" height="4" fill="black" fill-opacity="0.9" />
+                                        <rect y="16" width="32" height="4" fill="black" fill-opacity="0.86" />
+                                        <rect y="20" width="32" height="4" fill="black" fill-opacity="0.82" />
+                                        <rect y="24" width="32" height="4" fill="black" fill-opacity="0.78" />
+                                        <rect y="28" width="32" height="4" fill="black" fill-opacity="0.75" />
                                     </g>
                                     <defs>
-                                    <clipPath id="clip0_1103_812">
-                                    <rect width="32" height="32" fill="white"/>
-                                    </clipPath>
+                                        <clipPath id="clip0_1103_812">
+                                            <rect width="32" height="32" fill="white" />
+                                        </clipPath>
                                     </defs>
                                 </svg>
                             </button>
                         </div>
                         <p class="tint-info">
-                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
+                            <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+                            </svg>
                             Fade low brightness pixels. Useful for printing on non-white paper.
                         </p>
                     </div>
@@ -3395,7 +3535,7 @@
             </div>
         </div>
         <div id="customTemplate" class="custom">
-            <input type="file" id="upload"/>
+            <input type="file" id="upload" />
             <select id="customGridType">
                 <option>inch</option>
                 <option>cm</option>
@@ -3403,7 +3543,8 @@
         </div>
         <div>
             <div style="display: flex;gap:0.5rem;align-items: center">
-                <label style="white-space: pre;flex:1;"><input type="checkbox" id="enablePageNumbers" checked /> Page Numbers</label>
+                <label style="white-space: pre;flex:1;"><input type="checkbox" id="enablePageNumbers" checked /> Page
+                    Numbers</label>
                 <div id="font"></div>
             </div>
             <label>
@@ -3460,14 +3601,22 @@
                     </select>
                 </div>
                 <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
-                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                    Hold your print up to the light. If the front is offset to the right use a negative value. Reprint to verify.
+                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                            d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+                    </svg>
+                    Hold your print up to the light. If the front is offset to the right use a negative value. Reprint
+                    to verify.
                 </div>
                 <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
-                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16" /></svg>
-                    Not all paper is exactly 8.5in width, so this could vary if the cover or inner is using different paper!
+                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16" />
+                    </svg>
+                    Not all paper is exactly 8.5in width, so this could vary if the cover or inner is using different
+                    paper!
                 </div>
-                <div style="display: flex; gap: 1rem; padding-top: 0.75rem;margin-top:0.75rem;border-top: 2px solid #999;">
+                <div
+                    style="display: flex; gap: 1rem; padding-top: 0.75rem;margin-top:0.75rem;border-top: 2px solid #999;">
                     <label for="innerOffset" style="white-space: pre;">Inner Offset</label>
                     <select id="innerOffset">
                         <option value="1">1; Office 24lb, 90gsm</option>
@@ -3478,8 +3627,12 @@
                     </select>
                 </div>
                 <div style="color:#666; line-height: 1.2rem;margin-block-start: 0.5rem;">
-                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg>
-                    Nesting pages causes a gradual offset due to the paper thickness. Ensure inner pages are nested in order.
+                    <svg style="width:1rem;transform:translateY(2px)" viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                            d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+                    </svg>
+                    Nesting pages causes a gradual offset due to the paper thickness. Ensure inner pages are nested in
+                    order.
                 </div>
             </fieldset>
             <fieldset style="margin-block-start: 1rem;border: 2px solid #999;border-radius: 0.5rem;">
@@ -3494,43 +3647,74 @@
                     <div class="editor-column">
                         <div class="editor-row editor-presets">
                             <select id="presetSelect" disabled></select>
-                            <button id="presetAdd" class="editor-preset-add"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg></button>
-                            <button id="presetCopy" class="editor-preset-copy"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg></button>
+                            <button id="presetAdd" class="editor-preset-add"><svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;">
+                                    <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                </svg></button>
+                            <button id="presetCopy" class="editor-preset-copy"><svg xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;">
+                                    <path fill="currentColor"
+                                        d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                                </svg></button>
                             <div class="editor-preset-menu">
                                 <button class="editor-preset-menu-button" id="presetMenu">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path fill="currentColor" d="M18,9V10.5L12,16.5L6,10.5V9H18M12,13.67L14.67,11H9.33L12,13.67Z" /></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                        style="width:1rem;height:1rem;vertical-align:text-bottom;">
+                                        <path fill="currentColor"
+                                            d="M18,9V10.5L12,16.5L6,10.5V9H18M12,13.67L14.67,11H9.33L12,13.67Z" />
+                                    </svg>
                                 </button>
                                 <div id="presetMenuItems" class="editor-preset-menu-list hide">
                                     <div class="editor-preset-menu-items">
                                         <button id="presetRename" class="editor-preset-menu-item">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;">
+                                                <path fill="currentColor"
+                                                    d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20Z" />
+                                            </svg>
                                             <span>Rename</span>
                                         </button>
                                         <div class="editor-preset-menu-seperator"></div>
                                         <button id="presetImport" class="editor-preset-menu-item">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H18C19.11 22 20 21.11 20 20V8L14 2M18 20H6V4H13V9H18V20M15 11.93V19H7.93L10.05 16.88L7.22 14.05L10.05 11.22L12.88 14.05L15 11.93Z" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;">
+                                                <path fill="currentColor"
+                                                    d="M14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H18C19.11 22 20 21.11 20 20V8L14 2M18 20H6V4H13V9H18V20M15 11.93V19H7.93L10.05 16.88L7.22 14.05L10.05 11.22L12.88 14.05L15 11.93Z" />
+                                            </svg>
                                             <span>Import</span>
                                         </button>
                                         <button id="presetExport" class="editor-preset-menu-item">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2M18 20H6V4H13V9H18V20M16 11V18.1L13.9 16L11.1 18.8L8.3 16L11.1 13.2L8.9 11H16Z" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;">
+                                                <path fill="currentColor"
+                                                    d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2M18 20H6V4H13V9H18V20M16 11V18.1L13.9 16L11.1 18.8L8.3 16L11.1 13.2L8.9 11H16Z" />
+                                            </svg>
                                             <span>Export</span>
                                         </button>
                                         <div class="editor-preset-menu-seperator"></div>
                                         <button id="presetRemove" class="editor-preset-menu-item">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;"><path fill="currentColor" id="presetRemoveIcon" d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" /></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                style="width:1.5rem;height:1.5rem;vertical-align:text-bottom;">
+                                                <path fill="currentColor" id="presetRemoveIcon"
+                                                    d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z" />
+                                            </svg>
                                             <span id="presetRemoveText">Remove</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div id="presetNameWrapper" class="editor-preset-rename hide">
-                                <input id="presetName" class="editor-name" type="text" placeholder="Preset Name"/>
+                                <input id="presetName" class="editor-name" type="text" placeholder="Preset Name" />
                             </div>
                         </div>
                     </div>
                     <div class="editor-wrapper">
                         <div class="editor-header-hideshow">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1rem;height:1rem;vertical-align:text-bottom;"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                style="width:1rem;height:1rem;vertical-align:text-bottom;">
+                                <path
+                                    d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" />
+                            </svg>
                         </div>
                         <div class="editor-header-text">
                             Text Items
@@ -3556,17 +3740,23 @@
             <h3>How to Print</h3>
             <p>Start by printing the cover page, then decide if your notebook pages will have page numbers.</p>
             <h4>Without Page Numbers</h4>
-            <p>Since there are no page numbers each inner sheet will have a standard front and back. Print an info page on the cover back or any template.</p>
+            <p>Since there are no page numbers each inner sheet will have a standard front and back. Print an info page
+                on the cover back or any template.</p>
             <h4>With Page Numbers</h4>
             <p>Use the page selection tool to correctly mark the pages then print them.</p>
             <h3>Page</h3>
             <ul>
-                <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+ (199gsm) Cardstock paper recommended.</li>
-                <li><strong>Detail (Cover Back)</strong> - Optional informational page. This is preferred when the inner pages use a different paper stock. If this is not the case then print the inner page on the back of the cover page.</li>
-                <li><strong>Inner</strong> - This paper stock can vary depending on the usage. 65lb is common. Too many pages can cause a notebook to be difficult to close or staple.</li>
+                <li><strong>Cover</strong> - Front page is the right side and left the back of the booklet. 110lb+
+                    (199gsm) Cardstock paper recommended.</li>
+                <li><strong>Detail (Cover Back)</strong> - Optional informational page. This is preferred when the inner
+                    pages use a different paper stock. If this is not the case then print the inner page on the back of
+                    the cover page.</li>
+                <li><strong>Inner</strong> - This paper stock can vary depending on the usage. 65lb is common. Too many
+                    pages can cause a notebook to be difficult to close or staple.</li>
             </ul>
             <h3>Text Overlays</h3>
-            <p>Some templates ship with presets. These presets can be fully modified. You might also want to pull in dynamic data.</p>
+            <p>Some templates ship with presets. These presets can be fully modified. You might also want to pull in
+                dynamic data.</p>
             <ul>
                 <li><code>{pageNumber}</code> Current page number based on the left or right page placement.</li>
                 <li><code>{pageIndex}</code> Page index</li>
@@ -3585,11 +3775,14 @@
             <h4>Import</h4>
             <p>All imported text overlays will be stored as a new user defined entry.</p>
             <h4>Remove / Revert</h4>
-            <p>Changes to text overlay presets can be reverted back to the template default. Additionally any user defined text overlays can be removed.</p>
-            <hr/>
+            <p>Changes to text overlay presets can be reverted back to the template default. Additionally any user
+                defined text overlays can be removed.</p>
+            <hr />
             <h2>Source Code</h2>
-            <p><a href="https://github.com/Templarian/journal-generator">https://github.com/Templarian/journal-generator</a></p>
-            <hr/>
+            <p><a
+                    href="https://github.com/Templarian/journal-generator">https://github.com/Templarian/journal-generator</a>
+            </p>
+            <hr />
             <h3>Clear Cache</h3>
             <p>If something is not working. Note this resets all text and configs.</p>
             <button id="clearCache">Clear Cache</button>
