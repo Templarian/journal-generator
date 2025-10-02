@@ -1350,7 +1350,8 @@
             });
         }
         // Keep track of selected page
-        let currentIndex = 0;
+        // start at -1 to fully rerender 0
+        let currentIndex = -1;
         // Keep track of pages metaData
         let pages = [];
         // Google Fonts
@@ -1404,7 +1405,7 @@
             value: '160:102:28',
             label: 'Light Brown'
         }, {
-            value: '3:169:244',
+            value: '148:170:243',
             label: 'Blue Print'
         }];
         // Fonts
@@ -2859,11 +2860,13 @@
                 numPage.classList.add('page-number');
                 pEle.appendChild(numPage);
                 pEle.addEventListener('click', () => {
-                    // Update template list
-                    if (currentIndex !== page.index) {
-                        // Update templates list
-                        updateTemplateList(page.index);
+                    if (currentIndex === page.index) {
+                        return;
                     }
+                    // Update global page index
+                    currentIndex = page.index;
+                    // Update templates list
+                    updateTemplateList(page.index);
                     // Update page numbers
                     document.getElementById('print').textContent = `Print '${page.name}'`;
                     pageEles.forEach(pEle => pEle.classList.remove('selected'));
@@ -2880,17 +2883,13 @@
                         pageNumberEle.textContent = `${page.name}${isEnabled ? ` of ${totalPages + 1} Pages` : ''}`;
                     }
                     updateTemplate(page.index);
-                    if (currentIndex !== page.index) {
-                        currentIndex = page.index;
-                        if (page.index === 0) {
-                            document.getElementById('typeCover').click();
-                        } else if (page.index === 1) {
-                            document.getElementById('typeDetail').click();
-                        } else {
-                            document.getElementById('typeInner').click();
-                        }
+                    if (page.index === 0) {
+                        document.getElementById('typeCover').click();
+                    } else if (page.index === 1) {
+                        document.getElementById('typeDetail').click();
+                    } else {
+                        document.getElementById('typeInner').click();
                     }
-                    currentIndex = page.index;
                     // Update Paper Color, cover vs inner
                     updatePaperColor(getLocalStoragePaperColor());
                     updateTint();
@@ -2899,7 +2898,9 @@
                 pageSelect.appendChild(pEle);
                 pageEles.push(pEle);
             });
-            if (currentIndex < pageSelect.children.length) {
+            if (currentIndex === -1) {
+                pageSelect.children[0].click();
+            } else if (currentIndex < pageSelect.children.length) {
                 pageSelect.children[currentIndex].click();
             } else {
                 pageSelect.firstChild.click();
@@ -3323,7 +3324,7 @@
                 const preset = getPresetByUuid(id);
                 addUserDefinedPreset({
                     value: uuid(),
-                    label: preset.label,
+                    label: `${preset.label} (Copy)`,
                     nodes: structuredClone(preset.nodes)
                 });
                 updateTemplatePresets();
