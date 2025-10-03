@@ -2759,7 +2759,7 @@
                 customGridTypeEle.value = localStorage.getItem('innerGridType') ?? 'inch';
             }
             // Update Tint Selection
-
+            updateTint();
             // Custom list
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
