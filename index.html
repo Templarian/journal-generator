@@ -1605,6 +1605,27 @@
             }
             return -1;
         }
+        function setLocalStorageOpacity(value) {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:opacity`;
+            if (value === -1) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, `${value}`);
+            }
+        }
+        function getLocalStorageOpacity() {
+            const type = getCurrentType();
+            const template = getTemplate();
+            const templateKey = template ? template.value : 'custom';
+            const key = `${type}:${templateKey}:opacity`;
+            if (localStorage.getItem(key)) {
+                return localStorage.getItem(key);
+            }
+            return 1;
+        }
         /**
          * Pull user defined from localstorage
          */
@@ -2264,6 +2285,11 @@
                 .replace('{dayPadded}', dayPadded)
                 .replace('{index}', index);
         }
+        function updateOpacity() {
+            const opacityEle = document.getElementById('templateOpacity');
+            const opacity = getLocalStorageOpacity();
+            opacityEle.value = opacity;
+        }
         function updateTint() {
             const tintNoneEle = document.getElementById('tintNone');
             const tintCustomEle = document.getElementById('tintCustom');
@@ -2760,6 +2786,8 @@
             }
             // Update Tint Selection
             updateTint();
+            updateOpacity();
+            updateFade();
             // Custom list
             customTemplateEle.classList.toggle('hide', template !== 'custom');
             templateEle.classList.toggle('custom', template === 'custom');
@@ -3635,6 +3663,20 @@
                             </svg>
                             Provided tints are tested, but will vary by each printer's color profile.
                         </p>
+                        <div style="border-top: 1px solid #999;padding-top: 0.5rem;margin-top: 0.5rem;">
+                            <select id="templateOpacity">
+                                <option value="1.0">Opacity 100%</option>
+                                <option value="0.9">Opacity 90%</option>
+                                <option value="0.8">Opacity 80%</option>
+                                <option value="0.7">Opacity 70%</option>
+                                <option value="0.6">Opacity 60%</option>
+                                <option value="0.5">Opacity 50%</option>
+                                <option value="0.4">Opacity 40%</option>
+                                <option value="0.3">Opacity 30%</option>
+                                <option value="0.2">Opacity 20%</option>
+                                <option value="0.1">Opacity 10%</option>
+                            </select>
+                        </div>
                         <div class="fade" id="fade">
                             <button data-index="-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
