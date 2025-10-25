@@ -37,6 +37,19 @@ For templates with dynamic text use the export accessible from the dropdown to g
 
 All built-in templates are stored in black and white. Templates must have a base color of hex #AAA or RGB 170, 170, 170.
 
+## Detail / Inner Page Opacity
+
+- 75% Opacity
+  - Text
+  - Checkbox Squares
+- 50% Opacity
+  - Dots / Lines
+  - Drawing guidance lines
+- 25% Opacity
+  - Secondary drawing guidance lines
+  - Symbols or Info Boxes
+  - Watermarks
+
 ### Tint
 
 Use the tint feature to shift the color profile to the newly selected color.
@@ -64,3 +77,26 @@ To develop, use node to or any service to startup a local http server.
 ```bash
 npx http-server
 ```
+
+## Specific Paper
+
+What paper should I use? To make this easy I'll simply say [Field Notes](https://fieldnotesbrand.com/) knows more about paper than I'll ever be able to explain. As someone that owns hundreds of their notebooks I'll recommend doing the same and decide which is your favorite that way. The specification tab or the back of the notebook will list the paper used.
+
+While the official supplier may not ship to an individual you can usually find it through a larger seller. Not all paper comes in letter size unfortantly, so if you don't have a paper cutter it might not be an option.
+
+### Cover
+
+[Packing Brown Wrap Cardstock (Dur-O-Tone, Cover Weight)](https://www.frenchpaper.com/products/packing-brown-wrap-cardstock-dur-o-tone-cover?variant=39835421245619)
+> If you like [Field Notes](https://fieldnotesbrand.com/products/original-kraft) this is the same paper. This is not the same as craft paper and will print in a inkjet printer!
+
+### Inner
+
+There are two types of paper you'll be looking at.
+- Text - This is your standard copy paper.
+- Writing - This paper has a bit more texture, but is difficult to find as it usually comes in non-letter sized and has to be cut down.
+
+[Smooth, 96 Bright White Paper (Finch Opaque Digital, Text Weight)](https://www.frenchpaper.com/products/smooth-96-white-paper-finch-opaque-digital-text-weight)
+> This is almost always sold out, but is also what [Field Notes](https://fieldnotesbrand.com/products/original-kraft) uses.
+
+HP Paper - BrightWhite 24 lb 100 Bright
+> You want 96 or 100 Bright White at 24 lb or 60 lb text.
